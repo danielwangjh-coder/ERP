@@ -79,7 +79,6 @@
         submenuItem.title = second.label;
         submenuItem.classList.toggle("current", selectedSecondId() === second.id);
         submenuItem.append(create("span", "submenu-title", second.label));
-        if (Array.isArray(second.groups)) submenuItem.append(create("span", "submenu-arrow"));
 
         submenuItem.addEventListener("click", (event) => {
           event.stopPropagation();
