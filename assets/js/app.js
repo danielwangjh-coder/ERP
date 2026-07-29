@@ -13,9 +13,13 @@
   const emptyView = document.getElementById("emptyView");
   const emptyDescription = document.getElementById("emptyDescription");
   const pageFrame = document.getElementById("pageFrame");
+  const workspaceTabs = document.getElementById("workspaceTabs");
+  const workspaceTabsNav = document.getElementById("workspaceTabsNav");
+  const workspaceTabsActiveBar = document.getElementById("workspaceTabsActiveBar");
 
   const openModules = new Set(["supply-chain-management"]);
   const flatItems = [];
+  const openTabs = [];
   let currentItem = null;
   let activeThirdMenu = null;
 
@@ -183,6 +187,85 @@
     renderSidebar();
   }
 
+  function workspaceTabLabel(item) {
+    if (!item.menuRoute && item.page && Array.isArray(item.views) && item.views.length) {
+      return item.label + "列表";
+    }
+    return item.label;
+  }
+
+  function ensureWorkspaceTab(item) {
+    if (!item) return;
+    const existingTab = openTabs.find((tab) => tab.route === item.route);
+    if (existingTab) {
+      existingTab.item = item;
+      return;
+    }
+    openTabs.push({
+      route: item.route,
+      label: workspaceTabLabel(item),
+      item
+    });
+  }
+
+  function registerWorkspaceRoute(item) {
+    if (item.menuRoute) {
+      const listItem = flatItems.find((candidate) => !candidate.menuRoute && candidate.route === item.menuRoute);
+      ensureWorkspaceTab(listItem);
+    }
+    ensureWorkspaceTab(item);
+  }
+
+  function positionWorkspaceActiveBar() {
+    const activeTab = workspaceTabsNav.querySelector(".workspace-tab.active");
+    if (!activeTab) {
+      workspaceTabsActiveBar.style.width = "0";
+      return;
+    }
+    workspaceTabsActiveBar.style.width = activeTab.offsetWidth + "px";
+    workspaceTabsActiveBar.style.transform = "translateX(" + activeTab.offsetLeft + "px)";
+
+    const activeLeft = activeTab.offsetLeft;
+    const activeRight = activeLeft + activeTab.offsetWidth;
+    if (activeLeft < workspaceTabs.scrollLeft) workspaceTabs.scrollLeft = activeLeft;
+    if (activeRight > workspaceTabs.scrollLeft + workspaceTabs.clientWidth) {
+      workspaceTabs.scrollLeft = activeRight - workspaceTabs.clientWidth;
+    }
+  }
+
+  function renderWorkspaceTabs() {
+    workspaceTabsNav.querySelectorAll(".workspace-tab").forEach((tab) => tab.remove());
+    openTabs.forEach((tab) => {
+      const tabButton = create("button", "workspace-tab", tab.label);
+      const isActive = currentItem && currentItem.route === tab.route;
+      tabButton.type = "button";
+      tabButton.id = "workspace-tab-" + tab.item.id;
+      tabButton.title = tab.label;
+      tabButton.setAttribute("role", "tab");
+      tabButton.setAttribute("aria-selected", String(isActive));
+      tabButton.tabIndex = isActive ? 0 : -1;
+      tabButton.classList.toggle("active", isActive);
+      tabButton.addEventListener("click", () => navigateTo(tab.item));
+      workspaceTabsNav.append(tabButton);
+    });
+    window.requestAnimationFrame(positionWorkspaceActiveBar);
+  }
+
+  function syncDetailTabLabel(frameDocument) {
+    if (!currentItem || !currentItem.menuRoute) return;
+    const sourceActiveTab = frameDocument.querySelector(".page-tabs .page-tab.active, .page-tabs .page-tab.is-active");
+    if (!sourceActiveTab) return;
+    const sourceLabel = Array.from(sourceActiveTab.childNodes)
+      .filter((node) => node.nodeType === Node.TEXT_NODE)
+      .map((node) => node.textContent)
+      .join("")
+      .trim();
+    const currentTab = openTabs.find((tab) => tab.route === currentItem.route);
+    if (!sourceLabel || !currentTab || currentTab.label === sourceLabel) return;
+    currentTab.label = sourceLabel;
+    renderWorkspaceTabs();
+  }
+
   function bindEmbeddedPageNavigation(frameDocument) {
     if (!currentItem || currentItem.menuRoute) return;
     const detailItem = flatItems.find((item) => item.menuRoute === currentItem.route);
@@ -217,13 +300,14 @@
         const style = frameDocument.createElement("style");
         style.id = "erp-demo-embedded-style";
         style.textContent = [
-          ".topbar,.sidebar,.third-menu-panel{display:none!important}",
+          ".topbar,.sidebar,.third-menu-panel,.page-tabs{display:none!important}",
           ".srm-prototype{min-width:0!important;border:0!important}",
           ".layout{min-height:0!important}",
           "html,body{margin:0!important;background:#fff!important}"
         ].join("");
         frameDocument.head.append(style);
       }
+      syncDetailTabLabel(frameDocument);
       bindEmbeddedPageNavigation(frameDocument);
     } catch (error) {
       console.info("Embedded page styling was not injected.", error);
@@ -233,8 +317,10 @@
   function renderPage(item) {
     currentItem = item;
     openModules.add(item.module.id);
+    registerWorkspaceRoute(item);
     document.title = item.label + " - SmartOne ERP Demo";
     renderSidebar();
+    renderWorkspaceTabs();
 
     if (item.page) {
       emptyView.hidden = true;
@@ -278,6 +364,7 @@
   thirdMenuMask.addEventListener("click", closeThirdMenu);
   pageFrame.addEventListener("load", prepareEmbeddedPage);
   window.addEventListener("hashchange", handleRouteChange);
+  window.addEventListener("resize", positionWorkspaceActiveBar);
 
   window.PrototypeKit && window.PrototypeKit.init(document);
   handleRouteChange();

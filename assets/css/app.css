@@ -642,15 +642,79 @@ button {
   position: relative;
   min-width: 0;
   flex: 1;
-  overflow-x: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   background: #f7f8fa;
+}
+
+.workspace-tabs {
+  width: 100%;
+  height: 40px;
+  flex: 0 0 40px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  border-bottom: 1px solid #e4e7ed;
+  background: #ffffff;
+  scrollbar-width: thin;
+}
+
+.workspace-tabs-nav {
+  position: relative;
+  z-index: 2;
+  width: max-content;
+  min-width: 100%;
+  height: 40px;
+  display: inline-flex;
+  align-items: stretch;
+  white-space: nowrap;
+}
+
+.workspace-tabs-active-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 0;
+  height: 2px;
+  background: var(--primary);
+  transition: transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1), width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.workspace-tab {
+  position: relative;
+  z-index: 2;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 0;
+  color: #303133;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 40px;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.3s;
+}
+
+.workspace-tab:hover,
+.workspace-tab:focus-visible,
+.workspace-tab.active {
+  outline: 0;
+  color: var(--primary);
 }
 
 .page-stage {
   position: relative;
   width: 100%;
-  height: 100%;
+  min-height: 0;
   min-width: 780px;
+  flex: 1;
   overflow: hidden;
   background: #ffffff;
 }
