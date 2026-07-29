@@ -233,19 +233,67 @@
     }
   }
 
+  function showEmptyWorkspace() {
+    currentItem = null;
+    document.title = "SmartOne ERP Demo";
+    pageFrame.hidden = true;
+    pageFrame.removeAttribute("src");
+    emptyView.hidden = false;
+    emptyDescription.textContent = "请从左侧菜单打开页面";
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    renderSidebar();
+    renderWorkspaceTabs();
+  }
+
+  function closeWorkspaceTab(route) {
+    const tabIndex = openTabs.findIndex((tab) => tab.route === route);
+    if (tabIndex < 0) return;
+    const wasActive = currentItem && currentItem.route === route;
+    openTabs.splice(tabIndex, 1);
+
+    if (!wasActive) {
+      renderWorkspaceTabs();
+      return;
+    }
+
+    const replacementTab = openTabs[Math.min(tabIndex, openTabs.length - 1)];
+    if (replacementTab) {
+      navigateTo(replacementTab.item);
+      return;
+    }
+    showEmptyWorkspace();
+  }
+
   function renderWorkspaceTabs() {
     workspaceTabsNav.querySelectorAll(".workspace-tab").forEach((tab) => tab.remove());
     openTabs.forEach((tab) => {
-      const tabButton = create("button", "workspace-tab", tab.label);
+      const tabButton = create("div", "workspace-tab");
+      const tabLabel = create("span", "workspace-tab-label", tab.label);
+      const closeButton = create("button", "workspace-tab-close");
       const isActive = currentItem && currentItem.route === tab.route;
-      tabButton.type = "button";
       tabButton.id = "workspace-tab-" + tab.item.id;
       tabButton.title = tab.label;
       tabButton.setAttribute("role", "tab");
+      tabButton.setAttribute("aria-label", tab.label);
       tabButton.setAttribute("aria-selected", String(isActive));
       tabButton.tabIndex = isActive ? 0 : -1;
       tabButton.classList.toggle("active", isActive);
       tabButton.addEventListener("click", () => navigateTo(tab.item));
+      tabButton.addEventListener("keydown", (event) => {
+        if (event.target !== tabButton || (event.key !== "Enter" && event.key !== " ")) return;
+        event.preventDefault();
+        navigateTo(tab.item);
+      });
+
+      closeButton.type = "button";
+      closeButton.title = "关闭";
+      closeButton.setAttribute("aria-label", "关闭" + tab.label);
+      closeButton.tabIndex = isActive ? 0 : -1;
+      closeButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        closeWorkspaceTab(tab.route);
+      });
+      tabButton.append(tabLabel, closeButton);
       workspaceTabsNav.append(tabButton);
     });
     window.requestAnimationFrame(positionWorkspaceActiveBar);
@@ -292,6 +340,54 @@
     });
   }
 
+  function prepareEmbeddedListPage(frameDocument) {
+    const listToolbar = frameDocument.querySelector(".list-toolbar");
+    if (!listToolbar) return;
+
+    if (!frameDocument.getElementById("erp-demo-prototype-kit-style")) {
+      const kitStyle = frameDocument.createElement("link");
+      kitStyle.id = "erp-demo-prototype-kit-style";
+      kitStyle.rel = "stylesheet";
+      kitStyle.href = "assets/vendor/prototype-kit.css";
+      frameDocument.head.append(kitStyle);
+    }
+
+    listToolbar.querySelectorAll("button:not(.primary)").forEach((button) => {
+      if (button.dataset.erpDemoPrototypeKitButton) return;
+      button.dataset.erpDemoPrototypeKitButton = "true";
+      const label = button.textContent.trim();
+      const isDropdown = button.classList.contains("dropdown");
+      button.classList.remove("btn", "dropdown", "list-icon-btn");
+      button.type = "button";
+
+      if (label === "列展示" || label === "全屏") {
+        button.classList.add("pk-grid-icon-btn");
+        button.textContent = label === "列展示" ? "☰" : "⛶";
+        button.title = label;
+        button.setAttribute("aria-label", label);
+        return;
+      }
+
+      if (isDropdown) {
+        const labelElement = frameDocument.createElement("span");
+        const caretElement = frameDocument.createElement("span");
+        labelElement.textContent = label;
+        caretElement.className = "pk-toolbar-dropdown-caret";
+        button.replaceChildren(labelElement, caretElement);
+        button.classList.add("pk-toolbar-dropdown-trigger");
+        button.setAttribute("aria-haspopup", "true");
+        button.setAttribute("aria-expanded", "false");
+        return;
+      }
+
+      button.classList.add("pk-toolbar-btn");
+    });
+
+    frameDocument.querySelectorAll(".purchase-list-table tbody tr.active-row").forEach((row) => {
+      row.classList.remove("active-row");
+    });
+  }
+
   function prepareEmbeddedPage() {
     try {
       const frameDocument = pageFrame.contentDocument;
@@ -306,6 +402,9 @@
         style.id = "erp-demo-embedded-style";
         style.textContent = [
           ".topbar,.sidebar,.third-menu-panel,.page-tabs{display:none!important}",
+          ".list-toolbar{border-bottom:0!important}",
+          ".purchase-list-table tbody td.link-blue{color:#409eff!important}",
+          ".purchase-list-table tbody tr:hover td{background:#e6f7ff!important}",
           ".srm-prototype{min-width:0!important;border:0!important}",
           ".layout{min-height:0!important}",
           "html,body{margin:0!important;background:#fff!important}"
@@ -313,6 +412,7 @@
         frameDocument.head.append(style);
       }
       syncDetailTabLabel(frameDocument);
+      prepareEmbeddedListPage(frameDocument);
       bindEmbeddedPageNavigation(frameDocument);
     } catch (error) {
       console.info("Embedded page styling was not injected.", error);

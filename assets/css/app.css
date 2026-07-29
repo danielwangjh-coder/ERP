@@ -688,7 +688,7 @@ button {
   height: 40px;
   display: inline-flex;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 12px 0 20px;
   border: 0;
   border-radius: 0;
   color: #303133;
@@ -707,6 +707,52 @@ button {
 .workspace-tab.active {
   outline: 0;
   color: var(--primary);
+}
+
+.workspace-tab-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.workspace-tab-close {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #c0c4cc;
+  background: transparent;
+  font-size: 12px;
+  line-height: 14px;
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s, opacity 0.15s;
+}
+
+.workspace-tab-close::before {
+  content: "×";
+  transform: scale(0.9);
+}
+
+.workspace-tab:hover .workspace-tab-close,
+.workspace-tab.active .workspace-tab-close,
+.workspace-tab-close:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.workspace-tab-close:hover,
+.workspace-tab-close:focus-visible {
+  outline: 0;
+  color: #ffffff;
+  background: #c0c4cc;
 }
 
 .page-stage {
