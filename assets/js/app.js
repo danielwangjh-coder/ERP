@@ -183,19 +183,48 @@
     renderSidebar();
   }
 
+  function bindEmbeddedPageNavigation(frameDocument) {
+    if (!currentItem || currentItem.menuRoute) return;
+    const detailItem = flatItems.find((item) => item.menuRoute === currentItem.route);
+    if (!detailItem) return;
+
+    const navigateToDetail = () => navigateTo(detailItem);
+    const newButton = frameDocument.querySelector(".list-toolbar-left .btn.primary");
+    if (newButton && !newButton.dataset.erpDemoDetailNavigation) {
+      newButton.dataset.erpDemoDetailNavigation = "true";
+      newButton.addEventListener("click", navigateToDetail);
+    }
+
+    frameDocument.querySelectorAll(".purchase-list-table tbody .link-blue").forEach((documentCode) => {
+      if (documentCode.dataset.erpDemoDetailNavigation) return;
+      documentCode.dataset.erpDemoDetailNavigation = "true";
+      documentCode.setAttribute("role", "link");
+      documentCode.setAttribute("tabindex", "0");
+      documentCode.addEventListener("click", navigateToDetail);
+      documentCode.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        navigateToDetail();
+      });
+    });
+  }
+
   function prepareEmbeddedPage() {
     try {
       const frameDocument = pageFrame.contentDocument;
-      if (!frameDocument || frameDocument.getElementById("erp-demo-embedded-style")) return;
-      const style = frameDocument.createElement("style");
-      style.id = "erp-demo-embedded-style";
-      style.textContent = [
-        ".topbar,.sidebar,.third-menu-panel{display:none!important}",
-        ".srm-prototype{min-width:0!important;border:0!important}",
-        ".layout{min-height:0!important}",
-        "html,body{margin:0!important;background:#fff!important}"
-      ].join("");
-      frameDocument.head.append(style);
+      if (!frameDocument) return;
+      if (!frameDocument.getElementById("erp-demo-embedded-style")) {
+        const style = frameDocument.createElement("style");
+        style.id = "erp-demo-embedded-style";
+        style.textContent = [
+          ".topbar,.sidebar,.third-menu-panel{display:none!important}",
+          ".srm-prototype{min-width:0!important;border:0!important}",
+          ".layout{min-height:0!important}",
+          "html,body{margin:0!important;background:#fff!important}"
+        ].join("");
+        frameDocument.head.append(style);
+      }
+      bindEmbeddedPageNavigation(frameDocument);
     } catch (error) {
       console.info("Embedded page styling was not injected.", error);
     }
