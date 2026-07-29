@@ -527,14 +527,14 @@ button {
 
 .third-menu-shell .menu-content {
   display: grid;
-  grid-template-columns: repeat(3, 220px);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: start;
   gap: 6px 30px;
   padding: 10px 0 0 28px;
 }
 
 .third-menu-shell .menu-list-wrap {
-  width: 220px;
+  width: 100%;
   min-height: 28px;
   display: flex;
   align-items: flex-start;
