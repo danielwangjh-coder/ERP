@@ -50,11 +50,16 @@
 
   function renderSidebar() {
     sidebarMenu.replaceChildren();
+    const activeModuleId = activeThirdMenu
+      ? activeThirdMenu.module.id
+      : currentItem && currentItem.module
+        ? currentItem.module.id
+        : "";
 
     menuData.forEach((module) => {
       const section = create("div", "menu-section");
       const isOpen = openModules.has(module.id);
-      const isActive = currentItem && currentItem.module.id === module.id;
+      const isActive = activeModuleId === module.id;
       section.classList.toggle("open", isOpen);
 
       const menuItem = create("button", "menu-item");
