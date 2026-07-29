@@ -996,8 +996,8 @@
 
   .reference-popover {
     position: absolute;
-    width: 960px;
-    min-width: 640px;
+    width: auto;
+    min-width: min(320px, calc(100vw - 24px));
     max-width: calc(100vw - 24px);
     min-height: 213px;
     margin-top: 12px;
@@ -4155,7 +4155,7 @@
         sourceType: {
           columns: [
             { key: "seq", label: "序号", width: "70px" },
-            { key: "name", label: "类型名" },
+            { key: "name", label: "类型名", width: "220px" },
           ],
           rows: [
             { seq: "1", name: "手工创建" },
@@ -4168,7 +4168,7 @@
         businessType: {
           columns: [
             { key: "seq", label: "序号", width: "70px" },
-            { key: "name", label: "类型名称", width: "560px" },
+            { key: "name", label: "类型名称", width: "220px" },
           ],
           rows: [
             { seq: "1", name: "默认类型" },
@@ -4307,11 +4307,20 @@
         activeReferenceTrigger = null;
       };
 
-      const positionReferencePopover = function () {
+      const getReferencePopoverWidth = function (config) {
+        const contentWidth = config.columns.reduce((total, column) => {
+          const columnWidth = parseFloat(column.width);
+          return total + (Number.isFinite(columnWidth) ? columnWidth : 180);
+        }, 0) + 26;
+        return Math.min(Math.max(320, contentWidth), 960, document.documentElement.clientWidth - 24);
+      };
+
+      const positionReferencePopover = function (config) {
         if (!activeReferenceTrigger) return;
         const triggerRect = activeReferenceTrigger.getBoundingClientRect();
-        const popoverWidth = referencePopover.offsetWidth || 680;
+        const popoverWidth = getReferencePopoverWidth(config);
         const viewportWidth = document.documentElement.clientWidth;
+        referencePopover.style.width = popoverWidth + "px";
         const left = Math.max(0, Math.min(triggerRect.left, viewportWidth - popoverWidth - 8));
         const top = triggerRect.bottom + window.scrollY;
         referencePopover.style.left = left + window.scrollX + "px";
@@ -4371,7 +4380,7 @@
         referencePopover.classList.remove("hidden");
         referencePopover.setAttribute("aria-hidden", "false");
         referenceTriggers.forEach((item) => item.setAttribute("aria-expanded", item === trigger ? "true" : "false"));
-        positionReferencePopover();
+        positionReferencePopover(config);
       };
 
       referenceTriggers.forEach((trigger) => {

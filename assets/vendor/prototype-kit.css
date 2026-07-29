@@ -2186,8 +2186,8 @@
 
 .pk-reference-popover {
   position: fixed;
-  width: 960px;
-  min-width: 640px;
+  width: auto;
+  min-width: min(320px, calc(100vw - 24px));
   max-width: calc(100vw - 24px);
   min-height: 213px;
   display: none;

@@ -192,7 +192,7 @@
         valueKey: "name",
         columns: [
           { key: "seq", label: "序号", width: "70px" },
-          { key: "name", label: "类型名称", width: "560px" }
+          { key: "name", label: "类型名称", width: "220px" }
         ],
         rows: [
           { seq: "1", name: "手工创建" },
@@ -203,7 +203,7 @@
         valueKey: "name",
         columns: [
           { key: "seq", label: "序号", width: "70px" },
-          { key: "name", label: "类型名称", width: "560px" }
+          { key: "name", label: "类型名称", width: "220px" }
         ],
         rows: [
           { seq: "1", name: "默认类型" }
@@ -415,9 +415,18 @@
       ].join("");
     };
 
-    var positionPopover = function (trigger) {
+    var getPopoverWidth = function (trigger, config) {
+      var maxWidth = trigger.closest(".pk-table-sample") ? 860 : 960;
+      var contentWidth = config.columns.reduce(function (total, column) {
+        var columnWidth = parseFloat(column.width);
+        return total + (isFinite(columnWidth) ? columnWidth : 180);
+      }, 0) + 26;
+      return Math.min(Math.max(320, contentWidth), maxWidth, window.innerWidth - 24);
+    };
+
+    var positionPopover = function (trigger, config) {
       var rect = trigger.getBoundingClientRect();
-      var width = Math.min(trigger.closest(".pk-table-sample") ? 860 : 960, window.innerWidth - 24);
+      var width = getPopoverWidth(trigger, config);
       var left = Math.max(12, Math.min(rect.left, window.innerWidth - width - 12));
       var top = rect.bottom + 12;
       popover.style.width = width + "px";
@@ -440,8 +449,10 @@
         var open = trigger.getAttribute("aria-expanded") !== "true";
         closeReferencePopover();
         if (!open) return;
+        var key = trigger.getAttribute("data-pk-reference-trigger");
+        var config = referenceData[key] || referenceData.customer;
         renderPopover(trigger);
-        positionPopover(trigger);
+        positionPopover(trigger, config);
         popover.classList.add("is-open");
         popover.setAttribute("aria-hidden", "false");
         trigger.setAttribute("aria-expanded", "true");
