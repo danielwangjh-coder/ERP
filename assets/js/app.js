@@ -296,11 +296,17 @@
     try {
       const frameDocument = pageFrame.contentDocument;
       if (!frameDocument) return;
+      // Copied source files can contain BOM text nodes that render as an empty line.
+      Array.from(frameDocument.body.childNodes).forEach((node) => {
+        if (node.nodeType !== 3 || !node.textContent.includes("\uFEFF")) return;
+        if (node.textContent.replace(/\uFEFF/g, "").trim() === "") node.remove();
+      });
       if (!frameDocument.getElementById("erp-demo-embedded-style")) {
         const style = frameDocument.createElement("style");
         style.id = "erp-demo-embedded-style";
         style.textContent = [
           ".topbar,.sidebar,.third-menu-panel,.page-tabs{display:none!important}",
+          ".content>.ddp-search{margin-top:0!important}",
           ".srm-prototype{min-width:0!important;border:0!important}",
           ".layout{min-height:0!important}",
           "html,body{margin:0!important;background:#fff!important}"
