@@ -306,7 +306,6 @@
         style.id = "erp-demo-embedded-style";
         style.textContent = [
           ".topbar,.sidebar,.third-menu-panel,.page-tabs{display:none!important}",
-          ".content>.ddp-search{margin-top:0!important}",
           ".srm-prototype{min-width:0!important;border:0!important}",
           ".layout{min-height:0!important}",
           "html,body{margin:0!important;background:#fff!important}"
