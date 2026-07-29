@@ -9,76 +9,67 @@
 </head>
 <body>
   <div class="erp-app" id="erpApp">
-    <header class="topbar">
+    <div class="topbar">
       <div class="topbar-left">
         <div class="logo-wrapper">
           <div class="logo-box">SmartOne</div>
         </div>
-        <button class="menu-trigger" id="menuTrigger" type="button" aria-label="切换菜单" title="切换菜单">
-          <span></span>
-        </button>
-        <div class="search-box" id="globalSearch">
-          <input id="globalSearchInput" type="search" placeholder="搜索菜单" autocomplete="off" aria-label="搜索菜单">
-          <span class="search-icon" aria-hidden="true">⌕</span>
-          <div class="search-results" id="searchResults" hidden></div>
+        <button class="menu-trigger" id="menuTrigger" type="button" aria-label="切换菜单" title="切换菜单"><span></span></button>
+        <div class="search-box">
+          <span>请输入搜索内容</span>
+          <span class="search-icon">⌕</span>
         </div>
       </div>
-
       <div class="topbar-right">
-        <button class="top-action top-action--essential" id="homeAction" type="button" title="工作台" aria-label="工作台">⌂</button>
-        <button class="top-action" type="button" title="通知" aria-label="通知">
-          <span aria-hidden="true">●</span><span class="notify-badge">65</span>
-        </button>
-        <a class="top-action" href="https://itsm.sipingsoft.com" target="_blank" rel="noreferrer" title="帮助" aria-label="帮助">?</a>
-        <button class="top-action" type="button" title="语言" aria-label="语言">文</button>
-        <button class="top-action" id="fullscreenAction" type="button" title="全屏" aria-label="全屏">⛶</button>
-        <div class="avatar-box">
-          <span class="avatar-circle" aria-hidden="true"></span>
+        <span class="top-icon" title="工作台">⌂</span>
+        <span class="top-icon" title="通知">🔔<span class="notify-badge">65</span></span>
+        <a class="top-icon help-link" href="https://itsm.sipingsoft.com" target="_blank" rel="noreferrer" title="帮助">?</a>
+        <span class="top-icon" title="语言">🌐</span>
+        <span class="top-icon" title="锁屏">🔒</span>
+        <span class="top-icon" title="全屏">⛶</span>
+        <span class="avatar-box">
+          <span class="avatar-circle"></span>
           <span class="user-name">Admin</span>
-          <span class="arrow-down" aria-hidden="true">▾</span>
-        </div>
+          <span class="arrow-down">▾</span>
+        </span>
       </div>
-    </header>
+    </div>
 
-    <div class="app-layout">
-      <aside class="sidebar" id="sidebar" aria-label="ERP 主菜单">
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
         <div class="menu-group" id="sidebarMenu"></div>
-        <div class="sidebar-version">ERP Demo 1.0</div>
+        <div class="sidebar-version">Version 3.2.4.240903</div>
       </aside>
 
-      <main class="workspace">
-        <div class="page-context">
-          <nav class="breadcrumb" id="breadcrumb" aria-label="面包屑"></nav>
-          <span class="demo-badge">DEMO</span>
+      <div class="third-menu-panel hidden" id="thirdMenuPanel">
+        <button class="third-menu-mask" id="thirdMenuMask" type="button" tabindex="-1" aria-label="关闭菜单"></button>
+        <div class="third-menu-shell">
+          <div class="content-middle">
+            <div class="menu-group-wrap" id="thirdMenuContent"></div>
+          </div>
+          <div class="content-right">
+            <div class="anchor-point-wrap">
+              <div class="kd-anchor-wrapper">
+                <div class="kd-anchor">
+                  <div class="kd-anchor-line"><span class="kd-anchor-line-slider" id="anchorSlider"></span></div>
+                  <div id="thirdMenuAnchor"></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <section class="page-stage" aria-live="polite">
+      </div>
+
+      <main class="content">
+        <section class="page-stage">
           <div class="empty-view" id="emptyView">
             <div class="empty-icon" aria-hidden="true"></div>
-            <h1 id="emptyTitle">页面待接入</h1>
-            <p id="emptyDescription">当前菜单尚未配置原型页面</p>
+            <h1>页面待接入</h1>
+            <p id="emptyDescription"></p>
           </div>
           <iframe class="page-frame" id="pageFrame" title="ERP 原型页面" hidden></iframe>
         </section>
       </main>
-
-      <div class="third-menu-panel" id="thirdMenuPanel" hidden>
-        <button class="third-menu-mask" id="thirdMenuMask" type="button" tabindex="-1" aria-label="关闭菜单"></button>
-        <section class="third-menu-shell" aria-label="业务菜单">
-          <div class="third-menu-main">
-            <div class="third-menu-header">
-              <div>
-                <span class="third-menu-kicker" id="thirdMenuModule"></span>
-                <h2 id="thirdMenuTitle"></h2>
-              </div>
-              <button class="third-menu-close" id="thirdMenuClose" type="button" title="关闭" aria-label="关闭">×</button>
-            </div>
-            <div class="third-menu-content" id="thirdMenuContent"></div>
-          </div>
-          <nav class="third-menu-anchor" id="thirdMenuAnchor" aria-label="菜单分组"></nav>
-        </section>
-      </div>
-
-      <button class="mobile-backdrop" id="mobileBackdrop" type="button" tabindex="-1" aria-label="关闭菜单"></button>
     </div>
   </div>
 

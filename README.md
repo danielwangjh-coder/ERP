@@ -8,7 +8,7 @@
 index.html                  统一入口
 assets/css/app.css          门户布局与导航样式
 assets/js/menu-data.js      四级菜单及页面映射
-assets/js/app.js            菜单、搜索、Hash 路由和页面加载
+assets/js/app.js            菜单、Hash 路由和页面加载
 assets/vendor/              Prototype Kit 共享资源
 ```
 
