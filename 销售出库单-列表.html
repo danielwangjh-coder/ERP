@@ -1,0 +1,2242 @@
+﻿﻿﻿﻿<style>
+  :root {
+    --primary: #409eff;
+    --primary-deep: #337ecc;
+    --bg: #f3f5f7;
+    --panel: #ffffff;
+    --line: #dfe5ec;
+    --line-soft: #eef2f6;
+    --text: #2f3a4a;
+    --subtext: #7f8a9b;
+    --muted: #a8b2c1;
+    --hover: #eaf5fd;
+    --sidebar: #fbfcfd;
+    --stamp: #e66d6d;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  .srm-prototype {
+    width: 100%;
+    margin: 0;
+    font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid #dde3ea;
+    min-width: 1000px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar {
+    width: 100%;
+    height: 56px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px 0 8px;
+    background: linear-gradient(180deg, #11a6ef 0%, var(--primary) 100%);
+    color: #fff;
+  }
+
+  .topbar-left,
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+
+  .topbar-left {
+    gap: 8px;
+  }
+
+  .topbar-right {
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  .logo-box {
+    width: 160px;
+    height: 48px;
+    flex: 0 0 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.1px;
+    background: linear-gradient(180deg, #48beff 0%, #138fd8 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+
+  .logo-wrapper {
+    width: 210px;
+    flex: 0 0 210px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .menu-trigger {
+    width: 18px;
+    height: 18px;
+    position: relative;
+    margin: 0 6px 0 2px;
+  }
+
+  .menu-trigger::before,
+  .menu-trigger::after,
+  .menu-trigger span {
+    content: "";
+    position: absolute;
+    left: 1px;
+    right: 1px;
+    height: 2px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.96);
+  }
+
+  .menu-trigger::before {
+    top: 3px;
+  }
+
+  .menu-trigger span {
+    top: 8px;
+  }
+
+  .menu-trigger::after {
+    top: 13px;
+  }
+
+  .search-box {
+    width: 186px;
+    height: 28px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.98);
+    color: #97a3b4;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 9px 0 12px;
+    font-size: 12px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+  }
+
+  .search-box .search-icon {
+    color: #8fa0b1;
+    font-size: 22px;
+  }
+
+  .env-box {
+    height: 28px;
+    padding: 0 9px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 2px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
+    background: rgba(8, 111, 182, 0.22);
+    white-space: nowrap;
+  }
+
+  .top-icon {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 12px;
+    opacity: 0.96;
+  }
+
+  .top-icon.help-link {
+    text-decoration: none;
+  }
+
+  .notify-badge {
+    position: absolute;
+    top: -6px;
+    right: -9px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background: #f05b5b;
+    color: #fff;
+    font-size: 10px;
+    line-height: 16px;
+    text-align: center;
+    transform: scale(0.92);
+  }
+
+  .avatar-box {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 8px;
+    gap: 4px;
+  }
+
+  .avatar-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #d8eefc 0%, #a7d5f2 100%);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    position: relative;
+  }
+
+  .avatar-circle::before {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #6b8ca6;
+  }
+
+  .avatar-circle::after {
+    content: "";
+    position: absolute;
+    left: 3px;
+    bottom: 2px;
+    width: 12px;
+    height: 7px;
+    border-radius: 7px 7px 3px 3px;
+    background: #6b8ca6;
+  }
+
+  .user-name {
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  .arrow-down {
+    font-size: 10px;
+    opacity: 0.9;
+  }
+
+  .layout {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .sidebar {
+    width: 215px;
+    flex: 0 0 215px;
+    background: var(--sidebar);
+    border-right: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: width 0.2s ease;
+    overflow: hidden;
+  }
+
+  .menu-group {
+    padding: 0;
+    overflow-y: auto;
+  }
+
+  .menu-section {
+    border-bottom: 1px solid transparent;
+  }
+
+  .menu-item,
+  .submenu-item {
+    position: relative;
+    padding: 0 8px 0 8px;
+    font-size: 16px;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    line-height: 1.2;
+  }
+
+  .menu-item {
+    height: 46px;
+    width: 215px;
+    cursor: pointer;
+    user-select: none;
+    font-weight: bold;
+  }
+
+  .menu-label {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  .menu-item .icon {
+    width: 16px;
+    color: #6b7787;
+    text-align: center;
+    font-size: 12px;
+    flex: 0 0 16px;
+  }
+
+  .menu-arrow {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    color: #8a96a5;
+    font-size: 28px;
+    text-align: center;
+    line-height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(-90deg);
+    transition: transform 0.2s ease;
+  }
+
+  .menu-section.open .menu-arrow {
+    transform: rotate(0deg);
+  }
+
+  .menu-item.active {
+    background: #009bee1a;
+    color: var(--primary);
+    padding-left: 8px;
+  }
+
+  .menu-item.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--primary);
+  }
+
+  .submenu {
+    background: transparent;
+    border-top: 1px solid #edf6fb;
+    border-bottom: 1px solid #edf6fb;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease;
+  }
+
+  .menu-section.open .submenu {
+    max-height: 320px;
+  }
+
+  .submenu-item {
+    min-height: 38px;
+    padding: 0 8px 0 34px;
+    display: flex;
+    align-items: center;
+    color: #5b6775;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .submenu-item.current {
+    background: #e6f7ff;
+    color: var(--primary);
+    font-weight: normal;
+  }
+
+  .submenu-item.current::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--primary);
+  }
+
+  .sidebar.collapsed {
+    width: 54px;
+  }
+
+  .sidebar.collapsed .menu-label,
+  .sidebar.collapsed .menu-arrow,
+  .sidebar.collapsed .submenu,
+  .sidebar.collapsed .sidebar-version {
+    display: none;
+  }
+
+  .sidebar.collapsed .menu-item {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .sidebar-version {
+    padding: 12px 0 8px;
+    text-align: center;
+    color: #b4bcc8;
+    font-size: 10px;
+  }
+
+  .content {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    background: #f7f8fa;
+    position: relative;
+    overflow-x: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .content > .page-tabs,
+  .content > .ddp-search {
+    flex-shrink: 0;
+  }
+
+  .page-tabs {
+    height: 34px;
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    padding: 0 8px;
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* .page-tab base styles are defined in the override block below */
+
+  .toolbar {
+    height: 38px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .toolbar-left,
+  .toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn {
+    height: 24px;
+    padding: 0 10px;
+    border: 1px solid #d6dde6;
+    background: #fff;
+    color: #5f6b7b;
+    border-radius: 2px;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: default;
+  }
+
+  .btn.primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+
+  .workspace {
+    padding: 8px 10px 12px;
+  }
+
+  .panel {
+    position: relative;
+    background: #fff;
+    border: 1px solid var(--line);
+  }
+
+  .panel-head {
+    height: 32px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 12px;
+  }
+
+  .panel-head .tab-link {
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    color: #7b8796;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+  }
+
+  .panel-head .tab-link.active {
+    color: var(--primary);
+    border-color: var(--primary);
+  }
+
+  .stamp {
+    position: absolute;
+    top: 18px;
+    right: 16px;
+    width: 54px;
+    height: 32px;
+    border: 2px solid var(--stamp);
+    color: var(--stamp);
+    border-radius: 4px;
+    transform: rotate(-25deg);
+    opacity: 0.68;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid #f8fafc;
+  }
+
+  .info-item {
+    min-height: 52px;
+    padding: 8px 12px 6px;
+    border-right: 1px solid var(--line-soft);
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .info-item:nth-child(4n) {
+    border-right: none;
+  }
+
+  .field-label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 11px;
+    color: #7e8a99;
+  }
+
+  .field-value {
+    min-height: 18px;
+    font-size: 12px;
+    color: #3a4555;
+  }
+
+  .field-value.linkish::after {
+    content: "...";
+    float: right;
+    color: #adb8c6;
+    letter-spacing: 1px;
+  }
+
+  .divider-line {
+    height: 1px;
+    background: var(--primary);
+    margin: 1px 0 0;
+  }
+
+  .detail-panel {
+    margin-top: 8px;
+    background: #fff;
+    border: 1px solid var(--line);
+  }
+
+  .detail-tabs {
+    height: 31px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 10px;
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 12px;
+  }
+
+  .detail-tab {
+    color: #6c7888;
+    cursor: pointer;
+    padding-top: 1px;
+  }
+
+  .detail-tab.active {
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  .detail-toolbar {
+    height: 36px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .table-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .search-lite {
+    width: 180px;
+    height: 24px;
+    padding: 0 10px;
+    border: 1px solid #d9e0e8;
+    border-radius: 2px;
+    color: #a0a9b6;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+  }
+
+  .icon-btn {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #d9e0e8;
+    border-radius: 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #7f8a99;
+    font-size: 12px;
+    background: #fff;
+  }
+
+  .grid-wrap {
+    overflow: auto;
+    max-height: 450px;
+    background: #fff;
+    padding: 0 10px 10px;
+  }
+
+  table {
+    width: auto;
+    min-width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  .material-detail-table {
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .material-detail-table th:nth-child(-n + 3),
+  .material-detail-table td:nth-child(-n + 3) {
+    text-align: center;
+  }
+
+  thead th {
+    height: 28px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #f6f9fc;
+    color: #586476;
+    font-size: 11px;
+    font-weight: 600;
+    border-right: 1px solid var(--line-soft);
+    border-bottom: 1px solid var(--line);
+    padding: 0 2px;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  tbody td,
+  tfoot td {
+    height: 28px;
+    border-right: 1px solid var(--line-soft);
+    border-bottom: 1px solid var(--line-soft);
+    padding: 0 2px;
+    font-size: 11px;
+    color: #394355;
+    background: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  tbody tr:hover td {
+    background: var(--hover);
+  }
+
+  tfoot td {
+    background: #FFAA0014;
+    font-weight: 600;
+  }
+
+  th:last-child,
+  td:last-child {
+    border-right: none;
+  }
+
+  .ops {
+    color: #18a058;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 0;
+    padding: 0 4px !important;
+  }
+
+  .ops svg {
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .ops svg:hover {
+    opacity: 0.7;
+  }
+
+  .ops .danger {
+    color: #df5656;
+  }
+
+  .muted-cell {
+    color: #9aa4b3;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+
+
+  .page-tabs {
+    height: 40px;
+    align-items: center;
+    gap: 0;
+    padding: 0 10px;
+    background: #fff;
+    border-bottom: 2px solid #e4e7ed;
+  }
+
+  .page-tab {
+    height: 40px;
+    padding: 0 6px 0 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    background: transparent;
+    color: #909399;
+    font-size: 13px;
+    border-radius: 0;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    white-space: nowrap;
+    box-sizing: border-box;
+    transition: color 0.15s;
+  }
+
+  .page-tab:hover {
+    color: var(--primary);
+  }
+
+  .page-tab.active {
+    background: transparent;
+    color: var(--primary);
+    font-weight: normal;
+  }
+
+  .page-tab.active::after {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--primary);
+  }
+
+  .page-tab.active::before {
+    display: none;
+  }
+
+  .tab-close {
+    width: 14px;
+    height: 14px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: #c0c4cc;
+    font-size: 12px;
+    line-height: 1;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: background 0.1s, color 0.1s;
+  }
+
+  .tab-close:hover {
+    background: #c0c4cc;
+    color: #fff;
+  }
+
+  .page-tab.active .tab-close {
+    display: inline-flex;
+    color: #a8bdd6;
+  }
+
+  .page-tab.active .tab-close:hover {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  .toolbar {
+    height: 44px;
+    padding: 0 10px;
+    margin: 10px 10px 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+  }
+
+  .toolbar-left,
+  .toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn {
+    height: 26px;
+    padding: 0 10px;
+    border: 1px solid #d7dfe8;
+    background: #fff;
+    color: #566273;
+  }
+
+  .btn.primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+
+  .btn.split-drop {
+    min-width: 24px;
+    padding: 0 6px;
+  }
+
+  .btn.primary.split-drop {
+    border-left-color: rgba(255, 255, 255, 0.28);
+    margin-left: -6px;
+  }
+
+  .btn.next-entry {
+    color: #4f5d70;
+  }
+
+  .btn-icon {
+    font-size: 12px;
+    opacity: 0.92;
+  }
+
+  .doc-workspace {
+    padding: 8px 10px 12px;
+  }
+
+  .doc-section {
+    background: #fff;
+    border: 1px solid var(--line);
+  }
+
+  .detail-panel {
+    background: #fff;
+    border: none;
+  }
+
+  .section-tabs,
+  .detail-tabs {
+    height: 34px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 0 10px;
+    border-bottom: 1px solid #edf1f5;
+    background: #fff;
+  }
+
+  .section-tab,
+  .detail-tab {
+    height: 33px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    color: #6b7788;
+    font-size: 14px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+  }
+
+  .section-tab.active,
+  .detail-tab.active {
+    color: var(--primary);
+    font-weight: 600;
+    border-bottom-color: var(--primary);
+  }
+
+  .section-pane {
+    position: relative;
+    padding: 10px 12px 12px;
+  }
+
+  .doc-stamp {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    width: 60px;
+    height: 34px;
+    border: 2px solid var(--stamp);
+    color: var(--stamp);
+    border-radius: 4px;
+    transform: rotate(-24deg);
+    opacity: 0.68;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
+  .top-watermark {
+    position: absolute;
+    top: 104px;
+    right: 72px;
+    width: 60px;
+    height: 34px;
+    border: 2px solid var(--stamp);
+    color: var(--stamp);
+    border-radius: 4px;
+    transform: rotate(-24deg);
+    opacity: 0.68;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    z-index: 20;
+    pointer-events: none;
+    background: transparent;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px 10px;
+    align-items: start;
+  }
+
+  .form-grid+.form-grid {
+    margin-top: 8px;
+  }
+
+  .form-field {
+    min-width: 0;
+  }
+
+  .form-field.full {
+    grid-column: 1 / -1;
+  }
+
+  .form-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+    color: #6a7686;
+    font-size: 12px;
+    line-height: 18px;
+  }
+
+  .required {
+    color: #f04e4e;
+  }
+
+  .help-dot {
+    color: #9ca8b8;
+    font-size: 11px;
+  }
+
+  .input-shell,
+  .textarea-shell {
+    position: relative;
+    min-height: 28px;
+    border: none;
+    border-bottom: 1px solid #d8e0e8;
+    border-radius: 0;
+    background: transparent;
+    color: #394455;
+    font-size: 12px;
+  }
+
+  .input-shell {
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    gap: 8px;
+  }
+
+  .input-shell.disabled {
+    background: #f5f7fa;
+    color: #9ca6b5;
+  }
+
+  .input-shell .value {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .input-shell .placeholder {
+    color: #a7b0bf;
+  }
+
+  .input-shell .prefix-icon,
+  .input-shell .suffix-icon {
+    color: #768396;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+  }
+
+  .input-shell .suffix-button {
+    margin-right: -8px;
+    width: 24px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-left: none;
+    background: transparent;
+    color: #97a3b2;
+  }
+
+  .textarea-shell {
+    min-height: 56px;
+    padding: 6px 8px 18px;
+  }
+
+  .textarea-count {
+    position: absolute;
+    right: 8px;
+    bottom: 3px;
+    color: #a0abbb;
+    font-size: 11px;
+  }
+
+  .section-divider {
+    height: 1px;
+    margin-top: 8px;
+    background: var(--primary);
+  }
+
+  .detail-panel {
+    margin-top: 8px;
+  }
+
+  .detail-toolbar {
+    height: 38px;
+    padding: 0 10px;
+    background: #fff;
+  }
+
+  .search-lite {
+    width: 190px;
+    justify-content: space-between;
+    background: #fff;
+  }
+
+  .table-search-icon {
+    color: #95a2b2;
+  }
+
+  .icon-btn {
+    width: 26px;
+    height: 24px;
+  }
+
+
+
+
+
+  thead th {
+    height: 34px;
+    background: #009BEE1A;
+    font-size: 12px;
+  }
+
+  tbody td,
+  tfoot td {
+    height: 38px;
+    font-size: 12px;
+  }
+
+  .ops {
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  .el-input__inner {
+    width: 100%;
+    height: 28px;
+    padding: 0 8px;
+    line-height: 28px;
+    border: 1px solid #dcdfe6;
+    border-radius: 2px;
+    background: #fff;
+    color: #394355;
+    font-family: inherit;
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  }
+
+  .el-input__inner:hover {
+    border-color: #c0c4cc;
+    background: #fff;
+  }
+
+  .el-input__inner:focus {
+    border-color: var(--primary);
+    background: #fff;
+    box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.12);
+  }
+
+  .ddp-search {
+    min-height: 51px;
+    margin: 8px 10px 0;
+    padding: 0;
+    background: #fff;
+    border: 1px solid #e4e7ed;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(31, 45, 61, 0.04);
+    font-size: 12px;
+  }
+
+  .ddp-search .layout-container,
+  .ddp-search .box-layout-search {
+    width: 100%;
+  }
+
+  .ddp-search .layout-container {
+    min-height: 51px;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  .ddp-search .box-layout-search {
+    min-height: 31px;
+  }
+
+  .ddp-search .box-layout-search,
+  .ddp-search .layout-search-left,
+  .ddp-search .search-option,
+  .ddp-search .filter_wrap,
+  .ddp-search .el-button {
+    display: flex;
+    align-items: center;
+  }
+
+  .ddp-search .box-layout-search {
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .ddp-search .layout-search-left {
+    flex: 0 0 auto;
+    gap: 8px;
+  }
+
+  .ddp-search .layout-search {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ddp-search .search-option {
+    justify-content: flex-end;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .ddp-search .search-view-select .el-select {
+    width: 150px;
+  }
+
+  .ddp-search .el-input {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+  }
+
+  .ddp-search .el-input__inner {
+    height: 24px;
+    line-height: 24px;
+    border-color: #dfe6ee;
+    color: #566273;
+    font-size: 12px;
+    box-shadow: none;
+  }
+
+  .ddp-search .search-view-select .el-input__inner {
+    padding-right: 24px;
+    background: #fff;
+  }
+
+  .ddp-search .search-view-select .el-input__inner::placeholder {
+    color: #303844;
+    opacity: 1;
+  }
+
+  .ddp-search .search-input {
+    width: 230px;
+  }
+
+  .ddp-search .search-input .el-input__inner {
+    padding-left: 28px;
+    color: #9aa4b3;
+  }
+
+  .ddp-search .search-input .el-input__inner::placeholder {
+    color: #b6bfcc;
+    opacity: 1;
+  }
+
+  .ddp-search .el-input__prefix,
+  .ddp-search .el-input__suffix {
+    position: absolute;
+    top: 0;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    color: #a6b1c1;
+    pointer-events: none;
+  }
+
+  .ddp-search .el-input__prefix {
+    left: 8px;
+  }
+
+  .ddp-search .el-input__suffix {
+    right: 7px;
+  }
+
+  .ddp-search .el-button {
+    height: 24px;
+    padding: 0 8px;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    background: transparent;
+    color: #4f6f91;
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 22px;
+    gap: 4px;
+  }
+
+  .ddp-search .el-button>span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .ddp-search .el-button--primary {
+    min-width: 46px;
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+
+  .ddp-search .el-button--default {
+    border-color: #dfe6ee;
+    background: #fff;
+    color: #4f5d70;
+  }
+
+  .ddp-search .el-button--text {
+    color: #1684d8;
+  }
+
+  .ddp-search .filter_wrap .el-button--text {
+    min-width: 84px;
+    background: #edf7ff;
+    border-color: #b8dcff;
+    color: var(--primary);
+  }
+
+  .ddp-search .popover-box,
+  .ddp-search .el-select-dropdown,
+  .ddp-search .el-popover {
+    display: none;
+  }
+
+  .ddp-search .icon-search::before {
+    content: "⌕";
+  }
+
+  .ddp-search .icon-undo::before {
+    content: "↺";
+  }
+
+  .ddp-search .icon-filter::before {
+    content: "▽";
+    font-size: 10px;
+  }
+
+  .ddp-search .icon-down::before,
+  .ddp-search .el-icon-arrow-up::before {
+    content: "▾";
+    font-size: 10px;
+  }
+
+  /* main 内容区（body > div > div.layout > main）字号统一 14px */
+  body > div > div.layout > main,
+  body > div > div.layout > main *,
+  body > div > div.layout > main *::before,
+  body > div > div.layout > main *::after,
+  .srm-prototype > .layout > main.content,
+  .srm-prototype > .layout > main.content *,
+  .srm-prototype > .layout > main.content *::before,
+  .srm-prototype > .layout > main.content *::after {
+    font-size: 14px !important;
+  }
+
+  body > div > div.layout > main > section.list-table-shell,
+  body > div > div.layout > main > section,
+  .srm-prototype > .layout > main.content > section.list-table-shell,
+  .srm-prototype > .layout > main.content > section {
+    height: 734px;
+    flex: 0 0 734px;
+    max-height: 734px;
+    box-sizing: border-box;
+  }
+
+  .list-table-shell {
+    margin: 8px 10px 10px;
+    background: #fff;
+    border: 1px solid #e4e7ed;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(31, 45, 61, 0.04);
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .list-toolbar {
+    min-height: 38px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid #e7edf3;
+    background: #fff;
+    flex-shrink: 0;
+  }
+
+  .list-toolbar-left,
+  .list-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .list-toolbar-left .btn,
+  .list-toolbar-right .btn {
+    height: 26px;
+    padding: 0 8px;
+    font-size: 12px;
+    gap: 4px;
+  }
+
+  .list-toolbar-left .btn.primary {
+    background: #409eff;
+    border-color: #409eff;
+    color: #fff;
+  }
+
+  .list-toolbar-left .btn.dropdown {
+    padding-right: 24px;
+    position: relative;
+  }
+
+  .list-toolbar-left .btn.dropdown::after {
+    content: "";
+    position: absolute;
+    right: 9px;
+    top: 50%;
+    margin-top: -2px;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid #606266;
+  }
+
+  .checkbox-lite {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #303844;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .checkbox-box {
+    width: 14px;
+    height: 14px;
+    border: 1px solid #c8d1dc;
+    border-radius: 2px;
+    background: #fff;
+  }
+
+  .list-toolbar-right .btn.list-icon-btn {
+    width: auto;
+    min-width: auto;
+    padding: 0 8px;
+  }
+
+  /* 横向滚动容器不写左右 padding；留白在 .purchase-table-inner，随内容参与滚动宽度 */
+  .purchase-table-wrap {
+    position: relative;
+    overflow: auto;
+    overflow-x: auto;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    background: #fff;
+    box-sizing: border-box;
+    padding: 0;
+    scrollbar-gutter: stable;
+    border: none;
+    outline: none;
+    box-shadow: none;
+  }
+
+  .purchase-table-inner {
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+    width: max-content;
+    min-width: 100%;
+    max-width: none;
+    padding: 0 10px;
+    border: none;
+  }
+
+  /* 表格：对齐 VXE-UI Table 令牌 + 外层容器参考样式（width 100%、字色、边框语义） */
+  .purchase-list-table {
+    --vxe-ui-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    --vxe-ui-font-size-default: 14px;
+    --vxe-ui-font-size-medium: 14px;
+    --vxe-ui-font-size-small: 13px;
+    --vxe-ui-font-size-mini: 12px;
+    --vxe-ui-border-radius: 4px;
+    --vxe-ui-font-color: #606266;
+    --vxe-ui-font-primary-color: #409eff;
+    --vxe-ui-font-lighten-color: #797b80;
+    --vxe-ui-font-darken-color: #47494c;
+    --vxe-ui-font-disabled-color: #bfbfbf;
+    --vxe-ui-layout-background-color: #fff;
+    --vxe-ui-input-border-color: #dcdfe6;
+    --vxe-ui-table-header-font-color: var(--vxe-ui-font-color);
+    --vxe-ui-table-footer-font-color: var(--vxe-ui-font-color);
+    --vxe-ui-table-border-radius: var(--vxe-ui-border-radius);
+    --vxe-ui-table-border-width: 1.05px;
+    --vxe-ui-table-border-color: #e8eaec;
+    --vxe-ui-table-resizable-line-color: #d9dddf;
+    --vxe-ui-table-header-background-color: #f8f8f9;
+    --vxe-ui-table-column-to-row-background-color: #f8f8f9;
+    --vxe-ui-table-column-hover-background-color: #d7effb;
+    --vxe-ui-table-column-current-background-color: #e6f7ff;
+    --vxe-ui-table-column-hover-current-background-color: #d7effb;
+    --vxe-ui-table-footer-background-color: var(--vxe-ui-layout-background-color);
+    --vxe-ui-table-header-font-weight: 700;
+    --vxe-ui-table-row-height-default: 48px;
+    --vxe-ui-table-row-height-medium: 44px;
+    --vxe-ui-table-row-height-small: 40px;
+    --vxe-ui-table-row-height-mini: 36px;
+    --vxe-ui-table-row-line-height: 22px;
+    --vxe-ui-table-cell-padding-default: 10px;
+    --vxe-ui-table-cell-padding-medium: 8px;
+    --vxe-ui-table-cell-padding-small: 6px;
+    --vxe-ui-table-cell-padding-mini: 4px;
+    --vxe-ui-table-row-hover-background-color: #f5f7fa;
+    --vxe-ui-table-row-striped-background-color: #fafafa;
+    --vxe-ui-table-row-hover-striped-background-color: #f5f7fa;
+    --vxe-ui-table-row-current-background-color: #e6f7ff;
+    --vxe-ui-table-row-hover-current-background-color: #d7effb;
+    --vxe-ui-table-cell-area-background-color: rgba(64, 158, 255, 0.2);
+    --vxe-ui-table-header-active-area-background-color: rgba(64, 158, 255, 0.05);
+    --vxe-ui-input-disabled-color: #dcdfe6;
+    --vxe-ui-input-height-default: 34px;
+    --vxe-ui-input-height-medium: 32px;
+    --vxe-ui-input-height-small: 30px;
+    --vxe-ui-input-height-mini: 28px;
+    --vxe-ui-table-cell-placeholder-color: #c0c4cc;
+    --vxe-ui-table-cell-negative-color: #f56c6c;
+    --vxe-ui-base-popup-border-color: #dadce0;
+    --vxe-ui-base-popup-box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.16);
+    --vxe-ui-input-placeholder-color: #c0c4cc;
+    --vxe-ui-input-disabled-background-color: #f3f3f3;
+    --vxe-ui-loading-background-color: hsla(0, 0%, 100%, 0.5);
+    --vxe-ui-table-fixed-scrolling-box-shadow-color: rgba(0, 0, 0, 0.12);
+    --vxe-ui-table-fixed-left-scrolling-box-shadow: 8px 0 10px -5px var(--vxe-ui-table-fixed-scrolling-box-shadow-color);
+    --vxe-ui-table-fixed-right-scrolling-box-shadow: -8px 0 10px -5px var(--vxe-ui-table-fixed-scrolling-box-shadow-color);
+    --primary-color: #409eff;
+    --vxe-row-h: var(--vxe-ui-table-row-height-default);
+    --vxe-td-lh: var(--vxe-ui-table-row-line-height);
+    --vxe-td-pad-y: var(--vxe-ui-table-cell-padding-default);
+    --vxe-td-pad-x: var(--vxe-ui-table-cell-padding-medium);
+    -webkit-text-size-adjust: 100%;
+    width: max-content;
+    min-width: 100%;
+    max-width: none;
+    table-layout: fixed;
+    position: relative;
+    box-sizing: border-box;
+    flex: none;
+    font-family: var(--vxe-ui-font-family);
+    font-weight: 400;
+    outline: none;
+    font-size: var(--vxe-ui-font-size-mini) !important;
+    color: var(--vxe-ui-font-color);
+    background-color: var(--vxe-ui-layout-background-color);
+    border-collapse: collapse;
+    border: 1px solid #ebebeb;
+    border-right: none;
+    border-bottom: none;
+  }
+
+  .purchase-list-table th {
+    min-height: var(--vxe-row-h);
+    height: var(--vxe-row-h);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--vxe-ui-table-header-background-color);
+    color: var(--vxe-ui-table-header-font-color);
+    font-size: var(--vxe-ui-font-size-mini) !important;
+    font-weight: var(--vxe-ui-table-header-font-weight);
+    text-align: left;
+    padding: var(--vxe-td-pad-y) var(--vxe-td-pad-x);
+    line-height: var(--vxe-td-lh);
+    box-sizing: border-box;
+    border-right: var(--vxe-ui-table-border-width) solid var(--vxe-ui-table-border-color);
+    border-bottom: var(--vxe-ui-table-border-width) solid var(--vxe-ui-table-border-color);
+    vertical-align: middle;
+    outline: none;
+  }
+
+  .purchase-list-table td {
+    min-height: var(--vxe-row-h);
+    height: var(--vxe-row-h);
+    padding: var(--vxe-td-pad-y) var(--vxe-td-pad-x);
+    border-right: var(--vxe-ui-table-border-width) solid var(--vxe-ui-table-border-color);
+    border-bottom: var(--vxe-ui-table-border-width) solid var(--vxe-ui-table-border-color);
+    color: var(--vxe-ui-font-color);
+    font-size: var(--vxe-ui-font-size-mini) !important;
+    font-weight: 400;
+    line-height: var(--vxe-td-lh);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    background: var(--vxe-ui-layout-background-color);
+    box-sizing: border-box;
+    vertical-align: middle;
+    outline: none;
+  }
+
+  /* 操作 / 序号 / 复选列：与 VXE 单元格内联块一致，统一交互与字重 */
+  .purchase-list-table tbody td:nth-child(1),
+  .purchase-list-table tbody td:nth-child(2),
+  .purchase-list-table tbody td:nth-child(3) {
+    text-align: center;
+    font-weight: 500;
+    font-family: "PingFang SC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    user-select: none;
+    cursor: default;
+  }
+
+  /* 内联块仅用于「更多」按钮，避免给 td 设 inline-block 破坏表格布局；序号/复选用行高对齐 VXE 计算值 */
+  .purchase-list-table tbody td:nth-child(1) .row-more {
+    display: inline-block;
+    line-height: 27px;
+    vertical-align: middle;
+  }
+
+  .purchase-list-table tbody td:nth-child(2),
+  .purchase-list-table tbody td:nth-child(3) {
+    line-height: 27px;
+  }
+
+  .purchase-list-table thead th:nth-child(1),
+  .purchase-list-table thead th:nth-child(2),
+  .purchase-list-table thead th:nth-child(3) {
+    text-align: center;
+  }
+
+  .purchase-list-table tbody tr:nth-child(even) td {
+    background: var(--vxe-ui-table-row-striped-background-color);
+  }
+
+  .purchase-list-table tbody tr.active-row td {
+    background: var(--vxe-ui-table-row-current-background-color);
+  }
+
+  .purchase-list-table tbody tr:hover td {
+    background: var(--vxe-ui-table-row-hover-background-color);
+  }
+
+  .purchase-list-table tbody tr:nth-child(even):hover td {
+    background: var(--vxe-ui-table-row-hover-striped-background-color);
+  }
+
+  .purchase-list-table tbody tr.active-row:hover td {
+    background: var(--vxe-ui-table-row-hover-current-background-color);
+  }
+
+  /* tfoot：对齐 VXE 参考（令牌由 table.purchase-list-table 继承，此处补充页脚区排版） */
+  body > div > div.layout > main > section > div.purchase-table-wrap > div > table.purchase-list-table > tfoot,
+  .srm-prototype > .layout > main.content > section > div.purchase-table-wrap > div > table.purchase-list-table > tfoot {
+    /* 令牌继承自 table；不在此写 font-weight，避免盖住 td 加粗 */
+    --vxe-ui-table-footer-font-color: #666;
+    -webkit-text-size-adjust: 100%;
+    color: #666;
+    font-size: var(--vxe-ui-font-size-mini, 12px);
+    outline: none;
+    font-family: "PingFang SC", sans-serif !important;
+    box-sizing: border-box;
+    border-spacing: 0;
+    border-collapse: separate;
+  }
+
+  .purchase-list-table tfoot td {
+    position: sticky;
+    bottom: 0;
+    z-index: 4;
+    min-height: var(--vxe-row-h);
+    height: var(--vxe-row-h);
+    padding: var(--vxe-td-pad-y) var(--vxe-td-pad-x);
+    line-height: var(--vxe-td-lh);
+    color: #666;
+    font-size: 12px !important;
+    font-weight: var(--vxe-ui-table-header-font-weight, 700) !important;
+    font-family: "PingFang SC", sans-serif !important;
+    background: #fff8eb !important;
+    box-sizing: border-box;
+    vertical-align: middle;
+    outline: none;
+    border-right: var(--vxe-ui-table-border-width) solid var(--vxe-ui-table-border-color);
+    border-bottom: var(--vxe-ui-table-border-width) solid var(--vxe-ui-table-border-color);
+    border-top: var(--vxe-ui-table-border-width) solid var(--vxe-ui-table-border-color);
+  }
+
+  /* 与用户选择器对齐：外层留白；表格边框由 .purchase-list-table 令牌控制，勿再强制 border:none */
+  body > div > div.layout > main > section > div.purchase-table-wrap,
+  .srm-prototype > .layout > main.content > section > div.purchase-table-wrap {
+    padding: 0;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  body > div > div.layout > main > section > div.purchase-table-wrap > div > table.purchase-list-table,
+  .srm-prototype > .layout > main.content > section > div.purchase-table-wrap > div > table.purchase-list-table {
+    width: max-content;
+    min-width: 100%;
+    max-width: none;
+    table-layout: fixed;
+  }
+
+  /* 采购对账列表表头：字色 #333、加粗、浅蓝底（覆盖 .purchase-list-table th 令牌） */
+  body > div > div.layout > main > section > div.purchase-table-wrap > div > table.purchase-list-table > thead th,
+  .srm-prototype > .layout > main.content > section > div.purchase-table-wrap > div > table.purchase-list-table > thead th {
+    color: #333333;
+    font-weight: 700;
+    background: #E6F4FC;
+  }
+
+  .purchase-list-table .center {
+    text-align: center;
+  }
+
+  /* 表头全选：checkbox，未选白底，选中蓝底 */
+  .purchase-list-table thead th.purchase-th-checkbox {
+    vertical-align: middle;
+    padding: 0 6px;
+  }
+
+  .purchase-th-checkbox-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    margin: 0 auto;
+    cursor: pointer;
+  }
+
+  .purchase-th-checkbox-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  .purchase-th-checkbox-face {
+    position: absolute;
+    inset: 0;
+    box-sizing: border-box;
+    width: 14px;
+    height: 14px;
+    border: 1px solid #dcdfe6;
+    border-radius: 2px;
+    background: #fff;
+    pointer-events: none;
+    z-index: 1;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .purchase-th-checkbox-input:checked + .purchase-th-checkbox-face {
+    background: #409eff;
+    border-color: #409eff;
+  }
+
+  .purchase-th-checkbox-input:checked + .purchase-th-checkbox-face::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 8px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    box-sizing: border-box;
+  }
+
+  .purchase-th-checkbox-input:focus-visible + .purchase-th-checkbox-face {
+    outline: 2px solid rgba(64, 158, 255, 0.45);
+    outline-offset: 1px;
+  }
+
+  body > div > div.layout > main > section > div.purchase-table-wrap > div > table.purchase-list-table > thead > tr > th.center .purchase-th-checkbox-face,
+  .srm-prototype > .layout > main.content > section > div.purchase-table-wrap > div > table.purchase-list-table > thead > tr > th.center .purchase-th-checkbox-face {
+    background-color: #fff;
+    border-color: #dcdfe6;
+  }
+
+  body > div > div.layout > main > section > div.purchase-table-wrap > div > table.purchase-list-table > thead > tr > th.center .purchase-th-checkbox-input:checked + .purchase-th-checkbox-face,
+  .srm-prototype > .layout > main.content > section > div.purchase-table-wrap > div > table.purchase-list-table > thead > tr > th.center .purchase-th-checkbox-input:checked + .purchase-th-checkbox-face {
+    background-color: #409eff;
+    border-color: #409eff;
+  }
+
+  .purchase-list-table tbody td.purchase-td-checkbox {
+    vertical-align: middle;
+    padding: 0 6px;
+  }
+
+  body > div > div.layout > main > section > div.purchase-table-wrap > div > table.purchase-list-table > tbody > tr > td.center.purchase-td-checkbox .purchase-th-checkbox-face,
+  .srm-prototype > .layout > main.content > section > div.purchase-table-wrap > div > table.purchase-list-table > tbody > tr > td.center.purchase-td-checkbox .purchase-th-checkbox-face {
+    background-color: #fff;
+    border-color: #dcdfe6;
+  }
+
+  body > div > div.layout > main > section > div.purchase-table-wrap > div > table.purchase-list-table > tbody > tr > td.center.purchase-td-checkbox .purchase-th-checkbox-input:checked + .purchase-th-checkbox-face,
+  .srm-prototype > .layout > main.content > section > div.purchase-table-wrap > div > table.purchase-list-table > tbody > tr > td.center.purchase-td-checkbox .purchase-th-checkbox-input:checked + .purchase-th-checkbox-face {
+    background-color: #409eff;
+    border-color: #409eff;
+  }
+
+  .purchase-list-table .number {
+    text-align: right;
+  }
+
+  .link-blue {
+    color: #409eff;
+  }
+
+  .row-more {
+    color: #8b9aac;
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .purchase-list-table .row-more {
+    font-size: 16px;
+    line-height: 27px;
+  }
+
+  .list-footer-bar {
+    height: 38px;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #e7edf3;
+    background: #fff;
+    color: #5e6b7a;
+    font-size: 12px;
+    flex-shrink: 0;
+    margin-top: auto;
+  }
+
+  .selected-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #606f82;
+  }
+
+  .pagination-lite {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pager-size {
+    color: #566273;
+  }
+
+  .pager-btn,
+  .pager-num {
+    min-width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e4e7ed;
+    border-radius: 2px;
+    background: #f4f6f9;
+    color: #7a8797;
+    font-size: 12px;
+  }
+
+  .pager-num.active {
+    background: #409eff;
+    border-color: #409eff;
+    color: #fff;
+  }
+
+  .pager-more {
+    color: #9aa4b3;
+    padding: 0 2px;
+  }
+
+  .pager-jump {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .pager-input {
+    width: 36px;
+    height: 24px;
+    border: 1px solid #dcdfe6;
+    border-radius: 2px;
+    background: #fff;
+  }
+</style>
+
+<div class="srm-prototype">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="logo-wrapper">
+        <div class="logo-box">SmartOne</div>
+      </div>
+      <div class="menu-trigger"><span></span></div>
+      <div class="search-box">
+        <span>请输入搜索内容</span>
+        <span class="search-icon">⌕</span>
+      </div>
+      <div class="env-box">3.2.4.240903开发环境</div>
+    </div>
+    <div class="topbar-right">
+      <span class="top-icon" title="工作台">⌂</span>
+      <span class="top-icon" title="通知">🔔<span class="notify-badge">65</span></span>
+      <a class="top-icon help-link" href="https://itsm.sipingsoft.com" target="_blank" title="帮助">?</a>
+      <span class="top-icon" title="语言">🌐</span>
+      <span class="top-icon" title="锁屏">🔒</span>
+      <span class="top-icon" title="全屏">⛶</span>
+      <span class="avatar-box">
+        <span class="avatar-circle"></span>
+        <span class="user-name">Admin</span>
+        <span class="arrow-down">▾</span>
+      </span>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="menu-group">
+        <div class="menu-section">
+          <div class="menu-item"><span class="menu-label">我的</span><span class="menu-arrow">▾</span></div>
+        </div>
+        <div class="menu-section">
+          <div class="menu-item"><span class="menu-label">系统管理</span><span class="menu-arrow">▾</span></div>
+        </div>
+        <div class="menu-section">
+          <div class="menu-item"><span class="menu-label">基础设置</span><span class="menu-arrow">▾</span></div>
+        </div>
+        <div class="menu-section">
+          <div class="menu-item"><span class="menu-label">项目管理</span><span class="menu-arrow">▾</span></div>
+        </div>
+        <div class="menu-section">
+          <div class="menu-item"><span class="menu-label">供应商门户端</span><span class="menu-arrow">▾</span></div>
+        </div>
+        <div class="menu-section">
+          <div class="menu-item"><span class="menu-label">客户关系管理</span><span class="menu-arrow">▾</span></div>
+        </div>
+        <div class="menu-section">
+          <div class="menu-item"><span class="menu-label">人力资源管理</span><span class="menu-arrow">▾</span></div>
+        </div>
+        <div class="menu-section">
+          <div class="menu-item"><span class="menu-label">产品生命周期管理</span><span class="menu-arrow">▾</span></div>
+        </div>
+        <div class="menu-section open">
+          <div class="menu-item active"><span class="menu-label">供应链管理</span><span class="menu-arrow">▾</span></div>
+          <div class="submenu">
+            <div class="submenu-item">采购管理</div>
+            <div class="submenu-item">生产制造</div>
+            <div class="submenu-item">财务会计</div>
+            <div class="submenu-item">资金管理</div>
+            <div class="submenu-item">成本核算</div>
+            <div class="submenu-item">电子实验记录</div>
+            <div class="submenu-item">期末处理</div>
+            <div class="submenu-item">质量管理</div>
+            <div class="submenu-item">资产管理</div>
+            <div class="submenu-item current">对账协同</div>
+          </div>
+        </div>
+        <div class="menu-section">
+          <div class="menu-item"><span class="menu-label">BI</span><span class="menu-arrow">▾</span></div>
+        </div>
+      </div>
+      <div class="sidebar-version">Version 3.2.4.240903</div>
+    </aside>
+
+    <main class="content">
+      <div class="page-tabs" id="pageTabs">
+        <div class="page-tab" data-tab="workbench">工作台<span class="tab-close" title="关闭">×</span></div>
+        <div class="page-tab" data-tab="po-list">采购订单<span class="tab-close" title="关闭">×</span></div>
+        <div class="page-tab active" data-tab="recon-list">进项发票<span class="tab-close" title="关闭">×</span></div>
+      </div>
+
+      <div data-v-1f2e6716="" class="ddp-search"><div data-v-a9126b22="" data-v-1f2e6716="" class="layout-container"><div data-v-72d31b90="" data-v-1f2e6716="" class="box-layout-search" data-v-a9126b22=""><div data-v-72d31b90="" class="layout-search-left"><div data-v-72d31b90="" class="search-view-select"><div data-v-72d31b90="" class="el-select el-select--mini" style="font-size: 14px;"><!----><div class="el-input el-input--mini el-input--suffix"><!----><input type="text" readonly="readonly" autocomplete="off" placeholder="列表视图（全部）" class="el-input__inner"><!----><span class="el-input__suffix"><span class="el-input__suffix-inner"><i class="el-select__caret el-input__icon el-icon-arrow-up"></i><!----><!----><!----><!----><!----></span><!----></span><!----><!----></div><div class="el-select-dropdown el-popper selectionClass" style="display: none; min-width: 200px;"><div class="el-scrollbar" style=""><div class="el-select-dropdown__wrap el-scrollbar__wrap" style="margin-bottom: -8px; margin-right: -8px;"><ul class="el-scrollbar__view el-select-dropdown__list"><!----><li data-v-72d31b90="" class="el-select-dropdown__item selected"><span data-v-72d31b90="" class="search-view-select-left" style="float: left;"><!----> 列表视图（全部） </span><span data-v-72d31b90="" class="search-view-select-right" style="float: right;">设为默认</span></li><li data-v-72d31b90="" class="el-select-dropdown__item"><span data-v-72d31b90="" class="search-view-select-left" style="float: left;"><!----> 待我审批 </span><span data-v-72d31b90="" class="search-view-select-right" style="float: right;">设为默认</span></li><li data-v-72d31b90="" class="el-select-dropdown__item"><span data-v-72d31b90="" class="search-view-select-left" style="float: left;"><!----> 物料明细视图（全部） </span><span data-v-72d31b90="" class="search-view-select-right" style="float: right;">设为默认</span></li><li data-v-72d31b90="" class="el-select-dropdown__item"><span data-v-72d31b90="" class="search-view-select-left" style="float: left;"><!----> 付款计划视图（全部） </span><span data-v-72d31b90="" class="search-view-select-right" style="float: right;">设为默认</span></li></ul></div><div class="el-scrollbar__bar is-horizontal"><div class="el-scrollbar__thumb" style="transform: translateX(0%);"></div></div><div class="el-scrollbar__bar is-vertical"><div class="el-scrollbar__thumb" style="transform: translateY(0%);"></div></div></div><!----></div></div></div><div data-v-72d31b90="" class="filter_wrap"><span data-v-72d31b90=""><div role="tooltip" id="el-popover-9682" aria-hidden="true" class="el-popover el-popper ddp-list-search-filter-popover" tabindex="0" style="width: 250px; display: none;"><!----><div data-v-72d31b90="" class="filter_box"><div data-v-72d31b90="" class="filter_title">预设过滤器</div><div data-v-72d31b90="" class="filter_item"><span data-v-72d31b90=""><span data-v-72d31b90="" class="filter_item_default" style="display: none;">[默认]</span> 改个名字测试长啥样哈 </span><div data-v-72d31b90="" class="filter_item_right"><span data-v-72d31b90="" class="filter_item_right_box">设为默认</span></div></div><!----><div data-v-72d31b90="" class="filter_title" style="margin-top: 5px;">个人过滤器</div><span data-v-72d31b90="" class="filter_item" style="font-style: italic;">暂无过滤器</span></div></div><span class="el-popover__reference-wrapper"><button data-v-72d31b90="" type="button" class="el-button el-button--text el-button--mini el-popover__reference" aria-describedby="el-popover-9682" tabindex="0"><!----><i class="iconfont icon-filter"></i><span><span data-v-72d31b90="">选择过滤器</span><i data-v-72d31b90="" class="iconfont icon-down"></i></span></button></span></span><span data-v-72d31b90="" class="filter_span_color" style="display: none;"></span><button data-v-72d31b90="" type="button" class="el-button el-button--text el-button--mini" style="display: none;"><!----><i class="iconfont icon-close"></i><!----></button></div><!----><!----></div><div data-v-58c14430="" data-v-72d31b90="" class="layout-search"><div data-v-58c14430="" class="search-option"><div data-v-58c14430="" class="search-input el-input el-input--mini el-input--prefix el-input--suffix"><!----><input type="text" autocomplete="off" placeholder="请输入关键字搜索" class="el-input__inner"><span class="el-input__prefix"><i class="el-input__icon iconfont icon-search"></i></span><!----><!----><!----></div><button data-v-58c14430="" type="button" class="el-button el-tooltip el-button--primary el-button--mini" aria-describedby="el-tooltip-4507" tabindex="0"><!----><span><span data-v-58c14430="" class="btn_name">搜索</span></span></button><button data-v-58c14430="" type="button" class="el-button el-tooltip el-button--default el-button--mini" aria-describedby="el-tooltip-4916" tabindex="0"><!----><span><span data-v-58c14430="" class="btn_name">重置</span></span></button><button data-v-58c14430="" type="button" class="el-button search-btn el-button--text el-button--mini"><!----><!----><span><span data-v-58c14430="" class="btn_name">展开</span><i data-v-58c14430="" class="iconfont icon-down"></i></span></button><button data-v-58c14430="" type="button" class="el-button el-tooltip btn_name el-button--text el-button--mini" aria-describedby="el-tooltip-6079" tabindex="0"><!----><!----><span>保存</span></button><button data-v-58c14430="" type="button" class="el-button el-tooltip btn_name el-button--text el-button--mini" aria-describedby="el-tooltip-9933" tabindex="0"><!----><!----><span>另存为</span></button></div><div data-v-58c14430="" class="popover-box" style="display: none;"><div data-v-58c14430="" class="el-tabs el-tabs--top"><div class="el-tabs__header is-top"><div class="el-tabs__nav-wrap is-top"><div class="el-tabs__nav-scroll"><div role="tablist" class="el-tabs__nav is-top" style="transform: translateX(0px);"><div class="el-tabs__active-bar is-top" style="width: 0px; transform: translateX(0px);"></div><div id="tab-1" aria-controls="pane-1" role="tab" aria-selected="true" tabindex="0" class="el-tabs__item is-top is-active">普通属性</div></div></div></div></div><div class="el-tabs__content"><div data-v-58c14430="" role="tabpanel" id="pane-1" aria-labelledby="tab-1" class="el-tab-pane"><form data-v-58c14430="" class="el-form sone-form-box common-form el-form--label-top" style="height: auto; overflow-y: hidden;"><div class="el-row" style="margin-left: -10px; margin-right: -10px;"><div class="el-col el-col-6" style="padding-left: 10px; padding-right: 10px;"><div class="el-form-item el-form-item--mini"><label for="db7393b3a8f9485f98cbc6386130c306" class="el-form-item__label"><label><span>单据编码</span><!----></label></label><div class="el-form-item__content"><!----><div class="el-input el-input--mini el-input--suffix"><!----><input type="text" autocomplete="off" placeholder="请输入 单据编码" class="el-input__inner"><!----><!----><!----><!----></div><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----></div></div></div><div class="el-col el-col-6" style="padding-left: 10px; padding-right: 10px;"><div class="el-form-item el-form-item--mini"><label for="f50c2db58eae48a785954eda7874acd5" class="el-form-item__label"><label><span>单据日期</span><!----></label></label><div class="el-form-item__content"><!----><!----><!----><!----><!----><!----><!----><!----><!----><div class="el-date-editor el-range-editor el-input__inner el-date-editor--daterange el-range-editor--mini"><i class="el-input__icon el-range__icon el-icon-date"></i><input autocomplete="off" name="" class="el-range-input"><span class="el-range-separator">-</span><input autocomplete="off" name="" class="el-range-input"><i class="el-input__icon el-range__close-icon"></i></div><!----><!----></div></div></div><div class="el-col el-col-6" style="padding-left: 10px; padding-right: 10px;"><div class="el-form-item el-form-item--mini"><label for="24008c55b4304af1bde91fbcaf708d0f" class="el-form-item__label"><label><span>来源类型</span><!----></label></label><div class="el-form-item__content"><!----><div data-v-024a75a2="" data-v-58c14430="" class="special-Input"><div data-v-024a75a2="" class="special-mask" style="display: none;"></div><span data-v-024a75a2=""><span class="el-popover__reference-wrapper"><div data-v-024a75a2="" class="input-view el-input el-input--mini el-input--suffix el-popover__reference" aria-describedby="el-popover-8267" tabindex="0"><!----><input type="text" autocomplete="off" placeholder="请选择 来源类型" class="el-input__inner"><!----><!----><!----><!----></div></span></span><i data-v-024a75a2="" class="iconfont icon-more"></i><!----></div><!----></div></div></div><div class="el-col el-col-6" style="padding-left: 10px; padding-right: 10px;"><div class="el-form-item el-form-item--mini"><label for="5a9231dfb95b4661b40cc363615f4cd1" class="el-form-item__label"><label><span>合同类型</span><!----></label></label><div class="el-form-item__content"><!----><div data-v-024a75a2="" data-v-58c14430="" class="special-Input"><div data-v-024a75a2="" class="special-mask" style="display: none;"></div><span data-v-024a75a2=""><span class="el-popover__reference-wrapper"><div data-v-024a75a2="" class="input-view el-input el-input--mini el-input--suffix el-popover__reference" aria-describedby="el-popover-1098" tabindex="0"><!----><input type="text" autocomplete="off" placeholder="请选择 合同类型" class="el-input__inner"><!----><!----><!----><!----></div></span></span><i data-v-024a75a2="" class="iconfont icon-more"></i><!----></div><!----></div></div></div><div class="el-col el-col-6" style="padding-left: 10px; padding-right: 10px;"><div class="el-form-item el-form-item--mini"><label for="ca5b0d562dc54e1280dd6e0eca1dc718" class="el-form-item__label"><label><span>业务类型</span><!----></label></label><div class="el-form-item__content"><!----><div data-v-024a75a2="" data-v-58c14430="" class="special-Input"><div data-v-024a75a2="" class="special-mask" style="display: none;"></div><span data-v-024a75a2=""><span class="el-popover__reference-wrapper"><div data-v-024a75a2="" class="input-view el-input el-input--mini el-input--suffix el-popover__reference" aria-describedby="el-popover-7158" tabindex="0"><!----><input type="text" autocomplete="off" placeholder="请选择 业务类型" class="el-input__inner"><!----><!----><!----><!----></div></span></span><i data-v-024a75a2="" class="iconfont icon-more"></i><!----></div><!----></div></div></div><div class="el-col el-col-6" style="padding-left: 10px; padding-right: 10px;"><div class="el-form-item el-form-item--mini"><label for="ee64405088ba476eb8709e02cd37047e" class="el-form-item__label"><label><span>供应商</span><!----></label></label><div class="el-form-item__content"><!----><div data-v-024a75a2="" data-v-58c14430="" class="special-Input"><div data-v-024a75a2="" class="special-mask" style="display: none;"></div><span data-v-024a75a2=""><span class="el-popover__reference-wrapper"><div data-v-024a75a2="" class="input-view el-input el-input--mini el-input--suffix el-popover__reference" aria-describedby="el-popover-2016" tabindex="0"><!----><input type="text" autocomplete="off" placeholder="请选择 供应商" class="el-input__inner"><!----><!----><!----><!----></div></span></span><i data-v-024a75a2="" class="iconfont icon-more"></i><!----></div><!----></div></div></div><div class="el-col el-col-6" style="padding-left: 10px; padding-right: 10px;"><div class="el-form-item el-form-item--mini"><label for="20c443b7b9a74b4099578692542c36d1" class="el-form-item__label"><label><span>数量</span><!----></label></label><div class="el-form-item__content"><!----><div data-v-58c14430="" class="sone-input-number el-input-number el-input-number--mini is-without-controls"><!----><!----><div class="el-input el-input--mini el-input--suffix sone-number-ctl"><!----><input type="text" autocomplete="off" placeholder="请输入 数量" max="Infinity" min="-Infinity" class="el-input__inner" role="spinbutton" aria-valuemax="Infinity" aria-valuemin="-Infinity" aria-valuenow="" aria-disabled="false"><!----><!----><!----><!----></div></div><!----><!----></div></div></div><div class="el-col el-col-6" style="padding-left: 10px; padding-right: 10px;"><div class="el-form-item el-form-item--mini"><label for="255eaca8d76e4a08b74d0f37a68f7523" class="el-form-item__label"><label><span>价税合计</span><!----></label></label><div class="el-form-item__content"><!----><div data-v-58c14430="" class="sone-input-number el-input-number el-input-number--mini is-without-controls"><!----><!----><div class="el-input el-input--mini el-input--suffix sone-number-ctl"><!----><input type="text" autocomplete="off" placeholder="请输入 价税合计" max="Infinity" min="-Infinity" class="el-input__inner" role="spinbutton" aria-valuemax="Infinity" aria-valuemin="-Infinity" aria-valuenow="" aria-disabled="false"><!----><!----><!----><!----></div></div><!----><!----></div></div></div><div class="el-col el-col-6" style="padding-left: 10px; padding-right: 10px;"><div class="el-form-item el-form-item--mini"><label for="f0b009a383414be58930e8df16381f58" class="el-form-item__label"><label><span>采购员</span><!----></label></label><div class="el-form-item__content"><!----><div data-v-024a75a2="" data-v-58c14430="" class="special-Input"><div data-v-024a75a2="" class="special-mask" style="display: none;"></div><span data-v-024a75a2=""><span class="el-popover__reference-wrapper"><div data-v-024a75a2="" class="input-view el-input el-input--mini el-input--suffix el-popover__reference" aria-describedby="el-popover-5545" tabindex="0"><!----><input type="text" autocomplete="off" placeholder="请选择 采购员" class="el-input__inner"><!----><!----><!----><!----></div></span></span><i data-v-024a75a2="" class="iconfont icon-more"></i><!----></div><!----></div></div></div><div class="el-col el-col-6" style="padding-left: 10px; padding-right: 10px;"><div class="el-form-item el-form-item--mini"><label for="8c48610afdce471a99fee383109480cc" class="el-form-item__label"><label><span>采购部门</span><!----></label></label><div class="el-form-item__content"><!----><div data-v-024a75a2="" data-v-58c14430="" class="special-Input"><div data-v-024a75a2="" class="special-mask" style="display: none;"></div><span data-v-024a75a2=""><span class="el-popover__reference-wrapper"><div data-v-024a75a2="" class="input-view el-input el-input--mini el-input--suffix el-popover__reference" aria-describedby="el-popover-8571" tabindex="0"><!----><input type="text" autocomplete="off" placeholder="请选择 采购部门" class="el-input__inner"><!----><!----><!----><!----></div></span></span><i data-v-024a75a2="" class="iconfont icon-more"></i><!----></div><!----></div></div></div><div class="el-col el-col-6" style="padding-left: 10px; padding-right: 10px;"><div class="el-form-item el-form-item--mini"><label for="6238bea697034ffaa048b7674fee5ee3" class="el-form-item__label"><label><span>单据摘要</span><!----></label></label><div class="el-form-item__content"><!----><div class="el-input el-input--mini el-input--suffix"><!----><input type="text" autocomplete="off" placeholder="请输入 单据摘要" class="el-input__inner"><!----><!----><!----><!----></div><!----><!----><!----><!----><!----><!----><!----><!----><!----><!----></div></div></div><div class="el-col el-col-6" style="padding-left: 10px; padding-right: 10px;"><div class="el-form-item el-form-item--mini"><label for="93c2eaa05a1649df84a57f4e032dd676" class="el-form-item__label"><label><span>单据状态</span><!----></label></label><div class="el-form-item__content"><!----><div data-v-024a75a2="" data-v-58c14430="" class="special-Input"><div data-v-024a75a2="" class="special-mask" style="display: none;"></div><span data-v-024a75a2=""><span class="el-popover__reference-wrapper"><div data-v-024a75a2="" class="input-view el-input el-input--mini el-input--suffix el-popover__reference" aria-describedby="el-popover-5957" tabindex="0"><!----><input type="text" autocomplete="off" placeholder="请选择 单据状态" class="el-input__inner"><!----><!----><!----><!----></div></span></span><i data-v-024a75a2="" class="iconfont icon-more"></i><!----></div><!----></div></div></div><div class="el-col el-col-6" style="padding-left: 10px; padding-right: 10px;"><div class="el-form-item el-form-item--mini"><label for="d0306bffa1594ad2bdab0ffba7830b02" class="el-form-item__label"><label><span>审批状态</span><!----></label></label><div class="el-form-item__content"><!----><div class="el-select el-select--mini"><div class="el-select__tags" style="width: 100%;"><!----><!----><input type="text" autocomplete="off" class="el-select__input is-mini" style="flex-grow: 1;"></div><div class="el-input el-input--mini el-input--suffix"><!----><input tabindex="-1" type="text" readonly="readonly" autocomplete="off" placeholder="请选择 审批状态" class="el-input__inner" style="height: 28px;"><!----><span class="el-input__suffix"><span class="el-input__suffix-inner"><i class="el-select__caret el-input__icon el-icon-arrow-up"></i><!----><!----><!----><!----><!----></span><!----></span><!----><!----></div><div class="el-select-dropdown el-popper is-multiple" style="display: none;"><div class="el-scrollbar" style=""><div class="el-select-dropdown__wrap el-scrollbar__wrap" style="margin-bottom: -8px; margin-right: -8px;"><ul class="el-scrollbar__view el-select-dropdown__list"><!----><li class="el-select-dropdown__item"><span>待审批</span></li><li class="el-select-dropdown__item"><span>审批中</span></li><li class="el-select-dropdown__item"><span>已结束</span></li><li class="el-select-dropdown__item"><span>已拒绝</span></li><li class="el-select-dropdown__item"><span>已撤回</span></li><li class="el-select-dropdown__item"><span>已终止</span></li></ul></div><div class="el-scrollbar__bar is-horizontal"><div class="el-scrollbar__thumb" style="transform: translateX(0%);"></div></div><div class="el-scrollbar__bar is-vertical"><div class="el-scrollbar__thumb" style="transform: translateY(0%);"></div></div></div><!----></div></div><!----><!----><!----><!----></div></div></div><div class="el-col el-col-6" style="padding-left: 10px; padding-right: 10px;"><div class="el-form-item el-form-item--mini"><label for="changeBtn" class="el-form-item__label"><label><span> </span><!----></label></label><div class="el-form-item__content"><!----><button data-v-58c14430="" type="button" class="el-button el-button--text el-button--mini" style="font-size: 14px;"><!----><!----><span>&gt;&gt;切换到高级检索</span></button><!----></div></div></div></div><!----><!----></form></div><!----></div></div></div></div><!----><!----></div></div></div>
+
+      <section class="list-table-shell">
+        <div class="list-toolbar">
+          <div class="list-toolbar-left">
+            <button class="btn primary">新建</button>
+            <button class="btn">删除</button>
+            <button class="btn">提交</button>
+            <button class="btn dropdown">关联生成</button>
+            <button class="btn dropdown">关联查询</button>
+            <button class="btn">导出</button>
+            <button class="btn">刷新</button>
+            <button class="btn">打印</button>
+          </div>
+          <div class="list-toolbar-right">
+            <span class="checkbox-lite"><span class="checkbox-box"></span>显示明细</span>
+            <button class="btn list-icon-btn">列展示</button>
+            <button class="btn">全屏</button>
+          </div>
+        </div>
+
+        <div class="purchase-table-wrap">
+          <div class="purchase-table-inner">
+          <table class="purchase-list-table">
+            <thead>
+              <tr>
+                <th style="width: 48px;">操作</th>
+                <th style="width: 48px;">序号</th>
+                <th style="width: 40px;" class="center purchase-th-checkbox">
+                  <label class="purchase-th-checkbox-wrap">
+                    <input type="checkbox" class="purchase-th-checkbox-input" title="全选" />
+                    <span class="purchase-th-checkbox-face" aria-hidden="true"></span>
+                  </label>
+                </th>
+                <th style="width: 150px;">单据编码</th>
+                <th style="width: 110px;">单据日期</th>
+                <th style="width: 105px;">来源类型</th>
+                <th style="width: 105px;">票据分类</th>
+                <th style="width: 130px;">发票种类</th>
+                <th style="width: 100px;">发票类型</th>
+                <th style="width: 115px;">采购组织</th>
+                <th style="width: 115px;">供应商编码</th>
+                <th style="width: 160px;">供应商名称</th>
+                <th style="width: 110px;">供应商联系人</th>
+                <th style="width: 80px;">采购员</th>
+                <th style="width: 110px;">采购部门</th>
+                <th style="width: 120px;">金额</th>
+                <th style="width: 110px;">折扣额</th>
+                <th style="width: 120px;">价税合计</th>
+                <th style="width: 160px;">单据摘要</th>
+                <th style="width: 95px;">发票状态</th>
+                <th style="width: 95px;">单据状态</th>
+                <th style="width: 95px;">审批状态</th>
+                <th style="width: 105px;">单据名称</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="center"><span class="row-more">···</span></td><td class="center">1</td><td class="center purchase-td-checkbox"><label class="purchase-th-checkbox-wrap"><input type="checkbox" class="purchase-th-checkbox-input" title="选择该行" /><span class="purchase-th-checkbox-face" aria-hidden="true"></span></label></td><td class="link-blue">JXFP20260423-001</td><td>2026-04-27</td><td>采购对账单</td><td>进项发票</td><td>增值税专用发票</td><td>蓝字发票</td><td>西南采购中心</td><td>GYS20260301</td><td>绿源化工原料有限公司</td><td>张三</td><td>高勉</td><td>西南片区</td><td class="number">11,100.00</td><td class="number">0.00</td><td class="number">12,543.00</td><td>4月原料采购进项票</td><td>已勾稽</td><td>已生效</td><td>已审批</td><td>进项发票</td>
+              </tr>
+              <tr>
+                <td class="center"><span class="row-more">···</span></td><td class="center">2</td><td class="center purchase-td-checkbox"><label class="purchase-th-checkbox-wrap"><input type="checkbox" class="purchase-th-checkbox-input" title="选择该行" /><span class="purchase-th-checkbox-face" aria-hidden="true"></span></label></td><td class="link-blue">JXFP20260423-002</td><td>2026-04-25</td><td>采购对账单</td><td>进项发票</td><td>增值税专用发票</td><td>蓝字发票</td><td>西南采购中心</td><td>GYS20260402</td><td>创维智造工业电子厂</td><td>李四</td><td>高勉</td><td>西南片区</td><td class="number">7,894.25</td><td class="number">0.00</td><td class="number">8,920.50</td><td>电子件采购进项票</td><td>待勾稽</td><td>待确认</td><td>待审批</td><td>进项发票</td>
+              </tr>
+              <tr>
+                <td class="center"><span class="row-more">···</span></td><td class="center">3</td><td class="center purchase-td-checkbox"><label class="purchase-th-checkbox-wrap"><input type="checkbox" class="purchase-th-checkbox-input" title="选择该行" /><span class="purchase-th-checkbox-face" aria-hidden="true"></span></label></td><td class="link-blue">JXFP20260423-003</td><td>2026-04-23</td><td>采购对账单</td><td>进项发票</td><td>增值税专用发票</td><td>蓝字发票</td><td>华南采购中心</td><td>GYS20260503</td><td>华鑫源供应商</td><td>王五</td><td>刘强</td><td>华南片区</td><td class="number">39,646.02</td><td class="number">400.00</td><td class="number">44,800.00</td><td>辅料采购含折扣</td><td>已认证</td><td>已生效</td><td>已审批</td><td>进项发票</td>
+              </tr>
+              <tr>
+                <td class="center"><span class="row-more">···</span></td><td class="center">4</td><td class="center purchase-td-checkbox"><label class="purchase-th-checkbox-wrap"><input type="checkbox" class="purchase-th-checkbox-input" title="选择该行" /><span class="purchase-th-checkbox-face" aria-hidden="true"></span></label></td><td class="link-blue">JXFP20260423-004</td><td>2026-04-22</td><td>采购对账单</td><td>进项发票</td><td>增值税普通发票</td><td>蓝字发票</td><td>华北采购中心</td><td>GYS20260604</td><td>安可提</td><td>赵六</td><td>陈宇</td><td>华北片区</td><td class="number">2,787.61</td><td class="number">0.00</td><td class="number">3,150.00</td><td>办公耗材采购票</td><td>未认证</td><td>草稿</td><td>草稿</td><td>进项发票</td>
+              </tr>
+              <tr>
+                <td class="center"><span class="row-more">···</span></td><td class="center">5</td><td class="center purchase-td-checkbox"><label class="purchase-th-checkbox-wrap"><input type="checkbox" class="purchase-th-checkbox-input" title="选择该行" /><span class="purchase-th-checkbox-face" aria-hidden="true"></span></label></td><td class="link-blue">JXFP20260423-005</td><td>2026-04-20</td><td>采购对账单</td><td>进项发票</td><td>增值税专用发票</td><td>红字发票</td><td>西南采购中心</td><td>GYS20260301</td><td>绿源化工原料有限公司</td><td>张三</td><td>高勉</td><td>西南片区</td><td class="number">60,079.65</td><td class="number">0.00</td><td class="number">67,890.00</td><td>红字发票冲销差异</td><td>待认证</td><td>已驳回</td><td>已驳回</td><td>进项发票</td>
+              </tr>
+              <tr>
+                <td class="center"><span class="row-more">···</span></td><td class="center">6</td><td class="center purchase-td-checkbox"><label class="purchase-th-checkbox-wrap"><input type="checkbox" class="purchase-th-checkbox-input" title="选择该行" /><span class="purchase-th-checkbox-face" aria-hidden="true"></span></label></td><td class="link-blue">JXFP20260423-006</td><td>2026-04-19</td><td>采购对账单</td><td>进项发票</td><td>增值税专用发票</td><td>蓝字发票</td><td>华东采购中心</td><td>GYS20260705</td><td>鑫达精密制造有限公司</td><td>孙七</td><td>周明</td><td>华东片区</td><td class="number">19,769.91</td><td class="number">0.00</td><td class="number">22,340.00</td><td>精密件采购进项票</td><td>待勾稽</td><td>待确认</td><td>审批中</td><td>进项发票</td>
+              </tr>
+              <tr>
+                <td class="center"><span class="row-more">···</span></td><td class="center">7</td><td class="center purchase-td-checkbox"><label class="purchase-th-checkbox-wrap"><input type="checkbox" class="purchase-th-checkbox-input" title="选择该行" /><span class="purchase-th-checkbox-face" aria-hidden="true"></span></label></td><td class="link-blue">JXFP20260423-007</td><td>2026-04-18</td><td>采购对账单</td><td>进项发票</td><td>增值税普通发票</td><td>蓝字发票</td><td>西南采购中心</td><td>GYS20260806</td><td>博雅技术服务有限公司</td><td>周八</td><td>高勉</td><td>西南片区</td><td class="number">14,716.98</td><td class="number">0.00</td><td class="number">15,600.00</td><td>技术服务费进项票</td><td>已认证</td><td>已生效</td><td>已审批</td><td>进项发票</td>
+              </tr>
+              <tr class="active-row">
+                <td class="center"><span class="row-more">···</span></td><td class="center">8</td><td class="center purchase-td-checkbox"><label class="purchase-th-checkbox-wrap"><input type="checkbox" class="purchase-th-checkbox-input" title="选择该行" /><span class="purchase-th-checkbox-face" aria-hidden="true"></span></label></td><td class="link-blue">JXFP20260423-008</td><td>2026-04-17</td><td>采购对账单</td><td>进项发票</td><td>增值税专用发票</td><td>蓝字发票</td><td>华南采购中心</td><td>GYS20260503</td><td>华鑫源供应商</td><td>王五</td><td>刘强</td><td>华南片区</td><td class="number">27,610.62</td><td class="number">0.00</td><td class="number">31,200.00</td><td>4月备件采购发票</td><td>待勾稽</td><td>执行中</td><td>审批中</td><td>进项发票</td>
+              </tr>
+              <tr>
+                <td class="center"><span class="row-more">···</span></td><td class="center">9</td><td class="center purchase-td-checkbox"><label class="purchase-th-checkbox-wrap"><input type="checkbox" class="purchase-th-checkbox-input" title="选择该行" /><span class="purchase-th-checkbox-face" aria-hidden="true"></span></label></td><td class="link-blue">JXFP20260423-009</td><td>2026-04-16</td><td>采购对账单</td><td>进项发票</td><td>增值税专用发票</td><td>蓝字发票</td><td>华北采购中心</td><td>GYS20260907</td><td>赛科电子科技有限公司</td><td>吴九</td><td>陈宇</td><td>华北片区</td><td class="number">8,738.94</td><td class="number">0.00</td><td class="number">9,875.00</td><td>设备配件进项票</td><td>未认证</td><td>待确认</td><td>待审批</td><td>进项发票</td>
+              </tr>
+              <tr>
+                <td class="center"><span class="row-more">···</span></td><td class="center">10</td><td class="center purchase-td-checkbox"><label class="purchase-th-checkbox-wrap"><input type="checkbox" class="purchase-th-checkbox-input" title="选择该行" /><span class="purchase-th-checkbox-face" aria-hidden="true"></span></label></td><td class="link-blue">JXFP20260423-010</td><td>2026-04-15</td><td>采购对账单</td><td>进项发票</td><td>增值税专用发票</td><td>红字发票</td><td>西南采购中心</td><td>GYS20260301</td><td>绿源化工原料有限公司</td><td>张三</td><td>高勉</td><td>西南片区</td><td class="number">4,805.31</td><td class="number">0.00</td><td class="number">5,430.00</td><td>重复发票作废</td><td>已作废</td><td>已作废</td><td>已作废</td><td>进项发票</td>
+              </tr>
+              <tr>
+                <td class="center"><span class="row-more">···</span></td><td class="center">11</td><td class="center purchase-td-checkbox"><label class="purchase-th-checkbox-wrap"><input type="checkbox" class="purchase-th-checkbox-input" title="选择该行" /><span class="purchase-th-checkbox-face" aria-hidden="true"></span></label></td><td class="link-blue">JXFP20260423-011</td><td>2026-04-14</td><td>采购对账单</td><td>进项发票</td><td>增值税专用发票</td><td>蓝字发票</td><td>华东采购中心</td><td>GYS20261008</td><td>德力精工有限公司</td><td>郑十</td><td>周明</td><td>华东片区</td><td class="number">50,884.96</td><td class="number">500.00</td><td class="number">57,500.00</td><td>含索赔扣款进项票</td><td>已认证</td><td>已生效</td><td>已审批</td><td>进项发票</td>
+              </tr>
+              <tr>
+                <td class="center"><span class="row-more">···</span></td><td class="center">12</td><td class="center purchase-td-checkbox"><label class="purchase-th-checkbox-wrap"><input type="checkbox" class="purchase-th-checkbox-input" title="选择该行" /><span class="purchase-th-checkbox-face" aria-hidden="true"></span></label></td><td class="link-blue">JXFP20260423-012</td><td>2026-04-13</td><td>采购对账单</td><td>进项发票</td><td>增值税专用发票</td><td>蓝字发票</td><td>华南采购中心</td><td>GYS20260503</td><td>华鑫源供应商</td><td>王五</td><td>刘强</td><td>华南片区</td><td class="number">20,752.21</td><td class="number">0.00</td><td class="number">23,450.00</td><td>包装材料采购票</td><td>待勾稽</td><td>执行中</td><td>审批中</td><td>进项发票</td>
+              </tr>
+              <tr>
+                <td class="center"><span class="row-more">···</span></td><td class="center">13</td><td class="center purchase-td-checkbox"><label class="purchase-th-checkbox-wrap"><input type="checkbox" class="purchase-th-checkbox-input" title="选择该行" /><span class="purchase-th-checkbox-face" aria-hidden="true"></span></label></td><td class="link-blue">JXFP20260423-013</td><td>2026-04-12</td><td>采购对账单</td><td>进项发票</td><td>增值税普通发票</td><td>蓝字发票</td><td>西南采购中心</td><td>GYS20260402</td><td>创维智造工业电子厂</td><td>李四</td><td>高勉</td><td>西南片区</td><td class="number">18,900.00</td><td class="number">0.00</td><td class="number">18,900.00</td><td>暂存票据待补全</td><td>未认证</td><td>草稿</td><td>草稿</td><td>进项发票</td>
+              </tr>
+              <tr>
+                <td class="center"><span class="row-more">···</span></td><td class="center">14</td><td class="center purchase-td-checkbox"><label class="purchase-th-checkbox-wrap"><input type="checkbox" class="purchase-th-checkbox-input" title="选择该行" /><span class="purchase-th-checkbox-face" aria-hidden="true"></span></label></td><td class="link-blue">JXFP20260423-014</td><td>2026-04-10</td><td>采购对账单</td><td>进项发票</td><td>增值税专用发票</td><td>蓝字发票</td><td>华北采购中心</td><td>GYS20261109</td><td>北方重工集团有限公司</td><td>马十一</td><td>陈宇</td><td>华北片区</td><td class="number">106,637.17</td><td class="number">0.00</td><td class="number">120,500.00</td><td>大型设备采购进项票</td><td>已认证</td><td>已生效</td><td>已审批</td><td>进项发票</td>
+              </tr>
+              <tr>
+                <td class="center"><span class="row-more">···</span></td><td class="center">15</td><td class="center purchase-td-checkbox"><label class="purchase-th-checkbox-wrap"><input type="checkbox" class="purchase-th-checkbox-input" title="选择该行" /><span class="purchase-th-checkbox-face" aria-hidden="true"></span></label></td><td class="link-blue">JXFP20260423-015</td><td>2026-04-08</td><td>采购对账单</td><td>进项发票</td><td>增值税专用发票</td><td>蓝字发票</td><td>西南采购中心</td><td>GYS20260301</td><td>绿源化工原料有限公司</td><td>张三</td><td>高勉</td><td>西南片区</td><td class="number">2,070.80</td><td class="number">0.00</td><td class="number">2,340.00</td><td>零星材料采购票</td><td>待勾稽</td><td>待确认</td><td>待审批</td><td>进项发票</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td>合计</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="number">396,393.43</td>
+                <td class="number">900.00</td>
+                <td class="number">444,438.50</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+          </div>
+        </div>
+
+        <div class="list-footer-bar">
+          <span class="selected-count"><span>☑</span>已勾选 <strong>0</strong> 条</span>
+          <div class="pagination-lite">
+            <span>共 532 条</span>
+            <span class="pager-size">50条/页</span>
+            <span class="pager-btn">‹</span>
+            <span class="pager-num active">1</span>
+            <span class="pager-num">2</span>
+            <span class="pager-num">3</span>
+            <span class="pager-num">4</span>
+            <span class="pager-num">5</span>
+            <span class="pager-num">6</span>
+            <span class="pager-more">…</span>
+            <span class="pager-num">11</span>
+            <span class="pager-btn">›</span>
+            <span class="pager-jump">前往<span class="pager-input"></span>页</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const sidebar = document.querySelector(".sidebar");
+    const menuSections = document.querySelectorAll(".menu-section");
+    const submenuItems = document.querySelectorAll(".submenu-item");
+
+    document.querySelectorAll("[data-tab-group]").forEach((group) => {
+      const tabs = group.querySelectorAll("[data-target]");
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", function () {
+          const target = tab.getAttribute("data-target");
+          const container = group.parentElement;
+
+          tabs.forEach((item) => item.classList.remove("active"));
+          container.querySelectorAll("[data-pane]").forEach((pane) => pane.classList.add("hidden"));
+          tab.classList.add("active");
+          const targetPane = container.querySelector('[data-pane="' + target + '"]');
+          if (targetPane) {
+            targetPane.classList.remove("hidden");
+          }
+        });
+      });
+    });
+
+    menuSections.forEach((section) => {
+      const menuItem = section.querySelector(".menu-item");
+      const submenu = section.querySelector(".submenu");
+
+      menuItem.addEventListener("click", function () {
+        if (sidebar.classList.contains("collapsed")) {
+          sidebar.classList.remove("collapsed");
+        }
+
+        if (!submenu) {
+          document.querySelectorAll(".menu-item").forEach((item) => item.classList.remove("active"));
+          menuItem.classList.add("active");
+          return;
+        }
+
+        const willOpen = !section.classList.contains("open");
+        menuSections.forEach((item) => item.classList.remove("open"));
+        document.querySelectorAll(".menu-item").forEach((item) => item.classList.remove("active"));
+        if (willOpen) {
+          section.classList.add("open");
+          menuItem.classList.add("active");
+        }
+      });
+    });
+
+    submenuItems.forEach((item) => {
+      item.addEventListener("click", function (event) {
+        event.stopPropagation();
+        submenuItems.forEach((sub) => sub.classList.remove("current"));
+        item.classList.add("current");
+      });
+    });
+
+    // Page tab: click to activate, click × to close
+    const pageTabs = document.getElementById("pageTabs");
+    if (pageTabs) {
+      pageTabs.addEventListener("click", function (e) {
+        const closeBtn = e.target.closest(".tab-close");
+        const tab = e.target.closest(".page-tab");
+        if (!tab) return;
+
+        if (closeBtn) {
+          e.stopPropagation();
+          const wasActive = tab.classList.contains("active");
+          const allTabs = Array.from(pageTabs.querySelectorAll(".page-tab"));
+          const idx = allTabs.indexOf(tab);
+          tab.remove();
+          if (wasActive) {
+            const remaining = pageTabs.querySelectorAll(".page-tab");
+            if (remaining.length > 0) {
+              // activate the tab to the left, or the first one
+              const nextIdx = Math.max(0, idx - 1);
+              remaining[Math.min(nextIdx, remaining.length - 1)].classList.add("active");
+            }
+          }
+          return;
+        }
+
+        pageTabs.querySelectorAll(".page-tab").forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+      });
+    }
+
+    // 对账信息展开 / 收起
+    var reconToggle = document.getElementById('reconToggle');
+    var reconExtra = document.getElementById('reconExtra');
+    var reconArrow = document.getElementById('reconArrow');
+    if (reconToggle) {
+      reconToggle.addEventListener('click', function () {
+        var isHidden = reconExtra.style.display === 'none';
+        reconExtra.style.display = isHidden ? '' : 'none';
+        reconArrow.textContent = isHidden ? '▲' : '▼';
+      });
+    }
+
+    /* 采购对账单列表：表头全选 ↔ 各行复选框 */
+    var purchaseTable = document.querySelector('.purchase-list-table');
+    if (purchaseTable) {
+      var purchaseHeadCb = purchaseTable.querySelector('thead .purchase-th-checkbox-input');
+      var purchaseRowCbs = function () {
+        return purchaseTable.querySelectorAll('tbody td.purchase-td-checkbox .purchase-th-checkbox-input');
+      };
+      function purchaseSyncHead() {
+        if (!purchaseHeadCb) return;
+        var rowList = purchaseTable.querySelectorAll('tbody td.purchase-td-checkbox .purchase-th-checkbox-input');
+        var total = rowList.length;
+        var checked = 0;
+        rowList.forEach(function (inp) {
+          if (inp.checked) checked++;
+        });
+        purchaseHeadCb.checked = total > 0 && checked === total;
+        purchaseHeadCb.indeterminate = checked > 0 && checked < total;
+      }
+      if (purchaseHeadCb) {
+        purchaseHeadCb.addEventListener('change', function () {
+          var v = purchaseHeadCb.checked;
+          purchaseRowCbs().forEach(function (inp) {
+            inp.checked = v;
+          });
+          purchaseHeadCb.indeterminate = false;
+        });
+      }
+      purchaseRowCbs().forEach(function (inp) {
+        inp.addEventListener('change', purchaseSyncHead);
+      });
+      purchaseSyncHead();
+    }
+  })();
+</script>
