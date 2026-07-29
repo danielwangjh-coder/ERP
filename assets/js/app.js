@@ -31,7 +31,11 @@
       if (Array.isArray(second.groups)) {
         second.groups.forEach((group) => {
           (group.items || []).forEach((item) => {
-            flatItems.push(Object.assign({}, item, { module, second, group }));
+            const menuItem = Object.assign({}, item, { module, second, group });
+            flatItems.push(menuItem);
+            (item.views || []).forEach((view) => {
+              flatItems.push(Object.assign({}, menuItem, view, { menuRoute: item.route }));
+            });
           });
         });
         return;
@@ -41,7 +45,7 @@
     });
   });
 
-  const defaultItem = flatItems.find((item) => item.id === "sales-management") || flatItems[0] || null;
+  const defaultItem = flatItems.find((item) => item.id === "sales-outbound-order") || flatItems[0] || null;
 
   function selectedSecondId() {
     if (activeThirdMenu) return activeThirdMenu.second.id;
@@ -139,7 +143,8 @@
         const menuLink = create("button", "menu-list-wrap");
         menuLink.type = "button";
         menuLink.title = rawItem.label;
-        menuLink.classList.toggle("selected", currentItem && currentItem.route === rawItem.route);
+        const currentMenuRoute = currentItem && (currentItem.menuRoute || currentItem.route);
+        menuLink.classList.toggle("selected", currentMenuRoute === rawItem.route);
         const left = create("span", "menu-list-left");
         left.append(create("span", "text", rawItem.label));
         menuLink.append(left);

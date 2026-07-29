@@ -1,7 +1,13 @@
 (function () {
   "use strict";
 
-  const leaf = (id, label, route, page) => ({ id, label, route, page: page || "" });
+  const leaf = (id, label, route, page, views) => ({
+    id,
+    label,
+    route,
+    page: page || "",
+    views: Array.isArray(views) ? views : []
+  });
 
   window.ERP_MENU = [
     {
@@ -160,7 +166,32 @@
             }
           ]
         },
-        leaf("sales-management", "销售管理", "#/supply-chain-management/sales-management"),
+        {
+          id: "sales-management",
+          label: "销售管理",
+          groups: [
+            {
+              id: "sales-execution",
+              label: "销售执行",
+              items: [
+                leaf(
+                  "sales-outbound-order",
+                  "销售出库单",
+                  "#/supply-chain-management/sales-management/sales-execution/sales-outbound-order",
+                  "销售出库单-列表.html",
+                  [
+                    {
+                      id: "sales-outbound-order-detail",
+                      label: "销售出库单详情",
+                      route: "#/supply-chain-management/sales-management/sales-execution/sales-outbound-order/detail",
+                      page: "销售出库单-详情.html"
+                    }
+                  ]
+                )
+              ]
+            }
+          ]
+        },
         leaf("consignment-management", "寄售管理", "#/supply-chain-management/consignment-management"),
         leaf("inventory-management", "库存管理", "#/supply-chain-management/inventory-management"),
         leaf("supply-chain-advanced-reports", "供应链高级报表", "#/supply-chain-management/supply-chain-advanced-reports"),
