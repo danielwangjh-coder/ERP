@@ -346,12 +346,12 @@ button {
 .submenu-arrow::before {
   content: "";
   position: absolute;
-  left: 1px;
-  top: 1px;
-  width: 8px;
-  height: 8px;
-  border-top: 1.4px solid currentColor;
-  border-right: 1.4px solid currentColor;
+  left: 2px;
+  top: 2px;
+  width: 7px;
+  height: 7px;
+  border-top: 1px solid currentColor;
+  border-right: 1px solid currentColor;
   transform: rotate(45deg);
   transition: transform 0.18s ease;
 }
