@@ -795,7 +795,8 @@
   }
 
   function refreshTableSpacers(root) {
-    (root || document).querySelectorAll(".pk-table-sample table, .pk-table-grid-wrap table").forEach(function (table) {
+    var scope = root && typeof root.querySelectorAll === "function" ? root : document;
+    scope.querySelectorAll(".pk-table-sample table, .pk-table-grid-wrap table").forEach(function (table) {
       ensureTableSpacer(table);
     });
   }
@@ -992,6 +993,213 @@
     });
   }
 
+  function closeListWorkbenchPopovers(root, except) {
+    var scope = root && typeof root.querySelectorAll === "function" ? root : document;
+    scope.querySelectorAll("[data-pk-query-filter].is-open, [data-pk-column-manager].is-open, [data-pk-row-menu].is-open").forEach(function (container) {
+      if (container === except) return;
+      container.classList.remove("is-open");
+      var trigger = container.querySelector("[data-pk-query-filter-trigger], [data-pk-column-trigger], [data-pk-row-menu-trigger]");
+      var panel = container.querySelector("[data-pk-query-filter-panel], [data-pk-column-panel], [data-pk-row-menu-panel]");
+      if (trigger) trigger.setAttribute("aria-expanded", "false");
+      if (panel) panel.hidden = true;
+    });
+  }
+
+  function initListWorkbenches(root) {
+    var doc = root && root.nodeType === 9 ? root : (root.ownerDocument || document);
+
+    root.querySelectorAll("[data-pk-list-workbench]").forEach(function (workbench) {
+      if (!markReady(workbench, "pkListWorkbenchReady")) return;
+      var surface = workbench.querySelector(".pk-list-surface");
+      var table = workbench.querySelector("[data-pk-list-table]");
+      var queryToggle = workbench.querySelector("[data-pk-query-toggle]");
+      var advanced = workbench.querySelector("[data-pk-query-advanced]");
+      var fullscreenToggle = workbench.querySelector("[data-pk-list-fullscreen]");
+
+      if (queryToggle && advanced) {
+        queryToggle.addEventListener("click", function () {
+          var expanded = advanced.hidden;
+          advanced.hidden = !expanded;
+          queryToggle.setAttribute("aria-expanded", expanded ? "true" : "false");
+          queryToggle.textContent = expanded
+            ? (queryToggle.dataset.pkCollapseLabel || "收起")
+            : (queryToggle.dataset.pkExpandLabel || "展开");
+        });
+      }
+
+      workbench.querySelectorAll("[data-pk-query-filter]").forEach(function (filter) {
+        var trigger = filter.querySelector("[data-pk-query-filter-trigger]");
+        var panel = filter.querySelector("[data-pk-query-filter-panel]");
+        if (!trigger || !panel) return;
+
+        trigger.addEventListener("click", function (event) {
+          event.stopPropagation();
+          var open = !filter.classList.contains("is-open");
+          closeListWorkbenchPopovers(doc, filter);
+          filter.classList.toggle("is-open", open);
+          trigger.setAttribute("aria-expanded", open ? "true" : "false");
+          panel.hidden = !open;
+        });
+
+        panel.addEventListener("click", function (event) {
+          event.stopPropagation();
+          var option = event.target.closest("[data-pk-query-filter-value]");
+          if (!option) return;
+          panel.querySelectorAll("[data-pk-query-filter-value]").forEach(function (item) {
+            item.classList.toggle("is-selected", item === option);
+          });
+          var label = trigger.querySelector("[data-pk-query-filter-label]");
+          if (label) label.textContent = option.textContent.trim();
+          closeListWorkbenchPopovers(doc);
+        });
+      });
+
+      workbench.querySelectorAll("[data-pk-column-manager]").forEach(function (manager) {
+        var trigger = manager.querySelector("[data-pk-column-trigger]");
+        var panel = manager.querySelector("[data-pk-column-panel]");
+        if (!trigger || !panel) return;
+
+        trigger.addEventListener("click", function (event) {
+          event.stopPropagation();
+          var open = !manager.classList.contains("is-open");
+          closeListWorkbenchPopovers(doc, manager);
+          manager.classList.toggle("is-open", open);
+          trigger.setAttribute("aria-expanded", open ? "true" : "false");
+          panel.hidden = !open;
+        });
+
+        panel.addEventListener("click", function (event) {
+          event.stopPropagation();
+        });
+
+        panel.addEventListener("change", function (event) {
+          var checkbox = event.target.closest("[data-pk-column-index]");
+          if (!checkbox || !table) return;
+          var columnIndex = Number(checkbox.dataset.pkColumnIndex);
+          if (!Number.isInteger(columnIndex) || columnIndex < 1) return;
+          var hidden = !checkbox.checked;
+          var column = table.querySelector("col:nth-child(" + columnIndex + ")");
+          if (column) column.classList.toggle("pk-list-column-hidden", hidden);
+          table.querySelectorAll("tr").forEach(function (row) {
+            var cell = row.children[columnIndex - 1];
+            if (cell) cell.classList.toggle("pk-list-column-hidden", hidden);
+          });
+        });
+      });
+
+      workbench.addEventListener("click", function (event) {
+        var trigger = event.target.closest("[data-pk-row-menu-trigger]");
+        if (trigger) {
+          event.stopPropagation();
+          var menu = trigger.closest("[data-pk-row-menu]");
+          var panel = menu ? menu.querySelector("[data-pk-row-menu-panel]") : null;
+          if (!menu || !panel) return;
+          var open = !menu.classList.contains("is-open");
+          closeListWorkbenchPopovers(doc, menu);
+          menu.classList.toggle("is-open", open);
+          trigger.setAttribute("aria-expanded", open ? "true" : "false");
+          panel.hidden = !open;
+          return;
+        }
+
+        if (event.target.closest("[data-pk-row-menu-panel] button")) {
+          closeListWorkbenchPopovers(doc);
+        }
+      });
+
+      if (fullscreenToggle && surface) {
+        fullscreenToggle.addEventListener("click", function () {
+          var active = !surface.classList.contains("is-fullscreen");
+          surface.classList.toggle("is-fullscreen", active);
+          doc.body.classList.toggle("pk-list-fullscreen-active", active);
+          fullscreenToggle.setAttribute("aria-pressed", active ? "true" : "false");
+          fullscreenToggle.setAttribute("aria-label", active ? "退出全屏" : "全屏");
+          fullscreenToggle.title = active ? "退出全屏" : "全屏";
+          closeListWorkbenchPopovers(doc);
+        });
+      }
+    });
+
+    if (markReady(doc.documentElement, "pkListWorkbenchDocumentReady")) {
+      doc.addEventListener("click", function () {
+        closeListWorkbenchPopovers(doc);
+      });
+      doc.addEventListener("keydown", function (event) {
+        if (event.key !== "Escape") return;
+        var fullscreen = doc.querySelector(".pk-list-surface.is-fullscreen");
+        if (fullscreen) {
+          fullscreen.classList.remove("is-fullscreen");
+          doc.body.classList.remove("pk-list-fullscreen-active");
+          var toggle = fullscreen.querySelector("[data-pk-list-fullscreen]");
+          if (toggle) {
+            toggle.setAttribute("aria-pressed", "false");
+            toggle.setAttribute("aria-label", "全屏");
+            toggle.title = "全屏";
+          }
+        }
+        closeListWorkbenchPopovers(doc);
+      });
+    }
+  }
+
+  function setDialogVisible(mask, visible) {
+    if (!mask) return;
+    mask.classList.toggle("is-visible", visible);
+    mask.setAttribute("aria-hidden", visible ? "false" : "true");
+    var doc = mask.ownerDocument;
+    doc.body.classList.toggle("pk-dialog-open", visible || !!doc.querySelector(".pk-dialog-mask.is-visible"));
+    if (visible) {
+      var firstControl = mask.querySelector("button, input, select, textarea, [tabindex='0']");
+      if (firstControl) firstControl.focus();
+    }
+  }
+
+  function initDialogs(root) {
+    var doc = root && root.nodeType === 9 ? root : (root.ownerDocument || document);
+
+    root.querySelectorAll("[data-pk-dialog-open]").forEach(function (button) {
+      if (!markReady(button, "pkDialogOpenReady")) return;
+      button.addEventListener("click", function () {
+        var mask = doc.getElementById(button.getAttribute("data-pk-dialog-open"));
+        setDialogVisible(mask, true);
+      });
+    });
+
+    root.querySelectorAll(".pk-dialog-mask").forEach(function (mask) {
+      if (!markReady(mask, "pkDialogReady")) return;
+      mask.addEventListener("click", function (event) {
+        if (event.target === mask || event.target.closest("[data-pk-dialog-close]")) {
+          setDialogVisible(mask, false);
+        }
+      });
+    });
+
+    root.querySelectorAll("[data-pk-document-tabs]").forEach(function (tabs) {
+      if (!markReady(tabs, "pkDocumentTabsReady")) return;
+      tabs.addEventListener("click", function (event) {
+        var tab = event.target.closest("[data-pk-document-tab]");
+        if (!tab) return;
+        var dialog = tab.closest(".pk-dialog--document-detail");
+        if (!dialog) return;
+        dialog.querySelectorAll("[data-pk-document-tab]").forEach(function (item) {
+          item.classList.toggle("is-active", item === tab);
+          item.setAttribute("aria-selected", item === tab ? "true" : "false");
+        });
+        dialog.querySelectorAll("[data-pk-document-panel]").forEach(function (panel) {
+          panel.hidden = panel.dataset.pkDocumentPanel !== tab.dataset.pkDocumentTab;
+        });
+      });
+    });
+
+    if (markReady(doc.documentElement, "pkDialogDocumentReady")) {
+      doc.addEventListener("keydown", function (event) {
+        if (event.key !== "Escape") return;
+        var masks = Array.from(doc.querySelectorAll(".pk-dialog-mask.is-visible"));
+        setDialogVisible(masks[masks.length - 1], false);
+      });
+    }
+  }
+
   function initPrototypeKit(root) {
     var scope = root || document;
     initTextarea(scope);
@@ -1006,6 +1214,8 @@
     initButtonComponents(scope);
     initTableExamples(scope);
     initSnippetCopy(scope);
+    initListWorkbenches(scope);
+    initDialogs(scope);
     scope.querySelectorAll("[data-pk-indeterminate]").forEach(function (checkbox) {
       checkbox.indeterminate = true;
       checkbox.classList.add("is-indeterminate");
@@ -1021,6 +1231,7 @@
       closeDatePanel();
       closeSaveGroups();
       closeToolbarDropdowns();
+      closeListWorkbenchPopovers(document);
     }
   };
 

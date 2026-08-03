@@ -1521,18 +1521,23 @@
     font-size: var(--vxe-ui-font-size-mini) !important;
     color: var(--vxe-ui-font-color);
     background-color: var(--vxe-ui-layout-background-color);
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     border: 1px solid #ebebeb;
     border-right: none;
     border-bottom: none;
   }
 
-  .purchase-list-table th {
-    min-height: var(--vxe-row-h);
-    height: var(--vxe-row-h);
+  .purchase-list-table thead {
     position: sticky;
     top: 0;
     z-index: 5;
+  }
+
+  .purchase-list-table th {
+    min-height: var(--vxe-row-h);
+    height: var(--vxe-row-h);
+    position: static;
     background: var(--vxe-ui-table-header-background-color);
     color: var(--vxe-ui-table-header-font-color);
     font-size: var(--vxe-ui-font-size-mini) !important;

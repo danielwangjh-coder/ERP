@@ -15,9 +15,24 @@
           <div class="logo-box">SmartOne</div>
         </div>
         <button class="menu-trigger" id="menuTrigger" type="button" aria-label="切换菜单" title="切换菜单"><span></span></button>
-        <div class="search-box">
-          <span>请输入搜索内容</span>
-          <span class="search-icon">⌕</span>
+        <div class="menu-search" id="menuSearch">
+          <div class="search-box" id="menuSearchControl" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-owns="menuSearchPanel">
+            <input class="menu-search-input" id="menuSearchInput" type="search" placeholder="请输入搜索内容" autocomplete="off" aria-label="搜索应用菜单" aria-controls="menuSearchResults" aria-autocomplete="list">
+            <button class="menu-search-clear" id="menuSearchClear" type="button" aria-label="清空搜索" title="清空搜索" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+            </button>
+          </div>
+          <div class="menu-search-panel" id="menuSearchPanel" role="listbox" aria-label="菜单搜索结果" hidden>
+            <div class="menu-search-summary">
+              <span class="menu-search-summary-left">
+                <svg class="menu-search-summary-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m16 16 4 4"></path></svg>
+                <span id="menuSearchSummaryText"></span>
+              </span>
+              <span class="menu-search-total">共 <strong id="menuSearchTotal">0</strong> 项</span>
+            </div>
+            <div class="menu-search-results" id="menuSearchResults"></div>
+            <div class="menu-search-empty" id="menuSearchEmpty" hidden>未找到匹配菜单</div>
+          </div>
         </div>
       </div>
       <div class="topbar-right">

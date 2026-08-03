@@ -1,12 +1,13 @@
 (function () {
   "use strict";
 
-  const leaf = (id, label, route, page, views) => ({
+  const leaf = (id, label, route, page, views, workspaceLabel) => ({
     id,
     label,
     route,
     page: page || "",
-    views: Array.isArray(views) ? views : []
+    views: Array.isArray(views) ? views : [],
+    workspaceLabel: workspaceLabel || ""
   });
 
   window.ERP_MENU = [
@@ -23,8 +24,27 @@
               label: "单位数据",
               items: [
                 leaf("measurement-unit", "计量单位", "#/basic-settings/business-master-data/unit-data/measurement-unit"),
-                leaf("general-unit-conversion", "通用单位换算", "#/basic-settings/business-master-data/unit-data/general-unit-conversion"),
-                leaf("material-unit-conversion", "物料单位换算", "#/basic-settings/business-master-data/unit-data/material-unit-conversion")
+                leaf(
+                  "general-unit-conversion",
+                  "通用单位换算",
+                  "#/basic-settings/business-master-data/unit-data/general-unit-conversion",
+                  "通用单位换算-列表.html",
+                  [
+                    {
+                      id: "general-unit-conversion-detail",
+                      label: "通用单位换算详情",
+                      route: "#/basic-settings/business-master-data/unit-data/general-unit-conversion/detail",
+                      page: "通用单位换算-详情.html"
+                    }
+                  ],
+                  "通用单位换算"
+                ),
+                leaf(
+                  "material-unit-conversion",
+                  "物料单位换算",
+                  "#/basic-settings/business-master-data/unit-data/material-unit-conversion",
+                  "物料单位换算-列表.html"
+                )
               ]
             },
             {

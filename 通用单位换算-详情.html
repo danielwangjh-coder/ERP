@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>通用单位换算详情</title>
+  <link rel="stylesheet" href="assets/vendor/prototype-kit.css">
+  <style>
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      color: #303133;
+      background: #f5f7fa;
+      font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    button, input { font: inherit; }
+    .detail-page { min-height: 100%; background: #fff; }
+    .page-tabs {
+      display: flex;
+      height: 40px;
+      align-items: flex-end;
+      padding: 0 16px;
+      border-bottom: 1px solid #e4e7ed;
+      background: #fff;
+    }
+    .page-tab {
+      position: relative;
+      height: 40px;
+      padding: 0 12px;
+      border: 0;
+      background: transparent;
+      color: #409eff;
+      line-height: 40px;
+    }
+    .page-tab::after {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: 2px;
+      background: #409eff;
+      content: "";
+    }
+    .detail-toolbar {
+      display: flex;
+      height: 48px;
+      align-items: center;
+      padding: 0 20px;
+      border-bottom: 1px solid #ebeef5;
+      background: #fff;
+    }
+    .back-button {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #409eff;
+      cursor: pointer;
+    }
+    .detail-content { padding: 18px 20px 28px; }
+    .section-title {
+      margin: 0 0 18px;
+      padding-left: 9px;
+      border-left: 3px solid #409eff;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 20px;
+    }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px 28px;
+      max-width: 1120px;
+    }
+    .detail-field { min-width: 0; }
+    .detail-label { margin-bottom: 7px; color: #606266; }
+    .detail-value {
+      min-height: 32px;
+      padding: 6px 0;
+      overflow: hidden;
+      border-bottom: 1px solid #dcdfe6;
+      color: #303133;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .empty-state { padding: 56px 20px; color: #909399; text-align: center; }
+    @media (max-width: 760px) {
+      .detail-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="detail-page" data-testid="general-unit-conversion-detail-page">
+    <nav class="page-tabs" aria-label="详情页签">
+      <button class="page-tab active" type="button">通用单位换算详情</button>
+    </nav>
+    <div class="detail-toolbar">
+      <button class="back-button" id="backButton" type="button">返回</button>
+    </div>
+    <section class="detail-content" id="detailContent" aria-labelledby="detailHeading">
+      <h1 class="section-title" id="detailHeading">基本信息</h1>
+      <div class="detail-grid" id="detailGrid"></div>
+      <div class="empty-state" id="emptyState" hidden>未找到该通用单位换算关系</div>
+    </section>
+  </main>
+  <script>
+    (function () {
+      "use strict";
+      var STORAGE_KEY = "smartone.general-unit-conversions.v2";
+      var CURRENT_ID_KEY = "smartone.general-unit-conversion.current-record-id";
+      var fields = [
+        ["源单位换算系数", "sourceCoefficient"],
+        ["源单位", "sourceUnit"],
+        ["目标单位换算系数", "targetCoefficient"],
+        ["目标单位名称", "targetUnit"],
+        ["换算类型", "conversionType"],
+        ["系统预设", "systemPreset"]
+      ];
+
+      function escapeHtml(value) {
+        return String(value == null ? "" : value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/\"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function formatValue(record, field) {
+        if (field === "systemPreset") return record[field] ? "是" : "否";
+        if (field === "sourceCoefficient" || field === "targetCoefficient") {
+          return Number(record[field]).toLocaleString("zh-CN", { maximumFractionDigits: 0 });
+        }
+        return record[field];
+      }
+
+      function loadRecord() {
+        try {
+          var stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+          var currentId = sessionStorage.getItem(CURRENT_ID_KEY) || "";
+          if (!stored || stored.version !== 2 || !Array.isArray(stored.records)) return null;
+          return stored.records.find(function (record) { return record.id === currentId; }) || null;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      var record = loadRecord();
+      var grid = document.getElementById("detailGrid");
+      var emptyState = document.getElementById("emptyState");
+      if (!record) {
+        grid.hidden = true;
+        emptyState.hidden = false;
+      } else {
+        document.title = record.sourceUnit + " - 通用单位换算详情";
+        grid.innerHTML = fields.map(function (field) {
+          return '<div class="detail-field"><div class="detail-label">' + escapeHtml(field[0]) + '</div><div class="detail-value">' + escapeHtml(formatValue(record, field[1])) + '</div></div>';
+        }).join("");
+      }
+
+      document.getElementById("backButton").addEventListener("click", function () {
+        window.parent.location.hash = "/basic-settings/business-master-data/unit-data/general-unit-conversion";
+      });
+    })();
+  </script>
+</body>
+</html>

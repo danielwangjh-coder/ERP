@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>通用单位换算</title>
+  <link rel="stylesheet" href="assets/vendor/prototype-kit.css">
+  <style>
+    :root {
+      --primary: #409eff;
+      --primary-deep: #337ecc;
+      --bg: #f3f5f7;
+      --panel: #ffffff;
+      --line: #dfe5ec;
+      --line-soft: #eef2f6;
+      --text: #2f3a4a;
+      --subtext: #7f8a9b;
+      --muted: #a8b2c1;
+      --hover: #eaf5fd;
+      --sidebar: #fbfcfd;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #f7f8fa;
+      color: var(--text);
+      font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .srm-prototype {
+      width: 100%;
+      min-width: 760px;
+      height: 100%;
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .layout {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .content {
+      position: relative;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      background: #f7f8fa;
+    }
+
+    .srm-prototype > .layout > main.content,
+    .srm-prototype > .layout > main.content *,
+    .srm-prototype > .layout > main.content *::before,
+    .srm-prototype > .layout > main.content *::after {
+      font-size: 14px !important;
+    }
+
+    .content > .ddp-search {
+      flex-shrink: 0;
+    }
+
+    .btn {
+      height: 24px;
+      padding: 0 10px;
+      border: 1px solid #d6dde6;
+      border-radius: 2px;
+      background: #fff;
+      color: #5f6b7b;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+    }
+
+    .btn:hover {
+      color: var(--primary);
+      border-color: #b3d8ff;
+      background: #ecf5ff;
+    }
+
+    .btn.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn.primary:hover {
+      border-color: #66b1ff;
+      background: #66b1ff;
+      color: #fff;
+    }
+
+    .btn:disabled {
+      border-color: #e4e7ed;
+      background: #f5f7fa;
+      color: #c0c4cc;
+      cursor: not-allowed;
+    }
+
+    .el-input__inner {
+      width: 100%;
+      height: 28px;
+      padding: 0 10px;
+      border: 1px solid #dcdfe6;
+      border-radius: 2px;
+      outline: none;
+      background: #fff;
+      color: #606266;
+      transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    }
+
+    .el-input__inner:hover {
+      border-color: #c0c4cc;
+      background: #fff;
+    }
+
+    .el-input__inner:focus {
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.12);
+    }
+
+    .ddp-search {
+      position: relative;
+      z-index: 10;
+      width: auto;
+      height: 51px;
+      min-height: 51px;
+      margin: 8px 10px 0;
+      padding: 0;
+      overflow: visible;
+      border: 0;
+      background: #fff;
+      box-shadow: none;
+      font-size: 12px;
+    }
+
+    .ddp-search .layout-container {
+      width: 100%;
+      height: 51px;
+      padding: 10px;
+    }
+
+    .ddp-search .box-layout-search {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 30px;
+    }
+
+    .ddp-search .layout-search-left {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      display: flex;
+      width: 346px;
+      height: 28px;
+      align-items: center;
+    }
+
+    .ddp-search .layout-search {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 30px;
+    }
+
+    .ddp-search .search-option {
+      display: flex;
+      width: 100%;
+      height: 30px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .ddp-search .filter_wrap,
+    .ddp-search .el-button {
+      display: flex;
+      align-items: center;
+    }
+
+    .ddp-search .search-view-select {
+      position: relative;
+      width: 200px;
+    }
+
+    .ddp-search .search-view-select .el-select {
+      width: 200px;
+    }
+
+    .ddp-search .filter_wrap {
+      position: relative;
+      width: 136px;
+      margin-left: 10px;
+      border-radius: 3px;
+      background: #ccebfccc;
+    }
+
+    .ddp-search .el-input {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .ddp-search .el-input__inner {
+      height: 30px;
+      padding: 0 30px;
+      line-height: 30px;
+      border-color: #ebebeb;
+      color: #666;
+      font-size: 14px;
+      box-shadow: none;
+    }
+
+    .ddp-search .search-view-select .el-input__inner {
+      height: 28px;
+      padding: 0 30px 0 15px;
+      border-radius: 4px;
+      line-height: 28px;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .ddp-search .search-view-select.is-open .el-input__inner {
+      border-color: var(--primary);
+    }
+
+    .ddp-search .search-view-select .selectionClass {
+      position: absolute;
+      top: 28px;
+      left: 0;
+      z-index: 230;
+      display: block;
+      width: 260px;
+      margin: 12px 0 5px;
+      padding: 0;
+      border: 1px solid #ebebeb;
+      border-radius: 4px;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .ddp-search .search-view-select .selectionClass[hidden] {
+      display: none;
+    }
+
+    .ddp-search .search-view-select .el-select-dropdown__list {
+      margin: 0;
+      padding: 6px 0;
+      list-style: none;
+    }
+
+    .ddp-search .search-view-select .el-select-dropdown__item {
+      position: relative;
+      display: flow-root;
+      height: 28px;
+      padding: 0 10px;
+      color: #666;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 28px;
+      cursor: pointer;
+    }
+
+    .ddp-search .search-view-select .el-select-dropdown__item:hover,
+    .ddp-search .search-view-select .el-select-dropdown__item:focus {
+      outline: none;
+      background: #f5f7fa;
+    }
+
+    .ddp-search .search-view-select .el-select-dropdown__item.selected .search-view-select-left {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .ddp-search .search-view-select-left {
+      float: left;
+    }
+
+    .ddp-search .search-view-select-right {
+      float: right;
+      color: #52b5ef;
+      font-weight: 400;
+    }
+
+    .ddp-search .search-view-select .popper__arrow,
+    .ddp-search .search-view-select .popper__arrow::after {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-style: solid;
+    }
+
+    .ddp-search .search-view-select .popper__arrow {
+      top: -7px;
+      left: 11px;
+      border-width: 0 7px 7px;
+      border-color: transparent transparent #ebebeb;
+    }
+
+    .ddp-search .search-view-select .popper__arrow::after {
+      top: 1px;
+      left: -6px;
+      border-width: 0 6px 6px;
+      border-color: transparent transparent #fff;
+      content: "";
+    }
+
+    .ddp-search .search-input {
+      width: 250px;
+      margin-right: 10px;
+    }
+
+    .ddp-search .search-input .el-input__inner {
+      height: 28px;
+      padding: 0 30px;
+      border-radius: 4px;
+      color: #666;
+      line-height: 28px;
+    }
+
+    .ddp-search .search-input .el-input__prefix,
+    .ddp-search .search-input .el-input__suffix,
+    .ddp-search .search-view-select .el-input__prefix,
+    .ddp-search .search-view-select .el-input__suffix {
+      height: 28px;
+    }
+
+    .ddp-search .search-input .el-input__inner::placeholder {
+      color: #ccc;
+      opacity: 1;
+    }
+
+    .ddp-search .el-input__prefix,
+    .ddp-search .el-input__suffix {
+      position: absolute;
+      top: 0;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      color: #d9d9d9;
+      pointer-events: none;
+    }
+
+    .ddp-search .search-view-select .el-input__suffix {
+      height: 28px;
+    }
+
+    .ddp-search .el-input__prefix {
+      left: 8px;
+    }
+
+    .ddp-search .el-input__suffix {
+      right: 7px;
+    }
+
+    .ddp-search .el-button {
+      height: 28px;
+      padding: 0 10px;
+      border: 1px solid transparent;
+      border-radius: 3px;
+      background: transparent;
+      color: #666;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 18px;
+      gap: 4px;
+    }
+
+    .ddp-search .el-button > span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .ddp-search .el-button:focus {
+      outline: none;
+    }
+
+    .ddp-search .el-button--primary {
+      min-width: 44px;
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .ddp-search .el-button--default {
+      min-width: 44px;
+      border-color: #ebebeb;
+      background: #fff;
+      color: #666;
+    }
+
+    .ddp-search .el-button--text {
+      color: var(--primary);
+    }
+
+    .ddp-search .search-option .el-button {
+      margin-left: 10px;
+    }
+
+    .ddp-search .search-option .btn_name {
+      color: inherit;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .ddp-search .search-option > .btn_name {
+      height: 20px;
+      border-color: transparent;
+      background: transparent;
+    }
+
+    .srm-prototype > .layout > main.content .ddp-search .search-option > .el-button.btn_name,
+    .srm-prototype > .layout > main.content .ddp-search .search-option > .el-button.btn_name span {
+      color: #409eff !important;
+    }
+
+    .ddp-search .filter_wrap .el-button--text {
+      width: 136px;
+      min-width: 136px;
+      margin: 0;
+      padding: 0 10px;
+      justify-content: flex-start;
+      border-color: transparent;
+      background: transparent;
+      color: var(--primary);
+    }
+
+    .ddp-search .icon-search::before {
+      content: "⌕";
+    }
+
+    .ddp-search .filter-icon {
+      display: inline-block;
+      width: 14px;
+      height: 12px;
+      margin-right: 4px;
+      background: currentColor;
+      clip-path: polygon(0 0, 100% 0, 62% 46%, 62% 100%, 38% 82%, 38% 46%);
+    }
+
+    .ddp-search .menu-arrow {
+      position: relative;
+      display: inline-flex;
+      width: 12px;
+      min-width: 12px;
+      height: 12px;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      color: currentColor;
+      text-indent: -999px;
+    }
+
+    .ddp-search .menu-arrow::before {
+      width: 8px;
+      height: 8px;
+      border-top: 1.4px solid currentColor;
+      border-right: 1.4px solid currentColor;
+      content: "";
+      transform: rotate(135deg);
+      transition: transform 0.18s ease, border-color 0.16s;
+    }
+
+    .ddp-search .search-option-arrow,
+    .ddp-search .filter-arrow {
+      margin: -3px 0 0 4px;
+    }
+
+    .ddp-search .search-view-arrow {
+      color: #c0c4cc;
+      transform: scale(0.75);
+    }
+
+    .ddp-search .search-view-select.is-open .search-view-arrow::before {
+      transform: rotate(-45deg);
+    }
+
+    .ddp-search.is-expanded .search-option-arrow::before,
+    .ddp-search .filter_wrap.is-open .filter-arrow::before {
+      transform: rotate(-45deg);
+    }
+
+    .srm-prototype > .layout > main.content .ddp-search .ddp-list-search-filter-popover {
+      position: absolute;
+      top: 28px;
+      right: 0;
+      z-index: 220;
+      display: block;
+      width: 250px;
+      margin: 12px 0 0;
+      padding: 5px 10px 10px;
+      border: 1px solid #ebeef5;
+      border-radius: 4px;
+      background: #fff;
+      color: #666;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      font-size: 12px !important;
+      font-weight: 400;
+      line-height: 16.8px;
+    }
+
+    .srm-prototype > .layout > main.content .ddp-search .ddp-list-search-filter-popover[hidden] {
+      display: none !important;
+    }
+
+    .ddp-search .filter_box {
+      width: 228px;
+    }
+
+    .srm-prototype > .layout > main.content .ddp-search .filter_title {
+      height: 17px;
+      color: #333;
+      font-size: 12px !important;
+      font-weight: 700;
+      line-height: 17px;
+    }
+
+    .srm-prototype > .layout > main.content .ddp-search .filter_item {
+      display: flex;
+      width: 228px;
+      height: 28px;
+      padding-left: 10px;
+      align-items: center;
+      color: #666;
+      font-size: 12px !important;
+      font-style: italic;
+    }
+
+    .ddp-search button.filter_item {
+      border: 0;
+      background: transparent;
+      font-style: normal;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .ddp-search button.filter_item:hover,
+    .ddp-search button.filter_item:focus {
+      outline: none;
+      background: #ecf5ff;
+      color: var(--primary);
+    }
+
+    .ddp-search .personal-filter-title {
+      margin-top: 5px;
+    }
+
+    .ddp-search .ddp-list-search-filter-popover .popper__arrow,
+    .ddp-search .ddp-list-search-filter-popover .popper__arrow::after {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-style: solid;
+    }
+
+    .ddp-search .ddp-list-search-filter-popover .popper__arrow {
+      top: -7px;
+      right: 20px;
+      border-width: 0 7px 7px;
+      border-color: transparent transparent #ebeef5;
+    }
+
+    .ddp-search .ddp-list-search-filter-popover .popper__arrow::after {
+      top: 1px;
+      left: -6px;
+      border-width: 0 6px 6px;
+      border-color: transparent transparent #fff;
+      content: "";
+    }
+
+    .ddp-search .popover-box {
+      position: absolute;
+      top: 39px;
+      right: -10px;
+      left: -10px;
+      z-index: 200;
+      display: none;
+      height: auto;
+      margin: 0;
+      padding: 10px;
+      border: 0;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .ddp-search.is-expanded .popover-box {
+      display: block;
+    }
+
+    .ddp-search .el-tabs {
+      width: 100%;
+      height: auto;
+    }
+
+    .ddp-search .el-tabs__header {
+      height: 35px;
+      margin: 0;
+      border: 0;
+      border-bottom: 1px solid #e4e7ed;
+    }
+
+    .ddp-search .el-tabs__nav-wrap,
+    .ddp-search .el-tabs__nav-scroll,
+    .ddp-search .el-tabs__nav {
+      height: 35px;
+    }
+
+    .ddp-search .el-tabs__nav {
+      position: relative;
+      display: inline-flex;
+    }
+
+    .ddp-search .el-tabs__active-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 56px;
+      height: 2px;
+      background: var(--primary);
+    }
+
+    .ddp-search .el-tabs__item {
+      display: inline-flex;
+      height: 35px;
+      align-items: center;
+      color: var(--primary);
+      font-weight: 400;
+    }
+
+    .ddp-search .el-tabs__content {
+      height: auto;
+      min-height: 0;
+      padding-top: 10px;
+    }
+
+    .ddp-search .el-form {
+      position: relative;
+      height: auto;
+      min-height: 0;
+      overflow: visible;
+    }
+
+    .ddp-search .el-row {
+      width: calc(100% + 20px);
+      margin: 0 -10px;
+    }
+
+    .ddp-search .el-row::after {
+      display: table;
+      clear: both;
+      content: "";
+    }
+
+    .ddp-search .el-col-6 {
+      float: left;
+      width: 25%;
+      margin-bottom: 6px;
+      padding: 0 10px;
+    }
+
+    .ddp-search .el-form-item {
+      display: flex;
+      height: 49px;
+      min-width: 0;
+      margin: 0 0 4px;
+      overflow: hidden;
+      flex-direction: column;
+    }
+
+    .ddp-search .el-form-item__label {
+      display: block;
+      height: 18px;
+      overflow: hidden;
+      padding: 0;
+      color: #333;
+      font-size: 14px;
+      line-height: normal;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .ddp-search .el-form-item__content {
+      display: flex;
+      height: 31px;
+      align-items: center;
+    }
+
+    .ddp-search .el-form-item__content > .pk-input-shell,
+    .ddp-search .el-form-item__content > .pk-select {
+      width: 100%;
+    }
+
+    .ddp-search .el-form-item .el-input__inner {
+      height: 30px;
+      padding: 0 30px 0 15px;
+      border: 0;
+      border-bottom: 1px solid #e4e7ed;
+      border-radius: 0;
+      font-size: 14px;
+      line-height: 30px;
+      box-shadow: none;
+    }
+
+    .ddp-search .el-form-item .el-input__inner:focus {
+      border-bottom-color: var(--primary);
+      box-shadow: none;
+    }
+
+    .ddp-search .el-form-item select.el-input__inner {
+      cursor: pointer;
+    }
+
+    .ddp-search .advanced-search-switch {
+      display: inline-flex;
+      height: 30px;
+      padding: 0 15px;
+      align-items: center;
+      border: 0;
+      background: transparent;
+      color: var(--primary);
+      line-height: 30px;
+    }
+
+    .list-table-shell {
+      margin: 8px 10px 10px;
+      background: #fff;
+      border-width: 0 !important;
+      border-style: none !important;
+      border-color: transparent !important;
+      border-radius: 0;
+      box-shadow: none;
+      min-height: 0;
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .list-toolbar {
+      min-height: 38px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid #e7edf3;
+      background: #fff;
+      flex-shrink: 0;
+    }
+
+    .list-toolbar-left,
+    .list-toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .list-toolbar-left .btn,
+    .list-toolbar-right .btn {
+      height: 28px;
+      padding: 0 8px;
+      border-radius: 3px;
+      font-size: 14px;
+      gap: 4px;
+    }
+
+    .list-toolbar-left .btn.primary {
+      background: #409eff;
+      border-color: #409eff;
+      color: #fff;
+    }
+
+    .list-toolbar-left .btn.dropdown {
+      position: relative;
+      padding-right: 24px;
+    }
+
+    .list-toolbar-left .btn.dropdown::after {
+      content: "";
+      position: absolute;
+      right: 9px;
+      top: 50%;
+      margin-top: -2px;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid #606266;
+    }
+
+    .list-toolbar-right {
+      margin-left: auto;
+      flex-wrap: nowrap;
+    }
+
+    .list-toolbar-right .pk-grid-icon-btn {
+      border-radius: 3px;
+    }
+
+    .column-display-control {
+      position: relative;
+    }
+
+    .column-display-popover {
+      position: absolute;
+      z-index: 40;
+      top: 32px;
+      right: 0;
+      width: 188px;
+      padding: 6px 0;
+      border: 1px solid #e4e7ed;
+      border-radius: 3px;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .column-display-popover[hidden] {
+      display: none;
+    }
+
+    .column-display-title {
+      padding: 4px 12px 6px;
+      color: #303133;
+      font-weight: 600;
+      line-height: 20px;
+    }
+
+    .column-display-option {
+      display: flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 12px;
+      color: #606266;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .column-display-option:hover {
+      background: #f5f7fa;
+    }
+
+    .column-display-option .purchase-th-checkbox-wrap {
+      flex: 0 0 14px;
+      margin: 0 8px 0 0;
+    }
+
+    .is-column-hidden {
+      display: none !important;
+    }
+
+    body.table-fullscreen-active {
+      overflow: hidden;
+    }
+
+    .list-table-shell.is-fullscreen {
+      position: fixed;
+      z-index: 1200;
+      inset: 0;
+      width: auto;
+      height: auto;
+      margin: 0;
+      background: #fff;
+    }
+
+    .purchase-table-wrap {
+      position: relative;
+      overflow: auto;
+      flex: 1;
+      min-height: 0;
+      background: #fff;
+      padding: 0;
+      scrollbar-gutter: stable;
+      border: none;
+      outline: none;
+      box-shadow: none;
+    }
+
+    .purchase-table-inner {
+      display: inline-block;
+      vertical-align: top;
+      width: max-content;
+      min-width: 100%;
+      max-width: none;
+      padding: 0 0 0 10px;
+      border: none;
+    }
+
+    .purchase-list-table {
+      --vxe-ui-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --vxe-ui-font-size-mini: 12px;
+      --vxe-ui-font-color: #606266;
+      --vxe-ui-layout-background-color: #fff;
+      --vxe-ui-table-border-width: 1.05px;
+      --vxe-ui-table-border-color: #e8eaec;
+      --vxe-ui-table-header-background-color: #f8f8f9;
+      --vxe-ui-table-header-font-weight: 700;
+      --vxe-ui-table-row-height-default: 48px;
+      --vxe-ui-table-row-line-height: 22px;
+      --vxe-ui-table-cell-padding-default: 10px;
+      --vxe-ui-table-cell-padding-medium: 8px;
+      --vxe-ui-table-row-hover-background-color: #f5f7fa;
+      --vxe-ui-table-row-striped-background-color: #fafafa;
+      --vxe-ui-table-row-hover-striped-background-color: #f5f7fa;
+      --vxe-row-h: var(--vxe-ui-table-row-height-default);
+      --vxe-td-lh: var(--vxe-ui-table-row-line-height);
+      --vxe-td-pad-y: var(--vxe-ui-table-cell-padding-default);
+      --vxe-td-pad-x: var(--vxe-ui-table-cell-padding-medium);
+      width: max-content;
+      min-width: 100%;
+      max-width: none;
+      table-layout: fixed;
+      position: relative;
+      box-sizing: border-box;
+      flex: none;
+      font-family: var(--vxe-ui-font-family);
+      font-weight: 400;
+      outline: none;
+      font-size: var(--vxe-ui-font-size-mini);
+      color: var(--vxe-ui-font-color);
+      background-color: var(--vxe-ui-layout-background-color);
+      border-collapse: separate;
+      border-spacing: 0;
+      border: 1px solid #ebebeb;
+      border-right: none;
+      border-bottom: none;
+    }
+
+    .purchase-list-table thead {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .purchase-list-table th,
+    .purchase-list-table td {
+      min-height: var(--vxe-row-h);
+      height: var(--vxe-row-h);
+      padding: var(--vxe-td-pad-y) var(--vxe-td-pad-x);
+      border-right: var(--vxe-ui-table-border-width) solid var(--vxe-ui-table-border-color);
+      border-bottom: var(--vxe-ui-table-border-width) solid var(--vxe-ui-table-border-color);
+      color: var(--vxe-ui-font-color);
+      font-size: var(--vxe-ui-font-size-mini);
+      line-height: var(--vxe-td-lh);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: left;
+      box-sizing: border-box;
+      vertical-align: middle;
+      outline: none;
+    }
+
+    .purchase-list-table th {
+      color: #333;
+      font-weight: var(--vxe-ui-table-header-font-weight);
+      background: #e6f4fc;
+    }
+
+    .purchase-list-table td {
+      font-weight: 400;
+      background: var(--vxe-ui-layout-background-color);
+    }
+
+    .purchase-list-table tbody td:nth-child(1),
+    .purchase-list-table tbody td:nth-child(2),
+    .purchase-list-table tbody td:nth-child(3),
+    .purchase-list-table thead th:nth-child(1),
+    .purchase-list-table thead th:nth-child(2),
+    .purchase-list-table thead th:nth-child(3) {
+      text-align: center;
+    }
+
+    .purchase-list-table tbody tr:nth-child(even) td {
+      background: var(--vxe-ui-table-row-striped-background-color);
+    }
+
+    .purchase-list-table tbody tr:hover td,
+    .purchase-list-table tbody tr:nth-child(even):hover td {
+      background: var(--vxe-ui-table-row-hover-background-color);
+    }
+
+    .purchase-list-table .center {
+      text-align: center;
+    }
+
+    .purchase-list-table .number {
+      text-align: right;
+    }
+
+    .purchase-th-checkbox-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 14px;
+      margin: 0 auto;
+      cursor: pointer;
+    }
+
+    .purchase-th-checkbox-input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .purchase-th-checkbox-face {
+      position: absolute;
+      inset: 0;
+      width: 14px;
+      height: 14px;
+      border: 1px solid #dcdfe6;
+      border-radius: 2px;
+      background: #fff;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .purchase-th-checkbox-input:checked + .purchase-th-checkbox-face,
+    .purchase-th-checkbox-input:indeterminate + .purchase-th-checkbox-face {
+      background: #409eff;
+      border-color: #409eff;
+    }
+
+    .purchase-th-checkbox-input:checked + .purchase-th-checkbox-face::after {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 1px;
+      width: 4px;
+      height: 8px;
+      border: solid #fff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    .purchase-th-checkbox-input:indeterminate + .purchase-th-checkbox-face::after {
+      content: "";
+      position: absolute;
+      left: 3px;
+      top: 6px;
+      width: 8px;
+      height: 2px;
+      background: #fff;
+    }
+
+    .purchase-th-checkbox-input:focus-visible + .purchase-th-checkbox-face {
+      outline: 2px solid rgba(64, 158, 255, 0.45);
+      outline-offset: 1px;
+    }
+
+    .link-blue {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #409eff;
+      font-size: 12px;
+    }
+
+    .purchase-list-table td.operation-cell {
+      overflow: visible;
+    }
+
+    .dropdown_box_button.sone-table-buttonList.el-dropdown {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 27px;
+    }
+
+    .sone-table-buttonList .el-dropdown-link {
+      display: inline-flex;
+      width: 24px;
+      height: 24px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 2px;
+      color: #409eff;
+      cursor: pointer;
+    }
+
+    .sone-table-buttonList .el-dropdown-link:hover,
+    .sone-table-buttonList .el-dropdown-link:focus-visible,
+    .sone-table-buttonList.is-open .el-dropdown-link {
+      background: #ecf5ff;
+      outline: none;
+    }
+
+    .sone-table-buttonList .el-button {
+      width: 20px;
+      min-width: 0;
+      height: 24px;
+      margin: 0 !important;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      pointer-events: none;
+    }
+
+    .sone-table-buttonList .more-handel::before {
+      content: "···";
+      display: block;
+      font-style: normal;
+      font-weight: 700;
+      letter-spacing: 1px;
+      line-height: 20px;
+      transform: translateY(-2px);
+    }
+
+    .sone-table-buttonList .el-dropdown-menu {
+      position: fixed;
+      z-index: 2600;
+      display: none;
+      min-width: 122px;
+      margin: 0;
+      padding: 5px 0;
+      border: 1px solid #ebeef5;
+      border-radius: 3px;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+      list-style: none;
+    }
+
+    .sone-table-buttonList.is-open .el-dropdown-menu {
+      display: block;
+    }
+
+    .sone-table-buttonList .el-dropdown-menu__item {
+      height: 32px;
+      margin: 0;
+      padding: 0;
+      line-height: 32px;
+      white-space: nowrap;
+    }
+
+    .sone-table-buttonList .el-dropdown-menu__item:hover,
+    .sone-table-buttonList .el-dropdown-menu__item:focus-within {
+      background: #ecf5ff;
+    }
+
+    .sone-table-buttonList .el-dropdown-menu__item > button {
+      display: block;
+      width: 100%;
+      height: 32px;
+      padding: 0 18px;
+      border: 0;
+      background: transparent;
+      color: #606266;
+      font-size: 12px;
+      line-height: 32px;
+      text-align: left;
+      pointer-events: auto;
+    }
+
+    .sone-table-buttonList .el-dropdown-menu__item > button:hover,
+    .sone-table-buttonList .el-dropdown-menu__item > button:focus-visible {
+      color: #409eff;
+      outline: none;
+    }
+
+    .list-footer-bar {
+      height: 38px;
+      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #e7edf3;
+      background: #fff;
+      color: #5e6b7a;
+      font-size: 12px;
+      flex-shrink: 0;
+      margin-top: auto;
+    }
+
+    .selected-count,
+    .pagination-lite {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .selected-count {
+      gap: 6px;
+      color: #606f82;
+    }
+
+    .selected-count strong {
+      color: #409eff;
+    }
+
+    .pagination-lite {
+      gap: 8px;
+    }
+
+    .pager-btn,
+    .pager-num {
+      min-width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #e4e7ed;
+      border-radius: 2px;
+      background: #f4f6f9;
+      color: #7a8797;
+      font-size: 12px;
+    }
+
+    .pager-num.active {
+      background: #409eff;
+      border-color: #409eff;
+      color: #fff;
+    }
+
+    .pager-jump {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .pager-input {
+      width: 36px;
+      height: 24px;
+      border: 1px solid #dcdfe6;
+      border-radius: 2px;
+      background: #fff;
+      text-align: center;
+    }
+
+    .logistics-dialog-mask {
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.42);
+    }
+
+    .logistics-dialog-mask.is-visible {
+      display: flex;
+    }
+
+    .logistics-dialog {
+      position: relative;
+      width: min(960px, calc(100vw - 48px));
+      margin-top: 12vh;
+      border-radius: 2px;
+      background: #fff;
+      color: #606266;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      font-size: 14px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .logistics-dialog-header {
+      position: relative;
+      height: 55px;
+      padding: 20px 20px 10px;
+      border-bottom: 1px solid #dcdfe6;
+      background: linear-gradient(180deg, #dff4ff 0%, #fff 100%);
+    }
+
+    .logistics-dialog-title {
+      color: #409eff;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 24px;
+    }
+
+    .logistics-dialog-close {
+      position: absolute;
+      top: 18px;
+      right: 20px;
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #409eff;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .logistics-dialog-close::before,
+    .logistics-dialog-close::after {
+      content: "";
+      position: absolute;
+      top: 1px;
+      left: 9px;
+      width: 2px;
+      height: 18px;
+      border-radius: 2px;
+      background: currentColor;
+    }
+
+    .logistics-dialog-close::before {
+      transform: rotate(45deg);
+    }
+
+    .logistics-dialog-close::after {
+      transform: rotate(-45deg);
+    }
+
+    .logistics-dialog-body {
+      padding: 12px 12px 20px;
+    }
+
+    .logistics-dialog-footer {
+      display: flex;
+      height: 45px;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 8px 20px 9px;
+      border-top: 1px solid #ebeef5;
+    }
+
+    .logistics-btn {
+      min-width: 56px;
+      height: 30px;
+      padding: 0 14px;
+      border: 1px solid #dcdfe6;
+      border-radius: 3px;
+      background: #fff;
+      color: #606266;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .logistics-btn.primary {
+      border-color: #409eff;
+      background: #409eff;
+      color: #fff;
+    }
+
+    .conversion-dialog .logistics-dialog-body {
+      min-height: 260px;
+      padding: 14px 20px 22px;
+    }
+
+    .conversion-dialog .pk-form-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px 28px;
+    }
+
+    .conversion-dialog .pk-control {
+      background: transparent;
+    }
+
+    .conversion-dialog .pk-label,
+    .conversion-dialog .pk-required,
+    .conversion-dialog .pk-input-shell,
+    .conversion-dialog .pk-shell-input,
+    .conversion-dialog .pk-input-shell .value,
+    .conversion-dialog .pk-select-trigger,
+    .conversion-dialog .pk-option {
+      font-size: 14px !important;
+    }
+
+    .pk-reference-popover.is-open,
+    .pk-reference-popover.is-open * {
+      font-size: 14px !important;
+    }
+
+    .conversion-dialog .pk-field {
+      position: relative;
+    }
+
+    .conversion-dialog .pk-input-shell {
+      background: #fff;
+    }
+
+    .conversion-dialog .pk-input-shell.is-disabled {
+      background: #f5f7fa;
+      color: #9ca6b5;
+    }
+
+    .conversion-dialog .pk-input-shell.is-disabled .pk-shell-input,
+    .conversion-dialog .pk-input-shell.is-disabled .value,
+    .conversion-dialog .pk-input-shell.is-disabled .suffix-button {
+      color: #9ca6b5;
+      cursor: not-allowed;
+    }
+
+    .conversion-dialog .pk-field.has-error .pk-input-shell,
+    .conversion-dialog .pk-field.has-error .pk-select-trigger {
+      border-bottom-color: #f56c6c;
+    }
+
+    .form-error-summary {
+      margin: 0 0 12px;
+      padding: 8px 10px;
+      border: 1px solid #fde2e2;
+      border-radius: 3px;
+      background: #fef0f0;
+      color: #f56c6c;
+      font-size: 12px;
+      line-height: 20px;
+    }
+
+    .form-error-summary[hidden] {
+      display: none;
+    }
+
+    .field-error {
+      position: absolute;
+      left: 0;
+      top: 50px;
+      display: none;
+      color: #f56c6c;
+      font-size: 12px;
+      line-height: 18px;
+    }
+
+    .pk-field.has-error .field-error {
+      display: block;
+    }
+
+    .conversion-reference {
+      cursor: pointer;
+    }
+
+    .conversion-reference .value {
+      flex: 1;
+    }
+
+    .confirm-dialog {
+      width: min(460px, calc(100vw - 48px));
+      margin-top: 24vh;
+    }
+
+    .confirm-dialog .logistics-dialog-body {
+      min-height: 96px;
+      padding: 22px 24px;
+      color: #303133;
+      line-height: 24px;
+      white-space: pre-line;
+    }
+
+    .empty-row td {
+      height: 160px;
+      color: #909399;
+      text-align: center;
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      z-index: 3600;
+      min-height: 38px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      border: 1px solid #e1f3d8;
+      border-radius: 3px;
+      background: #f0f9eb;
+      color: #67c23a;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+      transform: translateX(-50%);
+    }
+
+    .toast[hidden] {
+      display: none;
+    }
+
+    .toast.is-error {
+      border-color: #fde2e2;
+      background: #fef0f0;
+      color: #f56c6c;
+    }
+
+    .toast.is-warning {
+      border-color: #faecd8;
+      background: #fdf6ec;
+      color: #e6a23c;
+    }
+
+    .ddp-search .query-reference {
+      cursor: pointer;
+    }
+
+    .ddp-search .query-select-form-item {
+      overflow: visible;
+    }
+
+    .ddp-search .query-select-form-item .pk-menu {
+      z-index: 260;
+    }
+
+    .query-reference-popover {
+      z-index: 2100;
+      width: 360px;
+    }
+
+    .query-reference-popover .popover-table {
+      max-height: 250px;
+    }
+
+    .query-reference-popover tbody tr {
+      cursor: pointer;
+    }
+
+    .query-reference-popover tbody tr.is-selected td {
+      background: #ecf5ff;
+      color: #409eff;
+    }
+
+    .query-reference-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 8px 10px;
+      border-top: 1px solid #ebeef5;
+      background: #fff;
+    }
+
+    .query-reference-check {
+      display: inline-flex;
+      width: 18px;
+      justify-content: center;
+    }
+
+    .system-preset-display {
+      display: inline-flex;
+      height: 32px;
+      align-items: center;
+      gap: 8px;
+      color: #606266;
+    }
+
+    .system-preset-display .pk-checkbox {
+      cursor: not-allowed;
+    }
+
+    .purchase-list-table td.unit-name-cell {
+      color: #409eff;
+    }
+
+    .system-preset-check {
+      color: #00b578;
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .pager-btn,
+    .pager-num {
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+    }
+
+    .pager-btn:not(:disabled),
+    .pager-num {
+      cursor: pointer;
+    }
+
+    .pager-btn:disabled {
+      color: #c0c4cc;
+      cursor: not-allowed;
+    }
+
+    .table-empty td {
+      height: 168px;
+      color: #909399;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .ddp-search .layout-search,
+      .ddp-search .search-option {
+        width: 100%;
+      }
+
+      .conversion-dialog .pk-form-grid {
+        grid-template-columns: 1fr;
+      }
+
+    }
+  </style>
+</head>
+<body>
+  <div class="srm-prototype" data-testid="general-unit-conversion-page">
+    <div class="layout">
+      <main class="content">
+        <div class="ddp-search" aria-label="查询条件">
+          <div class="layout-container">
+            <div class="box-layout-search">
+              <div class="layout-search-left">
+                <div class="search-view-select" id="listViewSelect">
+                  <div class="el-select el-select--mini">
+                    <div class="el-input el-input--mini el-input--suffix">
+                      <input class="el-input__inner" id="listViewInput" type="text" readonly value="列表视图（全部）" role="combobox" aria-label="列表视图" aria-haspopup="listbox" aria-expanded="false" aria-controls="listViewDropdown">
+                      <span class="el-input__suffix"><span class="menu-arrow search-view-arrow" aria-hidden="true"></span></span>
+                    </div>
+                    <div class="el-select-dropdown el-popper selectionClass" id="listViewDropdown" aria-hidden="true" hidden>
+                      <ul class="el-scrollbar__view el-select-dropdown__list" role="listbox">
+                        <li class="el-select-dropdown__item selected" data-list-view="" data-list-view-label="列表视图（全部）" role="option" aria-selected="true" tabindex="0">
+                          <span class="search-view-select-left">列表视图（全部）</span>
+                        </li>
+                      </ul>
+                      <div class="popper__arrow" aria-hidden="true"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="filter_wrap" id="personalFilter">
+                  <button class="el-button el-button--text el-button--mini" id="personalFilterButton" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="personalFilterPopover">
+                    <span class="filter-icon" aria-hidden="true"></span>
+                    <span id="personalFilterText">选择过滤器</span>
+                    <span class="menu-arrow filter-arrow" aria-hidden="true"></span>
+                  </button>
+                  <div class="el-popover el-popper ddp-list-search-filter-popover" id="personalFilterPopover" role="dialog" aria-label="过滤器" aria-hidden="true" hidden>
+                    <div class="filter_box">
+                      <div class="filter_title">预设过滤器</div>
+                      <div class="preset-filter-content">
+                        <div class="filter_item">暂无过滤器</div>
+                      </div>
+                      <div class="filter_title personal-filter-title">个人过滤器</div>
+                      <div class="filter_item">暂无过滤器</div>
+                    </div>
+                    <div class="popper__arrow" aria-hidden="true"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="layout-search">
+                <div class="search-option">
+                  <div class="search-input el-input el-input--mini el-input--prefix el-input--suffix">
+                    <input class="el-input__inner" id="keywordInput" type="text" placeholder="请输入关键字搜索" autocomplete="off">
+                    <span class="el-input__prefix"><i class="el-input__icon iconfont icon-search"></i></span>
+                  </div>
+                  <button class="el-button el-button--primary el-button--mini" id="searchButton" type="button"><span><span class="btn_name">搜索</span></span></button>
+                  <button class="el-button el-button--default el-button--mini" id="resetButton" type="button"><span><span class="btn_name">重置</span></span></button>
+                  <button class="el-button search-btn el-button--text el-button--mini" id="expandSearchButton" type="button" aria-expanded="false" aria-controls="advancedSearchPanel"><span><span class="btn_name" id="expandSearchText">展开</span><span class="menu-arrow search-option-arrow" aria-hidden="true"></span></span></button>
+                  <button class="el-button btn_name el-button--text el-button--mini" type="button"><span>保存</span></button>
+                  <button class="el-button btn_name el-button--text el-button--mini" type="button"><span>另存为</span></button>
+                </div>
+                <div class="popover-box" id="advancedSearchPanel" aria-hidden="true">
+                  <div class="el-tabs el-tabs--top">
+                    <div class="el-tabs__header is-top">
+                      <div class="el-tabs__nav-wrap is-top">
+                        <div class="el-tabs__nav-scroll">
+                          <div class="el-tabs__nav is-top" role="tablist">
+                            <div class="el-tabs__active-bar is-top"></div>
+                            <div class="el-tabs__item is-top is-active" role="tab" aria-selected="true">普通属性</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="el-tabs__content">
+                      <form class="el-form sone-form-box common-form el-form--label-top" id="advancedSearchForm" autocomplete="off" onsubmit="return false;">
+                        <div class="el-row">
+                          <div class="el-col el-col-6">
+                            <div class="el-form-item el-form-item--mini">
+                              <label class="el-form-item__label" id="querySourceUnitLabel">源单位</label>
+                              <div class="el-form-item__content">
+                                <div class="pk-input-shell query-reference" id="querySourceUnitReference" data-query-reference="source" tabindex="0" role="button" aria-labelledby="querySourceUnitLabel" aria-haspopup="listbox" aria-expanded="false">
+                                  <span class="value placeholder" id="querySourceUnitValue">请选择 源单位</span>
+                                  <span class="suffix-button">...</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="el-col el-col-6">
+                            <div class="el-form-item el-form-item--mini">
+                              <label class="el-form-item__label" id="queryTargetUnitLabel">目标单位名称</label>
+                              <div class="el-form-item__content">
+                                <div class="pk-input-shell query-reference" id="queryTargetUnitReference" data-query-reference="target" tabindex="0" role="button" aria-labelledby="queryTargetUnitLabel" aria-haspopup="listbox" aria-expanded="false">
+                                  <span class="value placeholder" id="queryTargetUnitValue">请选择 目标单位名称</span>
+                                  <span class="suffix-button">...</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="el-col el-col-6">
+                            <div class="el-form-item el-form-item--mini query-select-form-item">
+                              <label class="el-form-item__label" id="queryConversionTypeLabel">换算类型</label>
+                              <div class="el-form-item__content">
+                                <div class="pk-select" id="queryConversionTypeSelect">
+                                  <input id="queryConversionType" type="hidden" value="">
+                                  <button class="pk-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="queryConversionTypeLabel queryConversionTypeValue"><span id="queryConversionTypeValue" data-pk-value>全部</span></button>
+                                  <span class="pk-caret" aria-hidden="true"></span>
+                                  <ul class="pk-menu" role="listbox" aria-label="换算类型">
+                                    <li class="pk-option is-selected" data-value="" role="option" aria-selected="true" tabindex="0">全部</li>
+                                    <li class="pk-option" data-value="固定" role="option" aria-selected="false" tabindex="-1">固定</li>
+                                    <li class="pk-option" data-value="浮动" role="option" aria-selected="false" tabindex="-1">浮动</li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="el-col el-col-6">
+                            <div class="el-form-item el-form-item--mini query-select-form-item">
+                              <label class="el-form-item__label" id="querySystemPresetLabel">系统预设</label>
+                              <div class="el-form-item__content">
+                                <div class="pk-select" id="querySystemPresetSelect">
+                                  <input id="querySystemPreset" type="hidden" value="">
+                                  <button class="pk-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="querySystemPresetLabel querySystemPresetValue"><span id="querySystemPresetValue" data-pk-value>全部</span></button>
+                                  <span class="pk-caret" aria-hidden="true"></span>
+                                  <ul class="pk-menu" role="listbox" aria-label="系统预设">
+                                    <li class="pk-option is-selected" data-value="" role="option" aria-selected="true" tabindex="0">全部</li>
+                                    <li class="pk-option" data-value="是" role="option" aria-selected="false" tabindex="-1">是</li>
+                                    <li class="pk-option" data-value="否" role="option" aria-selected="false" tabindex="-1">否</li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="el-col el-col-6">
+                            <button class="advanced-search-switch" id="advancedSearchSwitch" type="button">&gt;&gt;切换到高级检索</button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <section class="list-table-shell" aria-label="通用单位换算列表">
+          <div class="list-toolbar">
+            <div class="list-toolbar-left">
+              <button class="btn primary" id="createButton" data-testid="create-general-conversion" data-erp-demo-local-create type="button">新增</button>
+              <button class="btn" id="batchDeleteButton" type="button">删除</button>
+              <button class="btn" id="exportButton" type="button">导出</button>
+              <button class="btn" id="refreshButton" type="button">刷新</button>
+            </div>
+            <div class="list-toolbar-right">
+              <div class="column-display-control" id="columnDisplayControl">
+                <button class="btn list-icon-btn" id="columnDisplayButton" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="columnDisplayPopover">列展示</button>
+                <div class="column-display-popover el-popper" id="columnDisplayPopover" role="group" aria-label="选择展示列" aria-hidden="true" hidden>
+                  <div class="column-display-title">列展示</div>
+                  <label class="column-display-option"><span class="purchase-th-checkbox-wrap"><input class="purchase-th-checkbox-input" type="checkbox" data-column-index="3" checked><span class="purchase-th-checkbox-face" aria-hidden="true"></span></span><span>源单位换算系数</span></label>
+                  <label class="column-display-option"><span class="purchase-th-checkbox-wrap"><input class="purchase-th-checkbox-input" type="checkbox" data-column-index="4" checked><span class="purchase-th-checkbox-face" aria-hidden="true"></span></span><span>源单位</span></label>
+                  <label class="column-display-option"><span class="purchase-th-checkbox-wrap"><input class="purchase-th-checkbox-input" type="checkbox" data-column-index="5" checked><span class="purchase-th-checkbox-face" aria-hidden="true"></span></span><span>目标单位换算系数</span></label>
+                  <label class="column-display-option"><span class="purchase-th-checkbox-wrap"><input class="purchase-th-checkbox-input" type="checkbox" data-column-index="6" checked><span class="purchase-th-checkbox-face" aria-hidden="true"></span></span><span>目标单位名称</span></label>
+                  <label class="column-display-option"><span class="purchase-th-checkbox-wrap"><input class="purchase-th-checkbox-input" type="checkbox" data-column-index="7" checked><span class="purchase-th-checkbox-face" aria-hidden="true"></span></span><span>换算类型</span></label>
+                  <label class="column-display-option"><span class="purchase-th-checkbox-wrap"><input class="purchase-th-checkbox-input" type="checkbox" data-column-index="8" checked><span class="purchase-th-checkbox-face" aria-hidden="true"></span></span><span>系统预设</span></label>
+                </div>
+              </div>
+              <button class="btn list-icon-btn" id="fullscreenButton" type="button" aria-pressed="false">全屏</button>
+            </div>
+          </div>
+
+          <div class="purchase-table-wrap">
+            <div class="purchase-table-inner">
+              <table class="purchase-list-table conversion-table">
+                <colgroup>
+                  <col style="width: 58px">
+                  <col style="width: 58px">
+                  <col style="width: 40px">
+                  <col style="width: 150px">
+                  <col style="width: 150px">
+                  <col style="width: 150px">
+                  <col style="width: 170px">
+                  <col style="width: 130px">
+                  <col style="width: 120px">
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>操作</th>
+                    <th>序号</th>
+                    <th class="center purchase-th-checkbox">
+                      <label class="purchase-th-checkbox-wrap">
+                        <input class="purchase-th-checkbox-input" id="selectAll" type="checkbox" title="全选">
+                        <span class="purchase-th-checkbox-face" aria-hidden="true"></span>
+                      </label>
+                    </th>
+                    <th class="number">源单位换算系数</th>
+                    <th>源单位</th>
+                    <th class="number">目标单位换算系数</th>
+                    <th>目标单位名称</th>
+                    <th>换算类型</th>
+                    <th>系统预设</th>
+                  </tr>
+                </thead>
+                <tbody id="conversionBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <footer class="list-footer-bar">
+            <span class="selected-count">已勾选 <strong id="selectedCount">0</strong> 条</span>
+            <div class="pagination-lite" aria-label="分页">
+              <span id="totalCount">共 0 条</span>
+              <span class="pager-size">10条/页</span>
+              <button class="pager-btn" id="previousPageButton" type="button" aria-label="上一页">‹</button>
+              <span id="pageNumbers"></span>
+              <button class="pager-btn" id="nextPageButton" type="button" aria-label="下一页">›</button>
+              <span class="pager-jump">前往 <input class="pager-input" type="text" value="1" aria-label="页码"> 页</span>
+            </div>
+          </footer>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="pk-reference-popover query-reference-popover" id="queryReferencePopover" data-pk-reference-popover aria-hidden="true">
+    <span class="popper-arrow"></span>
+    <div class="popover-table">
+      <table>
+        <thead><tr><th style="width: 44px">选择</th><th style="width: 128px">单位编码</th><th>单位名称</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="query-reference-footer">
+      <button class="logistics-btn" id="clearQueryReferenceButton" type="button">清空</button>
+      <button class="logistics-btn primary" id="confirmQueryReferenceButton" type="button">确定</button>
+    </div>
+  </div>
+
+  <div class="logistics-dialog-mask" id="detailModal" data-testid="general-conversion-detail-modal" aria-hidden="true">
+    <div class="logistics-dialog conversion-dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+      <div class="logistics-dialog-header">
+        <span class="logistics-dialog-title" id="dialogTitle">新增通用单位换算</span>
+        <button class="logistics-dialog-close" id="closeDialogButton" type="button" aria-label="关闭"></button>
+      </div>
+
+      <form id="conversionForm" novalidate>
+        <div class="logistics-dialog-body">
+          <div class="form-error-summary" id="formErrorSummary" role="alert" hidden></div>
+          <div class="pk-form-grid pk-unit-form-grid">
+            <div class="pk-field" data-field="sourceCoefficient">
+              <div class="pk-label"><span class="pk-required">*</span><span>源单位换算系数</span></div>
+              <div class="pk-control">
+                <div class="pk-input-shell"><input class="pk-shell-input" id="sourceCoefficientInput" type="text" inputmode="numeric" data-pk-numeric="integer" value="1" aria-label="源单位换算系数"></div>
+              </div>
+              <span class="field-error">源单位换算系数必须大于0，请重新输入。</span>
+            </div>
+
+            <div class="pk-field" data-field="sourceUnit">
+              <div class="pk-label"><span class="pk-required">*</span><span>源单位</span></div>
+              <div class="pk-control">
+                <div class="pk-input-shell conversion-reference" id="sourceUnitReference" data-conversion-reference="source" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="value placeholder" id="sourceUnitValue">请选择源单位</span>
+                  <span class="suffix-button">...</span>
+                </div>
+              </div>
+              <span class="field-error">请选择源单位</span>
+            </div>
+
+            <div class="pk-field" data-field="targetCoefficient">
+              <div class="pk-label"><span class="pk-required">*</span><span>目标单位换算系数</span></div>
+              <div class="pk-control">
+                <div class="pk-input-shell"><input class="pk-shell-input" id="targetCoefficientInput" type="text" inputmode="numeric" data-pk-numeric="integer" value="1" aria-label="目标单位换算系数"></div>
+              </div>
+              <span class="field-error">目标单位换算系数必须大于0，请重新输入。</span>
+            </div>
+
+            <div class="pk-field" data-field="targetUnit">
+              <div class="pk-label"><span class="pk-required">*</span><span>目标单位名称</span></div>
+              <div class="pk-control">
+                <div class="pk-input-shell conversion-reference" id="targetUnitReference" data-conversion-reference="target" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="value placeholder" id="targetUnitValue">请选择目标单位</span>
+                  <span class="suffix-button">...</span>
+                </div>
+              </div>
+              <span class="field-error">请选择目标单位</span>
+            </div>
+
+            <div class="pk-field" data-field="conversionType">
+              <div class="pk-label"><span class="pk-required">*</span><span>换算类型</span></div>
+              <div class="pk-control">
+                <div class="pk-select" id="conversionTypeSelect">
+                  <button class="pk-select-trigger" type="button"><span data-pk-value>固定</span></button>
+                  <span class="pk-caret"></span>
+                  <ul class="pk-menu">
+                    <li class="pk-option is-selected" data-value="固定">固定</li>
+                    <li class="pk-option" data-value="浮动">浮动</li>
+                  </ul>
+                </div>
+              </div>
+              <span class="field-error">请选择换算类型</span>
+            </div>
+
+            <div class="pk-field">
+              <div class="pk-label"><span>系统预设</span></div>
+              <div class="pk-control">
+                <div class="system-preset-display">
+                  <input class="pk-checkbox" id="systemPresetInput" type="checkbox" disabled aria-label="系统预设">
+                  <span id="systemPresetText">否</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="logistics-dialog-footer">
+          <button class="logistics-btn primary" data-testid="save-general-conversion" type="submit">保存</button>
+          <button class="logistics-btn" id="cancelButton" type="button">取消</button>
+        </div>
+      </form>
+    </div>
+    <div class="pk-reference-popover" id="conversionReferencePopover" data-pk-reference-popover data-conversion-reference-popover aria-hidden="true">
+      <span class="popper-arrow"></span>
+      <div class="popover-table">
+        <table>
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="logistics-dialog-mask" id="confirmModal" aria-hidden="true">
+    <div class="logistics-dialog confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+      <div class="logistics-dialog-header">
+        <span class="logistics-dialog-title" id="confirmTitle">操作确认</span>
+        <button class="logistics-dialog-close" id="closeConfirmButton" type="button" aria-label="关闭"></button>
+      </div>
+      <div class="logistics-dialog-body" id="confirmMessage"></div>
+      <div class="logistics-dialog-footer">
+        <button class="logistics-btn primary" id="confirmActionButton" type="button">确认</button>
+        <button class="logistics-btn" id="cancelConfirmButton" type="button">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="successToast" role="status" aria-live="polite" hidden>操作成功</div>
+
+  <script src="assets/js/general-unit-conversion.js"></script>
+
+</body>
+</html>

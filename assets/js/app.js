@@ -16,12 +16,23 @@
   const workspaceTabs = document.getElementById("workspaceTabs");
   const workspaceTabsNav = document.getElementById("workspaceTabsNav");
   const workspaceTabsActiveBar = document.getElementById("workspaceTabsActiveBar");
+  const menuSearch = document.getElementById("menuSearch");
+  const menuSearchControl = document.getElementById("menuSearchControl");
+  const menuSearchInput = document.getElementById("menuSearchInput");
+  const menuSearchClear = document.getElementById("menuSearchClear");
+  const menuSearchPanel = document.getElementById("menuSearchPanel");
+  const menuSearchSummaryText = document.getElementById("menuSearchSummaryText");
+  const menuSearchTotal = document.getElementById("menuSearchTotal");
+  const menuSearchResults = document.getElementById("menuSearchResults");
+  const menuSearchEmpty = document.getElementById("menuSearchEmpty");
 
   const openModules = new Set(["supply-chain-management"]);
   const flatItems = [];
   const openTabs = [];
   let currentItem = null;
   let activeThirdMenu = null;
+  let menuSearchMatches = [];
+  let menuSearchActiveIndex = -1;
 
   const create = (tag, className, text) => {
     const element = document.createElement(tag);
@@ -48,6 +59,142 @@
       flatItems.push(Object.assign({}, second, { module, second, group: null }));
     });
   });
+
+  function menuSearchPath(item) {
+    const labels = [];
+    if (item.module && item.module.label) labels.push(item.module.label);
+    if (item.second && item.second.id !== item.id && item.second.label) labels.push(item.second.label);
+    if (item.group && item.group.label) labels.push(item.group.label);
+    return labels.slice(0, 3);
+  }
+
+  function normalizeMenuSearchValue(value) {
+    return String(value || "").trim().toLowerCase();
+  }
+
+  const searchableMenuItems = flatItems
+    .filter((item) => !item.menuRoute)
+    .map((item) => {
+      const path = menuSearchPath(item);
+      return {
+        item,
+        path,
+        searchText: normalizeMenuSearchValue([item.label].concat(path).join(" "))
+      };
+    });
+
+  function appendHighlightedText(container, text, keyword) {
+    const source = String(text || "");
+    const normalizedSource = source.toLowerCase();
+    const normalizedKeyword = normalizeMenuSearchValue(keyword);
+    if (!normalizedKeyword) {
+      container.textContent = source;
+      return;
+    }
+
+    let cursor = 0;
+    let matchIndex = normalizedSource.indexOf(normalizedKeyword, cursor);
+    while (matchIndex >= 0) {
+      if (matchIndex > cursor) container.append(document.createTextNode(source.slice(cursor, matchIndex)));
+      const mark = create("mark", "", source.slice(matchIndex, matchIndex + normalizedKeyword.length));
+      container.append(mark);
+      cursor = matchIndex + normalizedKeyword.length;
+      matchIndex = normalizedSource.indexOf(normalizedKeyword, cursor);
+    }
+    if (cursor < source.length) container.append(document.createTextNode(source.slice(cursor)));
+  }
+
+  function setMenuSearchOpen(isOpen) {
+    const shouldOpen = Boolean(isOpen);
+    menuSearchPanel.hidden = !shouldOpen;
+    menuSearchControl.classList.toggle("is-open", shouldOpen);
+    menuSearchControl.setAttribute("aria-expanded", String(shouldOpen));
+    if (!shouldOpen) menuSearchInput.removeAttribute("aria-activedescendant");
+  }
+
+  function setActiveMenuSearchResult(index, shouldScroll) {
+    menuSearchActiveIndex = index;
+    const resultButtons = menuSearchResults.querySelectorAll(".menu-search-result");
+    resultButtons.forEach((button, buttonIndex) => {
+      const isActive = buttonIndex === index;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-selected", String(isActive));
+    });
+
+    const activeButton = index >= 0 ? resultButtons[index] : null;
+    if (!activeButton) {
+      menuSearchInput.removeAttribute("aria-activedescendant");
+      return;
+    }
+    menuSearchInput.setAttribute("aria-activedescendant", activeButton.id);
+    if (shouldScroll) activeButton.scrollIntoView({ block: "nearest" });
+  }
+
+  function closeMenuSearch(clearValue) {
+    setMenuSearchOpen(false);
+    menuSearchActiveIndex = -1;
+    if (!clearValue) return;
+    menuSearchInput.value = "";
+    menuSearchClear.hidden = true;
+    menuSearchResults.replaceChildren();
+    menuSearchEmpty.hidden = true;
+  }
+
+  function selectMenuSearchResult(index) {
+    const match = menuSearchMatches[index];
+    if (!match) return;
+    closeMenuSearch(true);
+    navigateTo(match.item);
+  }
+
+  function renderMenuSearchResults() {
+    const keyword = menuSearchInput.value.trim();
+    const normalizedKeyword = normalizeMenuSearchValue(keyword);
+    menuSearchClear.hidden = menuSearchInput.value.length === 0;
+    menuSearchResults.replaceChildren();
+    menuSearchMatches = [];
+    menuSearchActiveIndex = -1;
+
+    if (!normalizedKeyword) {
+      menuSearchEmpty.hidden = true;
+      setMenuSearchOpen(false);
+      return;
+    }
+
+    menuSearchMatches = searchableMenuItems.filter((entry) => entry.searchText.includes(normalizedKeyword));
+    menuSearchSummaryText.textContent = "搜索 \"" + keyword + "\"";
+    menuSearchTotal.textContent = String(menuSearchMatches.length);
+    menuSearchEmpty.hidden = menuSearchMatches.length > 0;
+
+    menuSearchMatches.forEach((entry, index) => {
+      const resultButton = create("button", "menu-search-result");
+      const title = create("span", "menu-search-result-title");
+      const icon = create("span", "menu-search-result-icon");
+      const label = create("span", "menu-search-result-label");
+      const path = create("span", "menu-search-result-path");
+
+      resultButton.type = "button";
+      resultButton.id = "menu-search-result-" + index;
+      resultButton.setAttribute("role", "option");
+      resultButton.setAttribute("aria-selected", "false");
+      resultButton.title = entry.item.label;
+      appendHighlightedText(label, entry.item.label, keyword);
+      title.append(icon, label);
+
+      entry.path.forEach((pathLabel, pathIndex) => {
+        if (pathIndex > 0) path.append(create("span", "menu-search-result-separator", ">"));
+        path.append(create("span", "", pathLabel));
+      });
+
+      resultButton.append(title, path);
+      resultButton.addEventListener("mouseenter", () => setActiveMenuSearchResult(index, false));
+      resultButton.addEventListener("click", () => selectMenuSearchResult(index));
+      menuSearchResults.append(resultButton);
+    });
+
+    setMenuSearchOpen(true);
+    setActiveMenuSearchResult(menuSearchMatches.length ? 0 : -1, false);
+  }
 
   const defaultItem = flatItems.find((item) => item.id === "sales-outbound-order") || flatItems[0] || null;
 
@@ -188,6 +335,7 @@
   }
 
   function workspaceTabLabel(item) {
+    if (item.workspaceLabel) return item.workspaceLabel;
     if (!item.menuRoute && item.page && Array.isArray(item.views) && item.views.length) {
       return item.label + "列表";
     }
@@ -320,7 +468,7 @@
     if (!detailItem) return;
 
     const navigateToDetail = () => navigateTo(detailItem);
-    const newButton = frameDocument.querySelector(".list-toolbar-left .btn.primary");
+    const newButton = frameDocument.querySelector(".list-toolbar-left .btn.primary:not([data-erp-demo-local-create])");
     if (newButton && !newButton.dataset.erpDemoDetailNavigation) {
       newButton.dataset.erpDemoDetailNavigation = "true";
       newButton.addEventListener("click", navigateToDetail);
@@ -344,7 +492,7 @@
     const listToolbar = frameDocument.querySelector(".list-toolbar");
     if (!listToolbar) return;
 
-    if (!frameDocument.getElementById("erp-demo-prototype-kit-style")) {
+    if (!frameDocument.querySelector('link[href="assets/vendor/prototype-kit.css"]')) {
       const kitStyle = frameDocument.createElement("link");
       kitStyle.id = "erp-demo-prototype-kit-style";
       kitStyle.rel = "stylesheet";
@@ -442,6 +590,7 @@
 
   function navigateTo(item) {
     if (!item) return;
+    closeMenuSearch(true);
     closeThirdMenu();
     if (window.location.hash === item.route) {
       renderPage(item);
@@ -461,6 +610,43 @@
     }
     renderPage(item);
   }
+
+  menuSearchInput.addEventListener("input", renderMenuSearchResults);
+  menuSearchInput.addEventListener("focus", () => {
+    if (menuSearchInput.value.trim()) renderMenuSearchResults();
+  });
+  menuSearchInput.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeMenuSearch(false);
+      return;
+    }
+    if (event.key === "Enter") {
+      if (!menuSearchPanel.hidden && menuSearchActiveIndex >= 0) {
+        event.preventDefault();
+        selectMenuSearchResult(menuSearchActiveIndex);
+      }
+      return;
+    }
+    if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+
+    if (menuSearchPanel.hidden && menuSearchInput.value.trim()) renderMenuSearchResults();
+    if (!menuSearchMatches.length) return;
+    event.preventDefault();
+    const direction = event.key === "ArrowDown" ? 1 : -1;
+    const nextIndex = (menuSearchActiveIndex + direction + menuSearchMatches.length) % menuSearchMatches.length;
+    setActiveMenuSearchResult(nextIndex, true);
+  });
+
+  menuSearchClear.addEventListener("mousedown", (event) => event.preventDefault());
+  menuSearchClear.addEventListener("click", () => {
+    menuSearchInput.value = "";
+    renderMenuSearchResults();
+    menuSearchInput.focus();
+  });
+
+  document.addEventListener("mousedown", (event) => {
+    if (!menuSearch.contains(event.target)) closeMenuSearch(false);
+  });
 
   menuTrigger.addEventListener("click", () => {
     closeThirdMenu();

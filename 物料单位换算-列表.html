@@ -1,0 +1,3187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>物料单位换算</title>
+  <link rel="stylesheet" href="assets/vendor/prototype-kit.css">
+  <style>
+    :root {
+      --primary: #409eff;
+      --primary-deep: #337ecc;
+      --bg: #f3f5f7;
+      --panel: #ffffff;
+      --line: #dfe5ec;
+      --line-soft: #eef2f6;
+      --text: #2f3a4a;
+      --subtext: #7f8a9b;
+      --muted: #a8b2c1;
+      --hover: #eaf5fd;
+      --sidebar: #fbfcfd;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #f7f8fa;
+      color: var(--text);
+      font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .srm-prototype {
+      width: 100%;
+      min-width: 760px;
+      height: 100%;
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .layout {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .content {
+      position: relative;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      background: #f7f8fa;
+    }
+
+    .srm-prototype > .layout > main.content,
+    .srm-prototype > .layout > main.content *,
+    .srm-prototype > .layout > main.content *::before,
+    .srm-prototype > .layout > main.content *::after {
+      font-size: 14px !important;
+    }
+
+    .content > .ddp-search {
+      flex-shrink: 0;
+    }
+
+    .btn {
+      height: 24px;
+      padding: 0 10px;
+      border: 1px solid #d6dde6;
+      border-radius: 2px;
+      background: #fff;
+      color: #5f6b7b;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+    }
+
+    .btn:hover {
+      color: var(--primary);
+      border-color: #b3d8ff;
+      background: #ecf5ff;
+    }
+
+    .btn.primary {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn.primary:hover {
+      border-color: #66b1ff;
+      background: #66b1ff;
+      color: #fff;
+    }
+
+    .btn:disabled {
+      border-color: #e4e7ed;
+      background: #f5f7fa;
+      color: #c0c4cc;
+      cursor: not-allowed;
+    }
+
+    .el-input__inner {
+      width: 100%;
+      height: 28px;
+      padding: 0 10px;
+      border: 1px solid #dcdfe6;
+      border-radius: 2px;
+      outline: none;
+      background: #fff;
+      color: #606266;
+      transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    }
+
+    .el-input__inner:hover {
+      border-color: #c0c4cc;
+      background: #fff;
+    }
+
+    .el-input__inner:focus {
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.12);
+    }
+
+    .ddp-search {
+      position: relative;
+      z-index: 10;
+      width: auto;
+      height: 51px;
+      min-height: 51px;
+      margin: 8px 10px 0;
+      padding: 0;
+      overflow: visible;
+      border: 0;
+      background: #fff;
+      box-shadow: none;
+      font-size: 12px;
+    }
+
+    .ddp-search .layout-container {
+      width: 100%;
+      height: 51px;
+      padding: 10px;
+    }
+
+    .ddp-search .box-layout-search {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 30px;
+    }
+
+    .ddp-search .layout-search-left {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      display: flex;
+      width: 346px;
+      height: 28px;
+      align-items: center;
+    }
+
+    .ddp-search .layout-search {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 30px;
+    }
+
+    .ddp-search .search-option {
+      display: flex;
+      width: 100%;
+      height: 30px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .ddp-search .filter_wrap,
+    .ddp-search .el-button {
+      display: flex;
+      align-items: center;
+    }
+
+    .ddp-search .search-view-select {
+      position: relative;
+      width: 200px;
+    }
+
+    .ddp-search .search-view-select .el-select {
+      width: 200px;
+    }
+
+    .ddp-search .filter_wrap {
+      position: relative;
+      width: 136px;
+      margin-left: 10px;
+      border-radius: 3px;
+      background: #ccebfccc;
+    }
+
+    .ddp-search .el-input {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .ddp-search .el-input__inner {
+      height: 30px;
+      padding: 0 30px;
+      line-height: 30px;
+      border-color: #ebebeb;
+      color: #666;
+      font-size: 14px;
+      box-shadow: none;
+    }
+
+    .ddp-search .search-view-select .el-input__inner {
+      height: 28px;
+      padding: 0 30px 0 15px;
+      border-radius: 4px;
+      line-height: 28px;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .ddp-search .search-view-select.is-open .el-input__inner {
+      border-color: var(--primary);
+    }
+
+    .ddp-search .search-view-select .selectionClass {
+      position: absolute;
+      top: 28px;
+      left: 0;
+      z-index: 230;
+      display: block;
+      width: 260px;
+      margin: 12px 0 5px;
+      padding: 0;
+      border: 1px solid #ebebeb;
+      border-radius: 4px;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .ddp-search .search-view-select .selectionClass[hidden] {
+      display: none;
+    }
+
+    .ddp-search .search-view-select .el-select-dropdown__list {
+      margin: 0;
+      padding: 6px 0;
+      list-style: none;
+    }
+
+    .ddp-search .search-view-select .el-select-dropdown__item {
+      position: relative;
+      display: flow-root;
+      height: 28px;
+      padding: 0 10px;
+      color: #666;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 28px;
+      cursor: pointer;
+    }
+
+    .ddp-search .search-view-select .el-select-dropdown__item:hover,
+    .ddp-search .search-view-select .el-select-dropdown__item:focus {
+      outline: none;
+      background: #f5f7fa;
+    }
+
+    .ddp-search .search-view-select .el-select-dropdown__item.selected .search-view-select-left {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .ddp-search .search-view-select-left {
+      float: left;
+    }
+
+    .ddp-search .search-view-select-right {
+      float: right;
+      color: #52b5ef;
+      font-weight: 400;
+    }
+
+    .ddp-search .search-view-select .popper__arrow,
+    .ddp-search .search-view-select .popper__arrow::after {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-style: solid;
+    }
+
+    .ddp-search .search-view-select .popper__arrow {
+      top: -7px;
+      left: 11px;
+      border-width: 0 7px 7px;
+      border-color: transparent transparent #ebebeb;
+    }
+
+    .ddp-search .search-view-select .popper__arrow::after {
+      top: 1px;
+      left: -6px;
+      border-width: 0 6px 6px;
+      border-color: transparent transparent #fff;
+      content: "";
+    }
+
+    .ddp-search .search-input {
+      width: 250px;
+      margin-right: 10px;
+    }
+
+    .ddp-search .search-input .el-input__inner {
+      height: 28px;
+      padding: 0 30px;
+      border-radius: 4px;
+      color: #666;
+      line-height: 28px;
+    }
+
+    .ddp-search .search-input .el-input__prefix,
+    .ddp-search .search-input .el-input__suffix,
+    .ddp-search .search-view-select .el-input__prefix,
+    .ddp-search .search-view-select .el-input__suffix {
+      height: 28px;
+    }
+
+    .ddp-search .search-input .el-input__inner::placeholder {
+      color: #ccc;
+      opacity: 1;
+    }
+
+    .ddp-search .el-input__prefix,
+    .ddp-search .el-input__suffix {
+      position: absolute;
+      top: 0;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      color: #d9d9d9;
+      pointer-events: none;
+    }
+
+    .ddp-search .search-view-select .el-input__suffix {
+      height: 28px;
+    }
+
+    .ddp-search .el-input__prefix {
+      left: 8px;
+    }
+
+    .ddp-search .el-input__suffix {
+      right: 7px;
+    }
+
+    .ddp-search .el-button {
+      height: 28px;
+      padding: 0 10px;
+      border: 1px solid transparent;
+      border-radius: 3px;
+      background: transparent;
+      color: #666;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 18px;
+      gap: 4px;
+    }
+
+    .ddp-search .el-button > span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .ddp-search .el-button:focus {
+      outline: none;
+    }
+
+    .ddp-search .el-button--primary {
+      min-width: 44px;
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .ddp-search .el-button--default {
+      min-width: 44px;
+      border-color: #ebebeb;
+      background: #fff;
+      color: #666;
+    }
+
+    .ddp-search .el-button--text {
+      color: var(--primary);
+    }
+
+    .ddp-search .search-option .el-button {
+      margin-left: 10px;
+    }
+
+    .ddp-search .search-option .btn_name {
+      color: inherit;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .ddp-search .search-option > .btn_name {
+      height: 20px;
+      border-color: transparent;
+      background: transparent;
+    }
+
+    .srm-prototype > .layout > main.content .ddp-search .search-option > .el-button.btn_name,
+    .srm-prototype > .layout > main.content .ddp-search .search-option > .el-button.btn_name span {
+      color: #409eff !important;
+    }
+
+    .ddp-search .filter_wrap .el-button--text {
+      width: 136px;
+      min-width: 136px;
+      margin: 0;
+      padding: 0 10px;
+      justify-content: flex-start;
+      border-color: transparent;
+      background: transparent;
+      color: var(--primary);
+    }
+
+    .ddp-search .icon-search::before {
+      content: "⌕";
+    }
+
+    .ddp-search .filter-icon {
+      display: inline-block;
+      width: 14px;
+      height: 12px;
+      margin-right: 4px;
+      background: currentColor;
+      clip-path: polygon(0 0, 100% 0, 62% 46%, 62% 100%, 38% 82%, 38% 46%);
+    }
+
+    .ddp-search .menu-arrow {
+      position: relative;
+      display: inline-flex;
+      width: 12px;
+      min-width: 12px;
+      height: 12px;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      color: currentColor;
+      text-indent: -999px;
+    }
+
+    .ddp-search .menu-arrow::before {
+      width: 8px;
+      height: 8px;
+      border-top: 1.4px solid currentColor;
+      border-right: 1.4px solid currentColor;
+      content: "";
+      transform: rotate(135deg);
+      transition: transform 0.18s ease, border-color 0.16s;
+    }
+
+    .ddp-search .search-option-arrow,
+    .ddp-search .filter-arrow {
+      margin: -3px 0 0 4px;
+    }
+
+    .ddp-search .search-view-arrow {
+      color: #c0c4cc;
+      transform: scale(0.75);
+    }
+
+    .ddp-search .search-view-select.is-open .search-view-arrow::before {
+      transform: rotate(-45deg);
+    }
+
+    .ddp-search.is-expanded .search-option-arrow::before,
+    .ddp-search .filter_wrap.is-open .filter-arrow::before {
+      transform: rotate(-45deg);
+    }
+
+    .srm-prototype > .layout > main.content .ddp-search .ddp-list-search-filter-popover {
+      position: absolute;
+      top: 28px;
+      right: 0;
+      z-index: 220;
+      display: block;
+      width: 250px;
+      margin: 12px 0 0;
+      padding: 5px 10px 10px;
+      border: 1px solid #ebeef5;
+      border-radius: 4px;
+      background: #fff;
+      color: #666;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      font-size: 12px !important;
+      font-weight: 400;
+      line-height: 16.8px;
+    }
+
+    .srm-prototype > .layout > main.content .ddp-search .ddp-list-search-filter-popover[hidden] {
+      display: none !important;
+    }
+
+    .ddp-search .filter_box {
+      width: 228px;
+    }
+
+    .srm-prototype > .layout > main.content .ddp-search .filter_title {
+      height: 17px;
+      color: #333;
+      font-size: 12px !important;
+      font-weight: 700;
+      line-height: 17px;
+    }
+
+    .srm-prototype > .layout > main.content .ddp-search .filter_item {
+      display: flex;
+      width: 228px;
+      height: 28px;
+      padding-left: 10px;
+      align-items: center;
+      color: #666;
+      font-size: 12px !important;
+      font-style: italic;
+    }
+
+    .ddp-search button.filter_item {
+      border: 0;
+      background: transparent;
+      font-style: normal;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .ddp-search button.filter_item:hover,
+    .ddp-search button.filter_item:focus {
+      outline: none;
+      background: #ecf5ff;
+      color: var(--primary);
+    }
+
+    .ddp-search .personal-filter-title {
+      margin-top: 5px;
+    }
+
+    .ddp-search .ddp-list-search-filter-popover .popper__arrow,
+    .ddp-search .ddp-list-search-filter-popover .popper__arrow::after {
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-style: solid;
+    }
+
+    .ddp-search .ddp-list-search-filter-popover .popper__arrow {
+      top: -7px;
+      right: 20px;
+      border-width: 0 7px 7px;
+      border-color: transparent transparent #ebeef5;
+    }
+
+    .ddp-search .ddp-list-search-filter-popover .popper__arrow::after {
+      top: 1px;
+      left: -6px;
+      border-width: 0 6px 6px;
+      border-color: transparent transparent #fff;
+      content: "";
+    }
+
+    .ddp-search .popover-box {
+      position: absolute;
+      top: 39px;
+      right: -10px;
+      left: -10px;
+      z-index: 200;
+      display: none;
+      height: auto;
+      margin: 0;
+      padding: 10px;
+      border: 0;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .ddp-search.is-expanded .popover-box {
+      display: block;
+    }
+
+    .ddp-search .el-tabs {
+      width: 100%;
+      height: auto;
+    }
+
+    .ddp-search .el-tabs__header {
+      height: 35px;
+      margin: 0;
+      border: 0;
+      border-bottom: 1px solid #e4e7ed;
+    }
+
+    .ddp-search .el-tabs__nav-wrap,
+    .ddp-search .el-tabs__nav-scroll,
+    .ddp-search .el-tabs__nav {
+      height: 35px;
+    }
+
+    .ddp-search .el-tabs__nav {
+      position: relative;
+      display: inline-flex;
+    }
+
+    .ddp-search .el-tabs__active-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 56px;
+      height: 2px;
+      background: var(--primary);
+    }
+
+    .ddp-search .el-tabs__item {
+      display: inline-flex;
+      height: 35px;
+      align-items: center;
+      color: var(--primary);
+      font-weight: 400;
+    }
+
+    .ddp-search .el-tabs__content {
+      height: auto;
+      min-height: 0;
+      padding-top: 10px;
+    }
+
+    .ddp-search .el-form {
+      position: relative;
+      height: auto;
+      min-height: 0;
+      overflow: visible;
+    }
+
+    .ddp-search .el-row {
+      width: calc(100% + 20px);
+      margin: 0 -10px;
+    }
+
+    .ddp-search .el-row::after {
+      display: table;
+      clear: both;
+      content: "";
+    }
+
+    .ddp-search .el-col-6 {
+      float: left;
+      width: 25%;
+      margin-bottom: 6px;
+      padding: 0 10px;
+    }
+
+    .ddp-search .el-form-item {
+      display: flex;
+      height: 49px;
+      min-width: 0;
+      margin: 0 0 4px;
+      overflow: hidden;
+      flex-direction: column;
+    }
+
+    .ddp-search .el-form-item__label {
+      display: block;
+      height: 18px;
+      overflow: hidden;
+      padding: 0;
+      color: #333;
+      font-size: 14px;
+      line-height: normal;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .ddp-search .el-form-item__content {
+      display: flex;
+      height: 31px;
+      align-items: center;
+    }
+
+    .ddp-search .el-form-item__content > .pk-input-shell,
+    .ddp-search .el-form-item__content > .pk-select {
+      width: 100%;
+    }
+
+    .ddp-search .query-reference {
+      cursor: pointer;
+    }
+
+    .ddp-search .query-select-form-item {
+      overflow: visible;
+    }
+
+    .ddp-search .query-select-form-item .pk-menu {
+      z-index: 260;
+    }
+
+    .query-reference-popover {
+      min-height: 0;
+      overflow: hidden;
+      z-index: 2315;
+    }
+
+    .query-reference-popover .popover-table {
+      height: 232px;
+    }
+
+    .query-reference-popover .query-reference-select-cell {
+      justify-content: center;
+      padding: 0;
+    }
+
+    .query-reference-popover .query-reference-footer {
+      display: flex;
+      min-height: 47px;
+      padding: 8px 12px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-top: 1px solid #ebeef5;
+      background: #fff;
+    }
+
+    .query-reference-popover .query-reference-selected-count {
+      color: #606266;
+      white-space: nowrap;
+    }
+
+    .query-reference-popover .query-reference-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .ddp-search .advanced-search-switch {
+      display: inline-flex;
+      height: 30px;
+      padding: 0 15px;
+      align-items: center;
+      border: 0;
+      background: transparent;
+      color: var(--primary);
+      line-height: 30px;
+    }
+
+    .list-table-shell {
+      margin: 8px 10px 10px;
+      background: #fff;
+      border-width: 0 !important;
+      border-style: none !important;
+      border-color: transparent !important;
+      border-radius: 0;
+      box-shadow: none;
+      min-height: 0;
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .list-toolbar {
+      min-height: 38px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid #e7edf3;
+      background: #fff;
+      flex-shrink: 0;
+    }
+
+    .list-toolbar-left,
+    .list-toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .list-toolbar-left .btn,
+    .list-toolbar-right .btn {
+      height: 28px;
+      padding: 0 8px;
+      border-radius: 3px;
+      font-size: 14px;
+      gap: 4px;
+    }
+
+    .list-toolbar-left .btn.primary {
+      background: #409eff;
+      border-color: #409eff;
+      color: #fff;
+    }
+
+    .list-toolbar-left .btn.dropdown {
+      position: relative;
+      padding-right: 24px;
+    }
+
+    .list-toolbar-left .btn.dropdown::after {
+      content: "";
+      position: absolute;
+      right: 9px;
+      top: 50%;
+      margin-top: -2px;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid #606266;
+    }
+
+    .list-toolbar-right {
+      margin-left: auto;
+      flex-wrap: nowrap;
+    }
+
+    .list-toolbar-right .pk-grid-icon-btn {
+      border-radius: 3px;
+    }
+
+    .column-display-control {
+      position: relative;
+    }
+
+    .column-display-popover {
+      position: absolute;
+      z-index: 40;
+      top: 32px;
+      right: 0;
+      width: 188px;
+      padding: 6px 0;
+      border: 1px solid #e4e7ed;
+      border-radius: 3px;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .column-display-popover[hidden] {
+      display: none;
+    }
+
+    .column-display-title {
+      padding: 4px 12px 6px;
+      color: #303133;
+      font-weight: 600;
+      line-height: 20px;
+    }
+
+    .column-display-option {
+      display: flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 12px;
+      color: #606266;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .column-display-option:hover {
+      background: #f5f7fa;
+    }
+
+    .column-display-option .purchase-th-checkbox-wrap {
+      flex: 0 0 14px;
+      margin: 0 8px 0 0;
+    }
+
+    .is-column-hidden {
+      display: none !important;
+    }
+
+    body.table-fullscreen-active {
+      overflow: hidden;
+    }
+
+    .list-table-shell.is-fullscreen {
+      position: fixed;
+      z-index: 1200;
+      inset: 0;
+      width: auto;
+      height: auto;
+      margin: 0;
+      background: #fff;
+    }
+
+    .purchase-table-wrap {
+      position: relative;
+      overflow: auto;
+      flex: 1;
+      min-height: 0;
+      background: #fff;
+      padding: 0;
+      scrollbar-gutter: stable;
+      border: none;
+      outline: none;
+      box-shadow: none;
+    }
+
+    .purchase-table-inner {
+      display: inline-block;
+      vertical-align: top;
+      width: max-content;
+      min-width: 100%;
+      max-width: none;
+      padding: 0 0 0 10px;
+      border: none;
+    }
+
+    .purchase-list-table {
+      --vxe-ui-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --vxe-ui-font-size-mini: 12px;
+      --vxe-ui-font-color: #606266;
+      --vxe-ui-layout-background-color: #fff;
+      --vxe-ui-table-border-width: 1.05px;
+      --vxe-ui-table-border-color: #e8eaec;
+      --vxe-ui-table-header-background-color: #f8f8f9;
+      --vxe-ui-table-header-font-weight: 700;
+      --vxe-ui-table-row-height-default: 48px;
+      --vxe-ui-table-row-line-height: 22px;
+      --vxe-ui-table-cell-padding-default: 10px;
+      --vxe-ui-table-cell-padding-medium: 8px;
+      --vxe-ui-table-row-hover-background-color: #f5f7fa;
+      --vxe-ui-table-row-striped-background-color: #fafafa;
+      --vxe-ui-table-row-hover-striped-background-color: #f5f7fa;
+      --vxe-row-h: var(--vxe-ui-table-row-height-default);
+      --vxe-td-lh: var(--vxe-ui-table-row-line-height);
+      --vxe-td-pad-y: var(--vxe-ui-table-cell-padding-default);
+      --vxe-td-pad-x: var(--vxe-ui-table-cell-padding-medium);
+      width: max-content;
+      min-width: 100%;
+      max-width: none;
+      table-layout: fixed;
+      position: relative;
+      box-sizing: border-box;
+      flex: none;
+      font-family: var(--vxe-ui-font-family);
+      font-weight: 400;
+      outline: none;
+      font-size: var(--vxe-ui-font-size-mini);
+      color: var(--vxe-ui-font-color);
+      background-color: var(--vxe-ui-layout-background-color);
+      border-collapse: separate;
+      border-spacing: 0;
+      border: 1px solid #ebebeb;
+      border-right: none;
+      border-bottom: none;
+    }
+
+    .purchase-list-table thead {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .purchase-list-table th,
+    .purchase-list-table td {
+      min-height: var(--vxe-row-h);
+      height: var(--vxe-row-h);
+      padding: var(--vxe-td-pad-y) var(--vxe-td-pad-x);
+      border-right: var(--vxe-ui-table-border-width) solid var(--vxe-ui-table-border-color);
+      border-bottom: var(--vxe-ui-table-border-width) solid var(--vxe-ui-table-border-color);
+      color: var(--vxe-ui-font-color);
+      font-size: var(--vxe-ui-font-size-mini);
+      line-height: var(--vxe-td-lh);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: left;
+      box-sizing: border-box;
+      vertical-align: middle;
+      outline: none;
+    }
+
+    .purchase-list-table th {
+      color: #333;
+      font-weight: var(--vxe-ui-table-header-font-weight);
+      background: #e6f4fc;
+    }
+
+    .purchase-list-table td {
+      font-weight: 400;
+      background: var(--vxe-ui-layout-background-color);
+    }
+
+    .purchase-list-table tbody td:nth-child(1),
+    .purchase-list-table tbody td:nth-child(2),
+    .purchase-list-table tbody td:nth-child(3),
+    .purchase-list-table thead th:nth-child(1),
+    .purchase-list-table thead th:nth-child(2),
+    .purchase-list-table thead th:nth-child(3) {
+      text-align: center;
+    }
+
+    .purchase-list-table tbody tr:nth-child(even) td {
+      background: var(--vxe-ui-table-row-striped-background-color);
+    }
+
+    .purchase-list-table tbody tr:hover td,
+    .purchase-list-table tbody tr:nth-child(even):hover td {
+      background: var(--vxe-ui-table-row-hover-background-color);
+    }
+
+    .purchase-list-table .center {
+      text-align: center;
+    }
+
+    .purchase-list-table .number {
+      text-align: right;
+    }
+
+    .purchase-th-checkbox-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 14px;
+      margin: 0 auto;
+      cursor: pointer;
+    }
+
+    .purchase-th-checkbox-input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .purchase-th-checkbox-face {
+      position: absolute;
+      inset: 0;
+      width: 14px;
+      height: 14px;
+      border: 1px solid #dcdfe6;
+      border-radius: 2px;
+      background: #fff;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .purchase-th-checkbox-input:checked + .purchase-th-checkbox-face,
+    .purchase-th-checkbox-input:indeterminate + .purchase-th-checkbox-face {
+      background: #409eff;
+      border-color: #409eff;
+    }
+
+    .purchase-th-checkbox-input:checked + .purchase-th-checkbox-face::after {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 1px;
+      width: 4px;
+      height: 8px;
+      border: solid #fff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    .purchase-th-checkbox-input:indeterminate + .purchase-th-checkbox-face::after {
+      content: "";
+      position: absolute;
+      left: 3px;
+      top: 6px;
+      width: 8px;
+      height: 2px;
+      background: #fff;
+    }
+
+    .purchase-th-checkbox-input:focus-visible + .purchase-th-checkbox-face {
+      outline: 2px solid rgba(64, 158, 255, 0.45);
+      outline-offset: 1px;
+    }
+
+    .link-blue {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #409eff;
+      font-size: 12px;
+    }
+
+    .purchase-list-table td.operation-cell {
+      overflow: visible;
+    }
+
+    .dropdown_box_button.sone-table-buttonList.el-dropdown {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 27px;
+    }
+
+    .sone-table-buttonList .el-dropdown-link {
+      display: inline-flex;
+      width: 24px;
+      height: 24px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 2px;
+      color: #409eff;
+      cursor: pointer;
+    }
+
+    .sone-table-buttonList .el-dropdown-link:hover,
+    .sone-table-buttonList .el-dropdown-link:focus-visible,
+    .sone-table-buttonList.is-open .el-dropdown-link {
+      background: #ecf5ff;
+      outline: none;
+    }
+
+    .sone-table-buttonList .el-button {
+      width: 20px;
+      min-width: 0;
+      height: 24px;
+      margin: 0 !important;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      pointer-events: none;
+    }
+
+    .sone-table-buttonList .more-handel::before {
+      content: "···";
+      display: block;
+      font-style: normal;
+      font-weight: 700;
+      letter-spacing: 1px;
+      line-height: 20px;
+      transform: translateY(-2px);
+    }
+
+    .sone-table-buttonList .el-dropdown-menu {
+      position: fixed;
+      z-index: 2600;
+      display: none;
+      min-width: 122px;
+      margin: 0;
+      padding: 5px 0;
+      border: 1px solid #ebeef5;
+      border-radius: 3px;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+      list-style: none;
+    }
+
+    .sone-table-buttonList.is-open .el-dropdown-menu {
+      display: block;
+    }
+
+    .sone-table-buttonList .el-dropdown-menu__item {
+      height: 32px;
+      margin: 0;
+      padding: 0;
+      line-height: 32px;
+      white-space: nowrap;
+    }
+
+    .sone-table-buttonList .el-dropdown-menu__item:hover,
+    .sone-table-buttonList .el-dropdown-menu__item:focus-within {
+      background: #ecf5ff;
+    }
+
+    .sone-table-buttonList .el-dropdown-menu__item > button {
+      display: block;
+      width: 100%;
+      height: 32px;
+      padding: 0 18px;
+      border: 0;
+      background: transparent;
+      color: #606266;
+      font-size: 12px;
+      line-height: 32px;
+      text-align: left;
+      pointer-events: auto;
+    }
+
+    .sone-table-buttonList .el-dropdown-menu__item > button:hover,
+    .sone-table-buttonList .el-dropdown-menu__item > button:focus-visible {
+      color: #409eff;
+      outline: none;
+    }
+
+    .list-footer-bar {
+      height: 38px;
+      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #e7edf3;
+      background: #fff;
+      color: #5e6b7a;
+      font-size: 12px;
+      flex-shrink: 0;
+      margin-top: auto;
+    }
+
+    .selected-count,
+    .pagination-lite {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .selected-count {
+      gap: 6px;
+      color: #606f82;
+    }
+
+    .selected-count strong {
+      color: #409eff;
+    }
+
+    .pagination-lite {
+      gap: 8px;
+    }
+
+    .pager-btn,
+    .pager-num {
+      min-width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #e4e7ed;
+      border-radius: 2px;
+      background: #f4f6f9;
+      color: #7a8797;
+      font-size: 12px;
+    }
+
+    .pager-num.active {
+      background: #409eff;
+      border-color: #409eff;
+      color: #fff;
+    }
+
+    .pager-jump {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .pager-input {
+      width: 36px;
+      height: 24px;
+      border: 1px solid #dcdfe6;
+      border-radius: 2px;
+      background: #fff;
+      text-align: center;
+    }
+
+    .logistics-dialog-mask {
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.42);
+    }
+
+    .logistics-dialog-mask.is-visible {
+      display: flex;
+    }
+
+    .logistics-dialog {
+      position: relative;
+      width: min(960px, calc(100vw - 48px));
+      margin-top: 12vh;
+      border-radius: 2px;
+      background: #fff;
+      color: #606266;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      font-size: 14px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .logistics-dialog-header {
+      position: relative;
+      height: 55px;
+      padding: 20px 20px 10px;
+      border-bottom: 1px solid #dcdfe6;
+      background: linear-gradient(180deg, #dff4ff 0%, #fff 100%);
+    }
+
+    .logistics-dialog-title {
+      color: #409eff;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 24px;
+    }
+
+    .logistics-dialog-close {
+      position: absolute;
+      top: 18px;
+      right: 20px;
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #409eff;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .logistics-dialog-close::before,
+    .logistics-dialog-close::after {
+      content: "";
+      position: absolute;
+      top: 1px;
+      left: 9px;
+      width: 2px;
+      height: 18px;
+      border-radius: 2px;
+      background: currentColor;
+    }
+
+    .logistics-dialog-close::before {
+      transform: rotate(45deg);
+    }
+
+    .logistics-dialog-close::after {
+      transform: rotate(-45deg);
+    }
+
+    .logistics-dialog-body {
+      padding: 12px 12px 20px;
+    }
+
+    .logistics-dialog-footer {
+      display: flex;
+      height: 45px;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 8px 20px 9px;
+      border-top: 1px solid #ebeef5;
+    }
+
+    .logistics-btn {
+      min-width: 56px;
+      height: 30px;
+      padding: 0 14px;
+      border: 1px solid #dcdfe6;
+      border-radius: 3px;
+      background: #fff;
+      color: #606266;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .logistics-btn.primary {
+      border-color: #409eff;
+      background: #409eff;
+      color: #fff;
+    }
+
+    .conversion-dialog .logistics-dialog-body {
+      min-height: 260px;
+      padding: 14px 20px 22px;
+    }
+
+    .conversion-dialog .pk-form-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px 28px;
+    }
+
+    .conversion-dialog .pk-control {
+      background: transparent;
+    }
+
+    .conversion-dialog .pk-label,
+    .conversion-dialog .pk-required,
+    .conversion-dialog .pk-input-shell,
+    .conversion-dialog .pk-shell-input,
+    .conversion-dialog .pk-input-shell .value,
+    .conversion-dialog .pk-select-trigger,
+    .conversion-dialog .pk-option {
+      font-size: 14px !important;
+    }
+
+    .pk-reference-popover.is-open,
+    .pk-reference-popover.is-open * {
+      font-size: 14px !important;
+    }
+
+    .conversion-dialog .pk-field {
+      position: relative;
+    }
+
+    .conversion-dialog .pk-input-shell {
+      background: #fff;
+    }
+
+    .conversion-dialog .pk-input-shell.is-disabled {
+      background: #f5f7fa;
+      color: #9ca6b5;
+    }
+
+    .conversion-dialog .pk-input-shell.is-disabled .pk-shell-input,
+    .conversion-dialog .pk-input-shell.is-disabled .value,
+    .conversion-dialog .pk-input-shell.is-disabled .suffix-button {
+      color: #9ca6b5;
+      cursor: not-allowed;
+    }
+
+    .conversion-dialog .pk-field.has-error .pk-input-shell,
+    .conversion-dialog .pk-field.has-error .pk-select-trigger {
+      border-bottom-color: #f56c6c;
+    }
+
+    .form-error-summary {
+      margin: 0 0 12px;
+      padding: 8px 10px;
+      border: 1px solid #fde2e2;
+      border-radius: 3px;
+      background: #fef0f0;
+      color: #f56c6c;
+      font-size: 12px;
+      line-height: 20px;
+    }
+
+    .form-error-summary[hidden] {
+      display: none;
+    }
+
+    .field-error {
+      position: absolute;
+      left: 0;
+      top: 50px;
+      display: none;
+      color: #f56c6c;
+      font-size: 12px;
+      line-height: 18px;
+    }
+
+    .pk-field.has-error .field-error {
+      display: block;
+    }
+
+    .conversion-reference {
+      cursor: pointer;
+    }
+
+    .conversion-reference .value {
+      flex: 1;
+    }
+
+    .confirm-dialog {
+      width: min(460px, calc(100vw - 48px));
+      margin-top: 24vh;
+    }
+
+    .confirm-dialog .logistics-dialog-body {
+      min-height: 96px;
+      padding: 22px 24px;
+      color: #303133;
+      line-height: 24px;
+      white-space: pre-line;
+    }
+
+    .empty-row td {
+      height: 160px;
+      color: #909399;
+      text-align: center;
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      z-index: 3600;
+      min-height: 38px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      border: 1px solid #e1f3d8;
+      border-radius: 3px;
+      background: #f0f9eb;
+      color: #67c23a;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+      transform: translateX(-50%);
+    }
+
+    .toast[hidden] {
+      display: none;
+    }
+
+    .toast.is-error {
+      border-color: #fde2e2;
+      background: #fef0f0;
+      color: #f56c6c;
+    }
+
+    .toast.is-warning {
+      border-color: #faecd8;
+      background: #fdf6ec;
+      color: #e6a23c;
+    }
+
+    @media (max-width: 900px) {
+      .ddp-search .layout-search,
+      .ddp-search .search-option {
+        width: 100%;
+      }
+
+      .conversion-dialog .pk-form-grid {
+        grid-template-columns: 1fr;
+      }
+
+    }
+  </style>
+</head>
+<body>
+  <div class="srm-prototype" data-testid="material-unit-conversion-page">
+    <div class="layout">
+      <main class="content pk-list-page">
+        <div class="ddp-search pk-query-panel" aria-label="查询条件">
+          <div class="layout-container">
+            <div class="box-layout-search">
+              <div class="layout-search-left">
+                <div class="search-view-select" id="listViewSelect">
+                  <div class="el-select el-select--mini">
+                    <div class="el-input el-input--mini el-input--suffix">
+                      <input class="el-input__inner" id="listViewInput" type="text" readonly value="列表视图（全部）" role="combobox" aria-label="列表视图" aria-haspopup="listbox" aria-expanded="false" aria-controls="listViewDropdown">
+                      <span class="el-input__suffix"><span class="menu-arrow search-view-arrow" aria-hidden="true"></span></span>
+                    </div>
+                    <div class="el-select-dropdown el-popper selectionClass" id="listViewDropdown" aria-hidden="true" hidden>
+                      <ul class="el-scrollbar__view el-select-dropdown__list" role="listbox">
+                        <li class="el-select-dropdown__item selected" data-list-view="" data-list-view-label="列表视图（全部）" role="option" aria-selected="true" tabindex="0">
+                          <span class="search-view-select-left">列表视图（全部）</span>
+                        </li>
+                      </ul>
+                      <div class="popper__arrow" aria-hidden="true"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="filter_wrap" id="personalFilter">
+                  <button class="el-button el-button--text el-button--mini" id="personalFilterButton" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="personalFilterPopover">
+                    <span class="filter-icon" aria-hidden="true"></span>
+                    <span id="personalFilterText">选择过滤器</span>
+                    <span class="menu-arrow filter-arrow" aria-hidden="true"></span>
+                  </button>
+                  <div class="el-popover el-popper ddp-list-search-filter-popover" id="personalFilterPopover" role="dialog" aria-label="过滤器" aria-hidden="true" hidden>
+                    <div class="filter_box">
+                      <div class="filter_title">预设过滤器</div>
+                      <div class="preset-filter-content">
+                        <div class="filter_item">暂无过滤器</div>
+                      </div>
+                      <div class="filter_title personal-filter-title">个人过滤器</div>
+                      <div class="filter_item">暂无过滤器</div>
+                    </div>
+                    <div class="popper__arrow" aria-hidden="true"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="layout-search">
+                <div class="search-option">
+                  <div class="search-input el-input el-input--mini el-input--prefix el-input--suffix">
+                    <input class="el-input__inner" id="keywordInput" type="text" placeholder="请输入关键字搜索" autocomplete="off">
+                    <span class="el-input__prefix"><i class="el-input__icon iconfont icon-search"></i></span>
+                  </div>
+                  <button class="el-button el-button--primary el-button--mini" id="searchButton" type="button"><span><span class="btn_name">搜索</span></span></button>
+                  <button class="el-button el-button--default el-button--mini" id="resetButton" type="button"><span><span class="btn_name">重置</span></span></button>
+                  <button class="el-button search-btn el-button--text el-button--mini" id="expandSearchButton" type="button" aria-expanded="false" aria-controls="advancedSearchPanel"><span><span class="btn_name" id="expandSearchText">展开</span><span class="menu-arrow search-option-arrow" aria-hidden="true"></span></span></button>
+                  <button class="el-button btn_name el-button--text el-button--mini" type="button"><span>保存</span></button>
+                  <button class="el-button btn_name el-button--text el-button--mini" type="button"><span>另存为</span></button>
+                </div>
+                <div class="popover-box" id="advancedSearchPanel" aria-hidden="true">
+                  <div class="el-tabs el-tabs--top">
+                    <div class="el-tabs__header is-top">
+                      <div class="el-tabs__nav-wrap is-top">
+                        <div class="el-tabs__nav-scroll">
+                          <div class="el-tabs__nav is-top" role="tablist">
+                            <div class="el-tabs__active-bar is-top"></div>
+                            <div class="el-tabs__item is-top is-active" role="tab" aria-selected="true">普通属性</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="el-tabs__content">
+                      <form class="el-form sone-form-box common-form el-form--label-top" id="advancedSearchForm" autocomplete="off" onsubmit="return false;">
+                        <div class="el-row">
+                          <div class="el-col el-col-6">
+                            <div class="el-form-item el-form-item--mini">
+                              <label class="el-form-item__label" id="queryMaterialNameLabel">物料名称</label>
+                              <div class="el-form-item__content">
+                                <div class="pk-input-shell query-reference" id="queryMaterialReference" data-query-reference-type="material" data-pk-reference-trigger="queryMaterialName" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="queryMaterialNameLabel">
+                                  <input id="queryMaterialName" type="hidden" value="">
+                                  <span class="value placeholder" id="queryMaterialNameValue">请选择物料名称</span>
+                                  <span class="suffix-button">...</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="el-col el-col-6">
+                            <div class="el-form-item el-form-item--mini">
+                              <label class="el-form-item__label" id="querySourceUnitLabel">源单位</label>
+                              <div class="el-form-item__content">
+                                <div class="pk-input-shell query-reference" id="querySourceUnitReference" data-query-reference-type="sourceUnit" data-pk-reference-trigger="querySourceUnit" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="querySourceUnitLabel">
+                                  <input id="querySourceUnit" type="hidden" value="">
+                                  <span class="value placeholder" id="querySourceUnitValue">请选择源单位</span>
+                                  <span class="suffix-button">...</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="el-col el-col-6">
+                            <div class="el-form-item el-form-item--mini">
+                              <label class="el-form-item__label" id="queryBaseUnitLabel">基本单位</label>
+                              <div class="el-form-item__content">
+                                <div class="pk-input-shell query-reference" id="queryBaseUnitReference" data-query-reference-type="baseUnit" data-pk-reference-trigger="queryBaseUnit" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="queryBaseUnitLabel">
+                                  <input id="queryBaseUnit" type="hidden" value="">
+                                  <span class="value placeholder" id="queryBaseUnitValue">请选择基本单位</span>
+                                  <span class="suffix-button">...</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="el-col el-col-6">
+                            <div class="el-form-item el-form-item--mini query-select-form-item">
+                              <label class="el-form-item__label" id="queryConversionTypeLabel">换算类型</label>
+                              <div class="el-form-item__content">
+                                <div class="pk-select" id="queryConversionTypeSelect">
+                                  <input id="queryConversionType" type="hidden" value="">
+                                  <button class="pk-select-trigger" id="queryConversionTypeTrigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="queryConversionTypeLabel queryConversionTypeValue"><span id="queryConversionTypeValue" data-pk-value>全部</span></button>
+                                  <span class="pk-caret" aria-hidden="true"></span>
+                                  <ul class="pk-menu" role="listbox" aria-label="换算类型">
+                                    <li class="pk-option is-selected" data-value="" role="option" aria-selected="true" tabindex="0">全部</li>
+                                    <li class="pk-option" data-value="固定" role="option" aria-selected="false" tabindex="-1">固定</li>
+                                    <li class="pk-option" data-value="浮动" role="option" aria-selected="false" tabindex="-1">浮动</li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="el-col el-col-6">
+                            <button class="advanced-search-switch" id="advancedSearchSwitch" type="button">&gt;&gt;切换到高级检索</button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <section class="list-table-shell pk-list-surface" aria-label="物料单位换算列表">
+          <div class="list-toolbar pk-list-toolbar">
+            <div class="list-toolbar-left pk-list-toolbar-left">
+              <button class="btn primary pk-list-toolbar-btn is-primary" id="createButton" data-testid="create-conversion" type="button">新增</button>
+              <button class="btn pk-list-toolbar-btn" id="batchDeleteButton" type="button">删除</button>
+              <button class="btn pk-list-toolbar-btn" id="exportButton" type="button">导出</button>
+              <button class="btn pk-list-toolbar-btn" id="refreshButton" type="button">刷新</button>
+            </div>
+            <div class="list-toolbar-right pk-list-toolbar-right">
+              <div class="column-display-control pk-column-manager" id="columnDisplayControl">
+                <button class="btn list-icon-btn pk-grid-icon-btn" id="columnDisplayButton" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="columnDisplayPopover">列展示</button>
+                <div class="column-display-popover el-popper pk-column-panel" id="columnDisplayPopover" role="group" aria-label="选择展示列" aria-hidden="true" hidden>
+                  <div class="column-display-title pk-column-panel-title">列展示</div>
+                  <label class="column-display-option pk-column-option"><span class="purchase-th-checkbox-wrap"><input class="purchase-th-checkbox-input" type="checkbox" data-column-index="4" checked><span class="purchase-th-checkbox-face" aria-hidden="true"></span></span><span>物料编码</span></label>
+                  <label class="column-display-option pk-column-option"><span class="purchase-th-checkbox-wrap"><input class="purchase-th-checkbox-input" type="checkbox" data-column-index="5" checked><span class="purchase-th-checkbox-face" aria-hidden="true"></span></span><span>物料名称</span></label>
+                  <label class="column-display-option pk-column-option"><span class="purchase-th-checkbox-wrap"><input class="purchase-th-checkbox-input" type="checkbox" data-column-index="6" checked><span class="purchase-th-checkbox-face" aria-hidden="true"></span></span><span>源单位换算系数</span></label>
+                  <label class="column-display-option pk-column-option"><span class="purchase-th-checkbox-wrap"><input class="purchase-th-checkbox-input" type="checkbox" data-column-index="7" checked><span class="purchase-th-checkbox-face" aria-hidden="true"></span></span><span>源单位</span></label>
+                  <label class="column-display-option pk-column-option"><span class="purchase-th-checkbox-wrap"><input class="purchase-th-checkbox-input" type="checkbox" data-column-index="8" checked><span class="purchase-th-checkbox-face" aria-hidden="true"></span></span><span>基本单位换算系数</span></label>
+                  <label class="column-display-option pk-column-option"><span class="purchase-th-checkbox-wrap"><input class="purchase-th-checkbox-input" type="checkbox" data-column-index="9" checked><span class="purchase-th-checkbox-face" aria-hidden="true"></span></span><span>基本单位</span></label>
+                  <label class="column-display-option pk-column-option"><span class="purchase-th-checkbox-wrap"><input class="purchase-th-checkbox-input" type="checkbox" data-column-index="10" checked><span class="purchase-th-checkbox-face" aria-hidden="true"></span></span><span>换算类型</span></label>
+                </div>
+              </div>
+              <button class="btn list-icon-btn pk-grid-icon-btn" id="fullscreenButton" type="button" aria-pressed="false">全屏</button>
+            </div>
+          </div>
+
+          <div class="purchase-table-wrap pk-list-table-wrap">
+            <div class="purchase-table-inner pk-list-table-inner">
+              <table class="purchase-list-table conversion-table pk-list-table">
+                <colgroup>
+                  <col style="width: 58px">
+                  <col style="width: 58px">
+                  <col style="width: 40px">
+                  <col style="width: 150px">
+                  <col style="width: 210px">
+                  <col style="width: 150px">
+                  <col style="width: 130px">
+                  <col style="width: 170px">
+                  <col style="width: 130px">
+                  <col style="width: 120px">
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>操作</th>
+                    <th>序号</th>
+                    <th class="center purchase-th-checkbox">
+                      <label class="purchase-th-checkbox-wrap">
+                        <input class="purchase-th-checkbox-input" id="selectAll" type="checkbox" title="全选">
+                        <span class="purchase-th-checkbox-face" aria-hidden="true"></span>
+                      </label>
+                    </th>
+                    <th>物料编码</th>
+                    <th>物料名称</th>
+                    <th class="number">源单位换算系数</th>
+                    <th>源单位</th>
+                    <th class="number">基本单位换算系数</th>
+                    <th>基本单位</th>
+                    <th>换算类型</th>
+                  </tr>
+                </thead>
+                <tbody id="conversionBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <footer class="list-footer-bar pk-list-footer">
+            <span class="selected-count">已勾选 <strong id="selectedCount">0</strong> 条</span>
+            <div class="pagination-lite pk-pagination" aria-label="分页">
+              <span id="totalCount">共 8 条</span>
+              <span class="pager-size">50条/页</span>
+              <span class="pager-btn">‹</span>
+              <span class="pager-num active">1</span>
+              <span class="pager-btn">›</span>
+              <span class="pager-jump">前往 <input class="pager-input" type="text" value="1" aria-label="页码"> 页</span>
+            </div>
+          </footer>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="logistics-dialog-mask pk-dialog-mask" id="detailModal" data-testid="conversion-detail-modal" aria-hidden="true">
+    <div class="logistics-dialog conversion-dialog pk-dialog pk-dialog--master-detail" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+      <div class="logistics-dialog-header pk-dialog-header">
+        <span class="logistics-dialog-title pk-dialog-title" id="dialogTitle">新增物料单位换算</span>
+        <button class="logistics-dialog-close pk-dialog-close" id="closeDialogButton" type="button" aria-label="关闭"></button>
+      </div>
+
+      <form id="conversionForm" novalidate>
+        <div class="logistics-dialog-body pk-dialog-body">
+          <div class="form-error-summary" id="formErrorSummary" role="alert" hidden></div>
+          <div class="pk-form-grid pk-unit-form-grid pk-master-detail-grid">
+            <div class="pk-field" data-field="materialCode">
+              <div class="pk-label"><span class="pk-required">*</span><span>物料编码</span></div>
+              <div class="pk-control">
+                <div class="pk-input-shell conversion-reference" id="materialReference" data-conversion-reference="material" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="value placeholder" id="materialCodeValue">请选择物料</span>
+                  <span class="suffix-button">...</span>
+                </div>
+              </div>
+              <span class="field-error">请选择物料编码</span>
+            </div>
+
+            <div class="pk-field">
+              <div class="pk-label"><span>物料名称</span></div>
+              <div class="pk-control">
+                <div class="pk-input-shell is-disabled"><input class="pk-shell-input" id="materialNameInput" type="text" readonly placeholder="选择物料后自动带出" aria-label="物料名称"></div>
+              </div>
+            </div>
+
+            <div class="pk-field" data-field="sourceCoefficient">
+              <div class="pk-label"><span class="pk-required">*</span><span>源单位换算系数</span></div>
+              <div class="pk-control">
+                <div class="pk-input-shell"><input class="pk-shell-input" id="sourceCoefficientInput" type="text" inputmode="numeric" value="1" aria-label="源单位换算系数"></div>
+              </div>
+              <span class="field-error">请输入大于 0 的整数</span>
+            </div>
+
+            <div class="pk-field" data-field="sourceUnit">
+              <div class="pk-label"><span class="pk-required">*</span><span>源单位</span></div>
+              <div class="pk-control">
+                <div class="pk-input-shell conversion-reference" id="sourceUnitReference" data-conversion-reference="unit" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="value placeholder" id="sourceUnitValue">请选择源单位</span>
+                  <span class="suffix-button">...</span>
+                </div>
+              </div>
+              <span class="field-error">请选择源单位</span>
+            </div>
+
+            <div class="pk-field" data-field="baseCoefficient">
+              <div class="pk-label"><span class="pk-required">*</span><span>基本单位换算系数</span></div>
+              <div class="pk-control">
+                <div class="pk-input-shell"><input class="pk-shell-input" id="baseCoefficientInput" type="text" inputmode="numeric" value="1" aria-label="基本单位换算系数"></div>
+              </div>
+              <span class="field-error">请输入大于 0 的整数</span>
+            </div>
+
+            <div class="pk-field">
+              <div class="pk-label"><span>基本单位</span></div>
+              <div class="pk-control">
+                <div class="pk-input-shell is-disabled"><span class="value placeholder" id="baseUnitValue">由物料信息自动带出</span><span class="suffix-button">...</span></div>
+              </div>
+            </div>
+
+            <div class="pk-field" data-field="conversionType">
+              <div class="pk-label"><span class="pk-required">*</span><span>换算类型</span></div>
+              <div class="pk-control">
+                <div class="pk-select" id="conversionTypeSelect">
+                  <button class="pk-select-trigger" type="button"><span data-pk-value>固定</span></button>
+                  <span class="pk-caret"></span>
+                  <ul class="pk-menu">
+                    <li class="pk-option is-selected" data-value="固定">固定</li>
+                    <li class="pk-option" data-value="浮动">浮动</li>
+                  </ul>
+                </div>
+              </div>
+              <span class="field-error">请选择换算类型</span>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="logistics-dialog-footer pk-dialog-footer">
+          <button class="logistics-btn primary pk-dialog-btn is-primary" data-testid="save-conversion" type="submit">保存</button>
+          <button class="logistics-btn pk-dialog-btn" id="cancelButton" type="button">取消</button>
+        </div>
+      </form>
+    </div>
+    <div class="pk-reference-popover" id="conversionReferencePopover" data-pk-reference-popover data-conversion-reference-popover aria-hidden="true">
+      <span class="popper-arrow"></span>
+      <div class="popover-table">
+        <table>
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="pk-reference-popover query-reference-popover" id="queryReferencePopover" data-pk-reference-popover role="dialog" aria-label="选择查询条件" aria-hidden="true">
+    <span class="popper-arrow"></span>
+    <div class="popover-table">
+      <table>
+        <thead></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="query-reference-footer">
+      <span class="query-reference-selected-count" id="queryReferenceSelectedCount">已选 0 项</span>
+      <div class="query-reference-actions">
+        <button class="logistics-btn" type="button" data-query-reference-action="clear">清空</button>
+        <button class="logistics-btn" type="button" data-query-reference-action="cancel">取消</button>
+        <button class="logistics-btn primary" type="button" data-query-reference-action="confirm">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="logistics-dialog-mask" id="confirmModal" aria-hidden="true">
+    <div class="logistics-dialog confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+      <div class="logistics-dialog-header">
+        <span class="logistics-dialog-title" id="confirmTitle">删除确认</span>
+        <button class="logistics-dialog-close" id="closeConfirmButton" type="button" aria-label="关闭"></button>
+      </div>
+      <div class="logistics-dialog-body" id="confirmMessage"></div>
+      <div class="logistics-dialog-footer">
+        <button class="logistics-btn primary" id="confirmActionButton" type="button">删除</button>
+        <button class="logistics-btn" id="cancelConfirmButton" type="button">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="successToast" role="status" aria-live="polite" hidden>保存成功</div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var STORAGE_KEY = "smartone.material-unit-conversions.v2";
+      var defaultRecords = [
+        { id: "UC-0001", materialCode: "WL-10001", materialName: "精密轴承", sourceCoefficient: 1, sourceUnit: "盒", baseCoefficient: 20, baseUnit: "个", conversionType: "固定", referencedBy: [] },
+        { id: "UC-0002", materialCode: "WL-10002", materialName: "不锈钢六角螺栓", sourceCoefficient: 1, sourceUnit: "包", baseCoefficient: 100, baseUnit: "个", conversionType: "固定", referencedBy: [] },
+        { id: "UC-0003", materialCode: "WL-10003", materialName: "工业润滑油", sourceCoefficient: 1, sourceUnit: "桶", baseCoefficient: 18, baseUnit: "千克", conversionType: "固定", referencedBy: ["采购订单 PO-20260718"] },
+        { id: "UC-0004", materialCode: "WL-10004", materialName: "PE 保护膜", sourceCoefficient: 1, sourceUnit: "卷", baseCoefficient: 200, baseUnit: "米", conversionType: "固定", referencedBy: [] },
+        { id: "UC-0005", materialCode: "WL-10005", materialName: "铝合金型材", sourceCoefficient: 1, sourceUnit: "根", baseCoefficient: 6, baseUnit: "米", conversionType: "固定", referencedBy: [] },
+        { id: "UC-0006", materialCode: "WL-10006", materialName: "包装纸箱", sourceCoefficient: 1, sourceUnit: "捆", baseCoefficient: 20, baseUnit: "个", conversionType: "固定", referencedBy: [] },
+        { id: "UC-0007", materialCode: "WL-10007", materialName: "环氧树脂 A", sourceCoefficient: 1, sourceUnit: "桶", baseCoefficient: 25, baseUnit: "千克", conversionType: "浮动", referencedBy: ["收货单 RC-20260726", "库存余额"] },
+        { id: "UC-0008", materialCode: "WL-10008", materialName: "线束端子", sourceCoefficient: 1, sourceUnit: "盘", baseCoefficient: 1000, baseUnit: "个", conversionType: "固定", referencedBy: [] }
+      ];
+
+      var materials = [
+        { code: "WL-10001", name: "精密轴承", specification: "20×47×14 mm", model: "6204-2RS", baseUnit: "个", status: "正常" },
+        { code: "WL-10002", name: "不锈钢六角螺栓", specification: "M8×30", model: "SUS304", baseUnit: "个", status: "正常" },
+        { code: "WL-10003", name: "工业润滑油", specification: "18 kg/桶", model: "L-HM46", baseUnit: "千克", status: "正常" },
+        { code: "WL-10004", name: "PE 保护膜", specification: "500 mm×200 m", model: "PE-50", baseUnit: "米", status: "正常" },
+        { code: "WL-10005", name: "铝合金型材", specification: "40×40×6000 mm", model: "6063-T5", baseUnit: "米", status: "正常" },
+        { code: "WL-10006", name: "包装纸箱", specification: "600×400×350 mm", model: "BC-5", baseUnit: "个", status: "正常" },
+        { code: "WL-10007", name: "环氧树脂 A", specification: "25 kg/桶", model: "E-51A", baseUnit: "千克", status: "正常" },
+        { code: "WL-10008", name: "线束端子", specification: "0.5-1.5 mm²", model: "DJ621-E2.8", baseUnit: "个", status: "正常" },
+        { code: "WL-20001", name: "伺服电机", specification: "750 W", model: "SM-750A", baseUnit: "台", status: "正常" },
+        { code: "WL-20002", name: "耐高温电缆", specification: "3×2.5 mm²", model: "YGZ-180", baseUnit: "米", status: "正常" },
+        { code: "WL-20003", name: "液压密封圈", specification: "40×50×6 mm", model: "UN-40", baseUnit: "个", status: "正常" },
+        { code: "WL-20004", name: "304 不锈钢板", specification: "2×1220×2440 mm", model: "SUS304-2B", baseUnit: "千克", status: "正常" },
+        { code: "WL-20005", name: "工业清洗剂", specification: "20 L/桶", model: "IC-20", baseUnit: "升", status: "正常" },
+        { code: "WL-20006", name: "停用测试物料", specification: "测试规格", model: "TEST-01", baseUnit: "个", status: "禁用" }
+      ];
+
+      var units = [
+        { code: "UNIT-EACH", name: "个", status: "启用" },
+        { code: "UNIT-METER", name: "米", status: "启用" },
+        { code: "UNIT-KG", name: "千克", status: "启用" },
+        { code: "UNIT-LITER", name: "升", status: "启用" },
+        { code: "UNIT-SET", name: "台", status: "启用" },
+        { code: "UNIT-BOX", name: "箱", status: "启用" },
+        { code: "UNIT-CASE", name: "盒", status: "启用" },
+        { code: "UNIT-PACK", name: "包", status: "启用" },
+        { code: "UNIT-BARREL", name: "桶", status: "启用" },
+        { code: "UNIT-ROLL", name: "卷", status: "启用" },
+        { code: "UNIT-ROOT", name: "根", status: "启用" },
+        { code: "UNIT-BUNDLE", name: "捆", status: "启用" },
+        { code: "UNIT-TRAY", name: "盘", status: "启用" },
+        { code: "UNIT-PALLET", name: "托", status: "停用" }
+      ];
+
+      var records = loadRecords();
+      var editingId = "";
+      var pendingConfirmAction = null;
+      var toastTimer = null;
+      var activeReferenceType = "";
+      var activeQueryReferenceType = "";
+      var pendingQueryReferenceValues = [];
+      var activeRowMenu = null;
+      var rowMenuCloseTimer = null;
+      var hiddenColumnIndexes = new Set();
+
+      var modal = document.getElementById("detailModal");
+      var form = document.getElementById("conversionForm");
+      var body = document.getElementById("conversionBody");
+      var title = document.getElementById("dialogTitle");
+      var materialReference = document.getElementById("materialReference");
+      var sourceUnitReference = document.getElementById("sourceUnitReference");
+      var referencePopover = document.getElementById("conversionReferencePopover");
+      var materialCodeValue = document.getElementById("materialCodeValue");
+      var materialNameInput = document.getElementById("materialNameInput");
+      var sourceCoefficientInput = document.getElementById("sourceCoefficientInput");
+      var sourceUnitValue = document.getElementById("sourceUnitValue");
+      var baseCoefficientInput = document.getElementById("baseCoefficientInput");
+      var baseUnitValue = document.getElementById("baseUnitValue");
+      var conversionTypeSelect = document.getElementById("conversionTypeSelect");
+      var conversionTypeValue = conversionTypeSelect.querySelector("[data-pk-value]");
+      var formErrorSummary = document.getElementById("formErrorSummary");
+      var saveButton = form.querySelector('[type="submit"]');
+      var selectedCount = document.getElementById("selectedCount");
+      var totalCount = document.getElementById("totalCount");
+      var selectAll = document.getElementById("selectAll");
+      var batchDeleteButton = document.getElementById("batchDeleteButton");
+      var listTableShell = document.querySelector(".list-table-shell");
+      var columnDisplayControl = document.getElementById("columnDisplayControl");
+      var columnDisplayButton = document.getElementById("columnDisplayButton");
+      var columnDisplayPopover = document.getElementById("columnDisplayPopover");
+      var fullscreenButton = document.getElementById("fullscreenButton");
+      var successToast = document.getElementById("successToast");
+      var keywordInput = document.getElementById("keywordInput");
+      var searchRoot = document.querySelector(".ddp-search");
+      var expandSearchButton = document.getElementById("expandSearchButton");
+      var expandSearchText = document.getElementById("expandSearchText");
+      var advancedSearchPanel = document.getElementById("advancedSearchPanel");
+      var queryMaterialName = document.getElementById("queryMaterialName");
+      var queryMaterialReference = document.getElementById("queryMaterialReference");
+      var queryMaterialNameValue = document.getElementById("queryMaterialNameValue");
+      var queryReferencePopover = document.getElementById("queryReferencePopover");
+      var queryReferenceSelectedCount = document.getElementById("queryReferenceSelectedCount");
+      var querySourceUnit = document.getElementById("querySourceUnit");
+      var querySourceUnitReference = document.getElementById("querySourceUnitReference");
+      var querySourceUnitValue = document.getElementById("querySourceUnitValue");
+      var queryBaseUnit = document.getElementById("queryBaseUnit");
+      var queryBaseUnitReference = document.getElementById("queryBaseUnitReference");
+      var queryBaseUnitValue = document.getElementById("queryBaseUnitValue");
+      var queryConversionType = document.getElementById("queryConversionType");
+      var queryConversionTypeSelect = document.getElementById("queryConversionTypeSelect");
+      var queryConversionTypeTrigger = document.getElementById("queryConversionTypeTrigger");
+      var queryConversionTypeValue = document.getElementById("queryConversionTypeValue");
+      var listViewSelect = document.getElementById("listViewSelect");
+      var listViewInput = document.getElementById("listViewInput");
+      var listViewDropdown = document.getElementById("listViewDropdown");
+      var personalFilter = document.getElementById("personalFilter");
+      var personalFilterButton = document.getElementById("personalFilterButton");
+      var personalFilterText = document.getElementById("personalFilterText");
+      var personalFilterPopover = document.getElementById("personalFilterPopover");
+      var confirmModal = document.getElementById("confirmModal");
+      var confirmTitle = document.getElementById("confirmTitle");
+      var confirmMessage = document.getElementById("confirmMessage");
+      var confirmActionButton = document.getElementById("confirmActionButton");
+
+      function clone(value) {
+        return JSON.parse(JSON.stringify(value));
+      }
+
+      function createId(index) {
+        return "UC-" + Date.now().toString(36) + "-" + String(index || 0);
+      }
+
+      function normalizeRecord(record, index) {
+        return {
+          id: record.id || createId(index),
+          materialCode: String(record.materialCode || ""),
+          materialName: String(record.materialName || ""),
+          sourceCoefficient: Number(record.sourceCoefficient) || 1,
+          sourceUnit: String(record.sourceUnit || ""),
+          baseCoefficient: Number(record.baseCoefficient) || 1,
+          baseUnit: String(record.baseUnit || ""),
+          conversionType: record.conversionType === "浮动" ? "浮动" : "固定",
+          referencedBy: Array.isArray(record.referencedBy) ? record.referencedBy.map(String) : []
+        };
+      }
+
+      function loadRecords() {
+        try {
+          var stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+          if (Array.isArray(stored)) return stored.map(normalizeRecord);
+        } catch (error) {
+          // Invalid local demo data falls back to the seeded records.
+        }
+        return clone(defaultRecords);
+      }
+
+      function persistRecords() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+          return true;
+        } catch (error) {
+          showToast("本地数据保存失败，请检查浏览器存储设置", "error", 3200);
+          return false;
+        }
+      }
+
+      function sortRecords() {
+        records.sort(function (left, right) {
+          return left.materialCode.localeCompare(right.materialCode, "zh-CN", { numeric: true, sensitivity: "base" });
+        });
+      }
+
+      function escapeHtml(value) {
+        return String(value == null ? "" : value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/\"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function normalizeSearchValue(value) {
+        return String(value || "").trim().toLowerCase();
+      }
+
+      function parseQueryReferenceValues(value) {
+        if (!value) return [];
+        try {
+          var parsed = JSON.parse(value);
+          return Array.isArray(parsed) ? parsed.map(String).filter(Boolean) : [];
+        } catch (error) {
+          return [String(value)];
+        }
+      }
+
+      function normalizeQueryReferenceValues(value) {
+        return parseQueryReferenceValues(value).map(normalizeSearchValue);
+      }
+
+      function getSearchCriteria() {
+        return {
+          keyword: normalizeSearchValue(keywordInput.value),
+          materialNames: normalizeQueryReferenceValues(queryMaterialName.value),
+          sourceUnits: normalizeQueryReferenceValues(querySourceUnit.value),
+          baseUnits: normalizeQueryReferenceValues(queryBaseUnit.value),
+          conversionType: normalizeSearchValue(queryConversionType.value)
+        };
+      }
+
+      function getQueryReferenceConfig(type) {
+        if (type === "material") {
+          return { trigger: queryMaterialReference, input: queryMaterialName, display: queryMaterialNameValue, placeholder: "请选择物料名称" };
+        }
+        if (type === "sourceUnit") {
+          return { trigger: querySourceUnitReference, input: querySourceUnit, display: querySourceUnitValue, placeholder: "请选择源单位" };
+        }
+        return { trigger: queryBaseUnitReference, input: queryBaseUnit, display: queryBaseUnitValue, placeholder: "请选择基本单位" };
+      }
+
+      function setQueryReferenceValues(type, values) {
+        var config = getQueryReferenceConfig(type);
+        var normalized = Array.from(new Set((values || []).map(String).filter(Boolean)));
+        config.input.value = normalized.length ? JSON.stringify(normalized) : "";
+        setDisplayValue(config.display, normalized.join("、"), config.placeholder);
+        config.trigger.title = normalized.join("、");
+      }
+
+      function clearSearchFields() {
+        keywordInput.value = "";
+        setQueryReferenceValues("material", []);
+        setQueryReferenceValues("sourceUnit", []);
+        setQueryReferenceValues("baseUnit", []);
+        setQueryConversionType("", "全部", false);
+      }
+
+      function closeQueryConversionType() {
+        queryConversionTypeSelect.classList.remove("is-open");
+        queryConversionTypeTrigger.setAttribute("aria-expanded", "false");
+      }
+
+      function setQueryConversionType(value, label, shouldRender) {
+        var normalized = value === "固定" || value === "浮动" ? value : "";
+        queryConversionType.value = normalized;
+        queryConversionTypeValue.textContent = label || normalized || "全部";
+        queryConversionTypeSelect.querySelectorAll(".pk-option").forEach(function (option) {
+          var selected = option.dataset.value === normalized;
+          option.classList.toggle("is-selected", selected);
+          option.setAttribute("aria-selected", selected ? "true" : "false");
+          option.tabIndex = selected ? 0 : -1;
+        });
+        closeQueryConversionType();
+        if (shouldRender) renderRows();
+      }
+
+      function closeListViewDropdown() {
+        listViewSelect.classList.remove("is-open");
+        listViewInput.setAttribute("aria-expanded", "false");
+        listViewDropdown.hidden = true;
+        listViewDropdown.setAttribute("aria-hidden", "true");
+      }
+
+      function openListViewDropdown() {
+        closePersonalFilter();
+        listViewSelect.classList.add("is-open");
+        listViewInput.setAttribute("aria-expanded", "true");
+        listViewDropdown.hidden = false;
+        listViewDropdown.setAttribute("aria-hidden", "false");
+      }
+
+      function setListViewSelection(value, label, shouldRender) {
+        listViewInput.value = label;
+        setQueryConversionType(value, value || "全部", false);
+        personalFilterText.textContent = "选择过滤器";
+        listViewDropdown.querySelectorAll("[data-list-view]").forEach(function (option) {
+          var selected = option.dataset.listView === value;
+          option.classList.toggle("selected", selected);
+          option.setAttribute("aria-selected", selected ? "true" : "false");
+          option.tabIndex = selected ? 0 : -1;
+        });
+        closeListViewDropdown();
+        if (shouldRender) renderRows();
+      }
+
+      function closePersonalFilter() {
+        personalFilter.classList.remove("is-open");
+        personalFilterButton.setAttribute("aria-expanded", "false");
+        personalFilterPopover.hidden = true;
+        personalFilterPopover.setAttribute("aria-hidden", "true");
+      }
+
+      function openPersonalFilter() {
+        closeListViewDropdown();
+        personalFilter.classList.add("is-open");
+        personalFilterButton.setAttribute("aria-expanded", "true");
+        personalFilterPopover.hidden = false;
+        personalFilterPopover.setAttribute("aria-hidden", "false");
+      }
+
+      function closeColumnDisplay() {
+        columnDisplayControl.classList.remove("is-open");
+        columnDisplayButton.setAttribute("aria-expanded", "false");
+        columnDisplayPopover.hidden = true;
+        columnDisplayPopover.setAttribute("aria-hidden", "true");
+      }
+
+      function openColumnDisplay() {
+        closeListViewDropdown();
+        closePersonalFilter();
+        closeRowMenu();
+        columnDisplayControl.classList.add("is-open");
+        columnDisplayButton.setAttribute("aria-expanded", "true");
+        columnDisplayPopover.hidden = false;
+        columnDisplayPopover.setAttribute("aria-hidden", "false");
+      }
+
+      function applyColumnVisibility() {
+        var table = document.querySelector(".conversion-table");
+        var hiddenCount = 0;
+        table.querySelectorAll("col").forEach(function (column, index) {
+          var hidden = hiddenColumnIndexes.has(index + 1);
+          column.classList.toggle("is-column-hidden", hidden);
+          if (hidden) hiddenCount += 1;
+        });
+        table.querySelectorAll("thead th").forEach(function (cell, index) {
+          cell.classList.toggle("is-column-hidden", hiddenColumnIndexes.has(index + 1));
+        });
+        body.querySelectorAll("tr").forEach(function (row) {
+          if (row.classList.contains("empty-row")) {
+            var emptyCell = row.querySelector("td");
+            if (emptyCell) emptyCell.colSpan = 10 - hiddenCount;
+            return;
+          }
+          row.querySelectorAll("td").forEach(function (cell, index) {
+            cell.classList.toggle("is-column-hidden", hiddenColumnIndexes.has(index + 1));
+          });
+        });
+      }
+
+      function setTableFullscreen(active) {
+        listTableShell.classList.toggle("is-fullscreen", active);
+        document.body.classList.toggle("table-fullscreen-active", active);
+        var fullscreenLabel = active ? "退出全屏" : "全屏";
+        fullscreenButton.textContent = fullscreenButton.classList.contains("pk-grid-icon-btn") ? "⛶" : fullscreenLabel;
+        fullscreenButton.title = fullscreenLabel;
+        fullscreenButton.setAttribute("aria-label", fullscreenLabel);
+        fullscreenButton.setAttribute("aria-pressed", active ? "true" : "false");
+        if (active) closeColumnDisplay();
+      }
+
+      function checkboxMarkup(recordId, visibleIndex) {
+        return '<label class="purchase-th-checkbox-wrap"><input class="purchase-th-checkbox-input row-checkbox" data-record-id="' + escapeHtml(recordId) + '" type="checkbox" title="选择第 ' + (visibleIndex + 1) + ' 行"><span class="purchase-th-checkbox-face" aria-hidden="true"></span></label>';
+      }
+
+      function rowActionMenuMarkup(recordId, visibleIndex) {
+        var menuId = "row-action-menu-" + recordId;
+        return [
+          '<div class="dropdown_box_button sone-table-buttonList el-dropdown" data-row-menu>',
+          '<span class="el-dropdown-link color-span menu-more el-dropdown-selfdefine" data-row-menu-trigger aria-label="第 ' + (visibleIndex + 1) + ' 行操作" aria-haspopup="menu" aria-expanded="false" aria-controls="' + menuId + '" role="button" tabindex="0">',
+          '<button type="button" class="el-button el-button--text el-button--mini" tabindex="-1" aria-hidden="true"><span><i class="el-icon-more more-handel"></i></span></button>',
+          '</span>',
+          '<ul class="el-dropdown-menu el-popper el-dropdown-menu--mini" id="' + menuId + '" role="menu" aria-hidden="true" hidden>',
+          '<li class="el-dropdown-menu__item sone-table-dropdown" role="none"><button type="button" role="menuitem" data-row-action="edit" data-record-id="' + escapeHtml(recordId) + '">编辑</button></li>',
+          '<li class="el-dropdown-menu__item sone-table-dropdown" role="none"><button type="button" role="menuitem" data-row-action="delete" data-record-id="' + escapeHtml(recordId) + '">删除</button></li>',
+          '</ul>',
+          '</div>'
+        ].join("");
+      }
+
+      function closeRowMenu() {
+        window.clearTimeout(rowMenuCloseTimer);
+        rowMenuCloseTimer = null;
+        if (!activeRowMenu) return;
+        var trigger = activeRowMenu.querySelector("[data-row-menu-trigger]");
+        var menu = activeRowMenu.querySelector(".el-dropdown-menu");
+        activeRowMenu.classList.remove("is-open");
+        if (trigger) trigger.setAttribute("aria-expanded", "false");
+        if (menu) {
+          menu.hidden = true;
+          menu.setAttribute("aria-hidden", "true");
+          menu.style.left = "";
+          menu.style.top = "";
+        }
+        activeRowMenu = null;
+      }
+
+      function positionRowMenu(dropdown) {
+        var trigger = dropdown.querySelector("[data-row-menu-trigger]");
+        var menu = dropdown.querySelector(".el-dropdown-menu");
+        if (!trigger || !menu) return;
+        var triggerRect = trigger.getBoundingClientRect();
+        var menuRect = menu.getBoundingClientRect();
+        var left = Math.max(8, Math.min(triggerRect.left, window.innerWidth - menuRect.width - 8));
+        var top = triggerRect.bottom + 4;
+        if (top + menuRect.height > window.innerHeight - 8) top = triggerRect.top - menuRect.height - 4;
+        menu.style.left = left + "px";
+        menu.style.top = Math.max(8, top) + "px";
+      }
+
+      function openRowMenu(dropdown, focusFirstItem) {
+        if (!dropdown) return;
+        if (activeRowMenu !== dropdown) closeRowMenu();
+        window.clearTimeout(rowMenuCloseTimer);
+        activeRowMenu = dropdown;
+        var trigger = dropdown.querySelector("[data-row-menu-trigger]");
+        var menu = dropdown.querySelector(".el-dropdown-menu");
+        dropdown.classList.add("is-open");
+        if (trigger) trigger.setAttribute("aria-expanded", "true");
+        if (menu) {
+          menu.hidden = false;
+          menu.setAttribute("aria-hidden", "false");
+          positionRowMenu(dropdown);
+          if (focusFirstItem) {
+            var firstItem = menu.querySelector('[role="menuitem"]');
+            if (firstItem) firstItem.focus();
+          }
+        }
+      }
+
+      function scheduleRowMenuClose() {
+        window.clearTimeout(rowMenuCloseTimer);
+        rowMenuCloseTimer = window.setTimeout(closeRowMenu, 140);
+      }
+
+      function findRecord(recordId) {
+        return records.find(function (record) { return record.id === recordId; });
+      }
+
+      function renderRows() {
+        closeRowMenu();
+        sortRecords();
+        var criteria = getSearchCriteria();
+        var visibleRecords = records.filter(function (record) {
+          var matchesKeyword = !criteria.keyword || [record.materialCode, record.materialName].some(function (value) {
+            return normalizeSearchValue(value).includes(criteria.keyword);
+          });
+          return matchesKeyword
+            && (!criteria.materialNames.length || criteria.materialNames.includes(normalizeSearchValue(record.materialName)))
+            && (!criteria.sourceUnits.length || criteria.sourceUnits.includes(normalizeSearchValue(record.sourceUnit)))
+            && (!criteria.baseUnits.length || criteria.baseUnits.includes(normalizeSearchValue(record.baseUnit)))
+            && (!criteria.conversionType || normalizeSearchValue(record.conversionType) === criteria.conversionType);
+        });
+
+        if (!visibleRecords.length) {
+          body.innerHTML = '<tr class="empty-row"><td colspan="10">暂无符合条件的物料单位换算记录</td></tr>';
+        } else {
+          body.innerHTML = visibleRecords.map(function (record, visibleIndex) {
+            return [
+              '<tr data-record-id="' + escapeHtml(record.id) + '">',
+              '<td class="operation-cell">' + rowActionMenuMarkup(record.id, visibleIndex) + '</td>',
+              '<td>' + (visibleIndex + 1) + '</td>',
+              '<td class="center purchase-td-checkbox">' + checkboxMarkup(record.id, visibleIndex) + '</td>',
+              '<td><button class="link-blue" type="button" data-edit-id="' + escapeHtml(record.id) + '">' + escapeHtml(record.materialCode) + '</button></td>',
+              '<td>' + escapeHtml(record.materialName) + '</td>',
+              '<td class="number">' + escapeHtml(record.sourceCoefficient) + '</td>',
+              '<td>' + escapeHtml(record.sourceUnit) + '</td>',
+              '<td class="number">' + escapeHtml(record.baseCoefficient) + '</td>',
+              '<td>' + escapeHtml(record.baseUnit) + '</td>',
+              '<td>' + escapeHtml(record.conversionType) + '</td>',
+              '</tr>'
+            ].join("");
+          }).join("");
+        }
+        totalCount.textContent = "共 " + visibleRecords.length + " 条";
+        selectAll.checked = false;
+        selectAll.indeterminate = false;
+        syncSelectedCount();
+        applyColumnVisibility();
+      }
+
+      function renderReferenceOptions(type) {
+        var isMaterial = type === "material";
+        var currentBaseUnit = baseUnitValue.classList.contains("placeholder") ? "" : baseUnitValue.textContent.trim();
+        var columns = isMaterial
+          ? [
+              { label: "序号", width: 56 },
+              { label: "物料编码", width: 130 },
+              { label: "物料名称", width: 220 },
+              { label: "基本单位", width: 90 },
+              { label: "状态", width: 70 }
+            ]
+          : [
+              { label: "序号", width: 56 },
+              { label: "单位编码", width: 120 },
+              { label: "单位名称", width: 120 },
+              { label: "状态", width: 70 }
+            ];
+        var rows = isMaterial
+          ? materials.filter(function (item) { return item.status === "正常"; })
+          : units.filter(function (item) { return item.status === "启用" && item.name !== currentBaseUnit; });
+        var currentValue = isMaterial
+          ? (materialCodeValue.classList.contains("placeholder") ? "" : materialCodeValue.textContent.trim())
+          : (sourceUnitValue.classList.contains("placeholder") ? "" : sourceUnitValue.textContent.trim());
+        var table = referencePopover.querySelector("table");
+        table.innerHTML = [
+          "<colgroup>",
+          columns.map(function (column) { return '<col style="width: ' + column.width + 'px">'; }).join(""),
+          "</colgroup><thead><tr>",
+          columns.map(function (column) { return '<th><div class="cell">' + column.label + "</div></th>"; }).join(""),
+          "</tr></thead><tbody>",
+          rows.map(function (item, index) {
+            var value = isMaterial ? item.code : item.name;
+            var cells = isMaterial
+              ? [index + 1, item.code, item.name, item.baseUnit, item.status]
+              : [index + 1, item.code, item.name, item.status];
+            return '<tr class="' + (value === currentValue ? "is-selected" : "") + '" data-pk-reference-value="' + escapeHtml(value) + '" data-reference-kind="' + type + '">' + cells.map(function (cell) { return '<td><div class="cell">' + escapeHtml(cell) + "</div></td>"; }).join("") + "</tr>";
+          }).join(""),
+          "</tbody>"
+        ].join("");
+      }
+
+      function setDisplayValue(element, value, placeholder) {
+        element.textContent = value || placeholder;
+        element.classList.toggle("placeholder", !value);
+      }
+
+      function queryReferenceCheckboxMarkup(value, label, checked, selectAll) {
+        return [
+          '<label class="purchase-th-checkbox-wrap query-reference-checkbox-wrap" aria-label="' + escapeHtml(label) + '">',
+          '<input class="purchase-th-checkbox-input query-reference-checkbox" type="checkbox" ' + (selectAll ? 'data-query-select-all ' : 'data-query-reference-checkbox data-query-reference-value="' + escapeHtml(value) + '" ') + (checked ? "checked " : "") + ">",
+          '<span class="purchase-th-checkbox-face"></span>',
+          "</label>"
+        ].join("");
+      }
+
+      function getQueryReferenceRows(type) {
+        return type === "material"
+          ? materials.filter(function (item) { return item.status === "正常"; })
+          : units.filter(function (item) { return item.status === "启用"; });
+      }
+
+      function renderQueryReferenceOptions(type) {
+        var isMaterial = type === "material";
+        var columns = isMaterial
+          ? [
+              { label: "", width: 42 },
+              { label: "物料编码", width: 130 },
+              { label: "物料名称", width: 190 },
+              { label: "规格", width: 170 },
+              { label: "型号", width: 170 }
+            ]
+          : [
+              { label: "", width: 42 },
+              { label: "单位编码", width: 170 },
+              { label: "单位名称", width: 170 }
+            ];
+        var rows = getQueryReferenceRows(type);
+        var allSelected = rows.length > 0 && rows.every(function (item) {
+          return pendingQueryReferenceValues.includes(item.name);
+        });
+        var table = queryReferencePopover.querySelector("table");
+        table.innerHTML = [
+          "<colgroup>",
+          columns.map(function (column) { return '<col style="width: ' + column.width + 'px">'; }).join(""),
+          "</colgroup><thead><tr>",
+          columns.map(function (column, index) {
+            var content = index === 0 ? queryReferenceCheckboxMarkup("", "全选", allSelected, true) : escapeHtml(column.label);
+            return '<th><div class="cell' + (index === 0 ? " query-reference-select-cell" : "") + '">' + content + "</div></th>";
+          }).join(""),
+          "</tr></thead><tbody>",
+          rows.map(function (item) {
+            var value = item.name;
+            var selected = pendingQueryReferenceValues.includes(value);
+            var cells = isMaterial ? [item.code, item.name, item.specification, item.model] : [item.code, item.name];
+            return [
+              '<tr class="' + (selected ? "is-selected" : "") + '" data-query-reference-value="' + escapeHtml(value) + '">',
+              '<td><div class="cell query-reference-select-cell">' + queryReferenceCheckboxMarkup(value, "选择" + value, selected, false) + "</div></td>",
+              cells.map(function (cell) { return '<td><div class="cell">' + escapeHtml(cell) + "</div></td>"; }).join(""),
+              "</tr>"
+            ].join("");
+          }).join(""),
+          "</tbody>"
+        ].join("");
+        var tableWrap = queryReferencePopover.querySelector(".popover-table");
+        tableWrap.scrollTop = 0;
+        tableWrap.scrollLeft = 0;
+        syncQueryReferenceSelection();
+      }
+
+      function syncQueryReferenceSelection() {
+        var rows = Array.from(queryReferencePopover.querySelectorAll("tbody [data-query-reference-value]"));
+        rows.forEach(function (row) {
+          var selected = pendingQueryReferenceValues.includes(row.dataset.queryReferenceValue);
+          row.classList.toggle("is-selected", selected);
+          var checkbox = row.querySelector("[data-query-reference-checkbox]");
+          if (checkbox) checkbox.checked = selected;
+        });
+        var selectAllCheckbox = queryReferencePopover.querySelector("[data-query-select-all]");
+        if (selectAllCheckbox) {
+          selectAllCheckbox.checked = rows.length > 0 && pendingQueryReferenceValues.length === rows.length;
+          selectAllCheckbox.indeterminate = pendingQueryReferenceValues.length > 0 && pendingQueryReferenceValues.length < rows.length;
+        }
+        queryReferenceSelectedCount.textContent = "已选 " + pendingQueryReferenceValues.length + " 项";
+      }
+
+      function closeQueryReference() {
+        queryReferencePopover.classList.remove("is-open");
+        queryReferencePopover.setAttribute("aria-hidden", "true");
+        [queryMaterialReference, querySourceUnitReference, queryBaseUnitReference].forEach(function (trigger) {
+          trigger.setAttribute("aria-expanded", "false");
+        });
+        activeQueryReferenceType = "";
+        pendingQueryReferenceValues = [];
+      }
+
+      function toggleQueryReference(type) {
+        var config = getQueryReferenceConfig(type);
+        var willOpen = !queryReferencePopover.classList.contains("is-open") || activeQueryReferenceType !== type;
+        closeQueryReference();
+        if (!willOpen) return;
+        closeQueryConversionType();
+        activeQueryReferenceType = type;
+        pendingQueryReferenceValues = parseQueryReferenceValues(config.input.value);
+        renderQueryReferenceOptions(type);
+        var rect = config.trigger.getBoundingClientRect();
+        var width = Math.min(type === "material" ? 760 : 430, window.innerWidth - 24);
+        var left = Math.max(12, Math.min(rect.left, window.innerWidth - width - 12));
+        queryReferencePopover.style.width = width + "px";
+        queryReferencePopover.style.left = left + "px";
+        queryReferencePopover.style.top = rect.bottom + 12 + "px";
+        var arrow = queryReferencePopover.querySelector(".popper-arrow");
+        if (arrow) arrow.style.left = Math.max(12, Math.min(rect.left - left + 24, width - 24)) + "px";
+        queryReferencePopover.classList.add("is-open");
+        queryReferencePopover.setAttribute("aria-hidden", "false");
+        config.trigger.setAttribute("aria-expanded", "true");
+      }
+
+      function setConversionType(value) {
+        var normalized = value === "浮动" ? "浮动" : "固定";
+        conversionTypeValue.textContent = normalized;
+        conversionTypeSelect.querySelectorAll(".pk-option").forEach(function (option) {
+          option.classList.toggle("is-selected", option.dataset.value === normalized);
+        });
+        conversionTypeSelect.classList.remove("is-open");
+      }
+
+      function getFormData() {
+        return {
+          materialCode: materialCodeValue.classList.contains("placeholder") ? "" : materialCodeValue.textContent.trim(),
+          materialName: materialNameInput.value.trim(),
+          sourceCoefficient: sourceCoefficientInput.value.trim(),
+          sourceUnit: sourceUnitValue.classList.contains("placeholder") ? "" : sourceUnitValue.textContent.trim(),
+          baseCoefficient: baseCoefficientInput.value.trim(),
+          baseUnit: baseUnitValue.classList.contains("placeholder") ? "" : baseUnitValue.textContent.trim(),
+          conversionType: conversionTypeValue.textContent.trim()
+        };
+      }
+
+      function closePopovers() {
+        referencePopover.classList.remove("is-open");
+        referencePopover.setAttribute("aria-hidden", "true");
+        materialReference.setAttribute("aria-expanded", "false");
+        sourceUnitReference.setAttribute("aria-expanded", "false");
+        activeReferenceType = "";
+      }
+
+      function togglePopover(type) {
+        var trigger = type === "material" ? materialReference : sourceUnitReference;
+        if (type === "unit" && baseUnitValue.classList.contains("placeholder")) {
+          setFieldError("materialCode", "请先选择物料编码");
+          materialReference.focus();
+          return;
+        }
+        var willOpen = !referencePopover.classList.contains("is-open") || activeReferenceType !== type;
+        closePopovers();
+        if (!willOpen) return;
+        activeReferenceType = type;
+        renderReferenceOptions(type);
+        var rect = trigger.getBoundingClientRect();
+        var width = Math.min(type === "material" ? 592 : 392, window.innerWidth - 24);
+        var left = Math.max(12, Math.min(rect.left, window.innerWidth - width - 12));
+        referencePopover.style.width = width + "px";
+        referencePopover.style.left = left + "px";
+        referencePopover.style.top = rect.bottom + 12 + "px";
+        var arrow = referencePopover.querySelector(".popper-arrow");
+        if (arrow) arrow.style.left = Math.max(12, Math.min(rect.left - left + 24, width - 24)) + "px";
+        referencePopover.classList.add("is-open");
+        referencePopover.setAttribute("aria-hidden", "false");
+        trigger.setAttribute("aria-expanded", "true");
+      }
+
+      function clearErrors() {
+        form.querySelectorAll(".pk-field.has-error").forEach(function (field) {
+          field.classList.remove("has-error");
+        });
+        formErrorSummary.hidden = true;
+        formErrorSummary.textContent = "";
+      }
+
+      function setFieldError(fieldName, message) {
+        var field = form.querySelector('[data-field="' + fieldName + '"]');
+        if (!field) return;
+        field.classList.add("has-error");
+        var error = field.querySelector(".field-error");
+        if (error) error.textContent = message;
+      }
+
+      function resetForm() {
+        clearErrors();
+        setDisplayValue(materialCodeValue, "", "请选择物料");
+        materialNameInput.value = "";
+        sourceCoefficientInput.value = "1";
+        setDisplayValue(sourceUnitValue, "", "请选择源单位");
+        baseCoefficientInput.value = "1";
+        setDisplayValue(baseUnitValue, "", "由物料信息自动带出");
+        setConversionType("固定");
+      }
+
+      function fillForm(record) {
+        clearErrors();
+        setDisplayValue(materialCodeValue, record.materialCode, "请选择物料");
+        materialNameInput.value = record.materialName;
+        sourceCoefficientInput.value = record.sourceCoefficient;
+        setDisplayValue(sourceUnitValue, record.sourceUnit, "请选择源单位");
+        baseCoefficientInput.value = record.baseCoefficient;
+        setDisplayValue(baseUnitValue, record.baseUnit, "由物料信息自动带出");
+        setConversionType(record.conversionType);
+      }
+
+      function openDialog(recordId) {
+        var record = recordId ? findRecord(recordId) : null;
+        editingId = record ? record.id : "";
+        title.textContent = record ? "编辑物料单位换算" : "新增物料单位换算";
+        if (record) fillForm(record);
+        else resetForm();
+        modal.classList.add("is-visible");
+        modal.setAttribute("aria-hidden", "false");
+        window.setTimeout(function () { materialReference.focus(); }, 0);
+      }
+
+      function closeDialog() {
+        closePopovers();
+        conversionTypeSelect.classList.remove("is-open");
+        modal.classList.remove("is-visible");
+        modal.setAttribute("aria-hidden", "true");
+        editingId = "";
+        document.getElementById("createButton").focus();
+      }
+
+      function isPositiveInteger(value) {
+        return /^[1-9]\d*$/.test(value);
+      }
+
+      function validateForm(data) {
+        clearErrors();
+        var errors = [];
+        var material = materials.find(function (item) { return item.code === data.materialCode; });
+        var unit = units.find(function (item) { return item.name === data.sourceUnit; });
+
+        function addError(field, message) {
+          errors.push({ field: field, message: message });
+          if (!form.querySelector('[data-field="' + field + '"].has-error')) setFieldError(field, message);
+        }
+
+        if (!data.materialCode) addError("materialCode", "请选择物料编码");
+        else if (!material || material.status !== "正常") addError("materialCode", "所选物料不是正常状态，请重新选择");
+        if (!isPositiveInteger(data.sourceCoefficient)) addError("sourceCoefficient", "请输入大于 0 的整数");
+        if (!data.sourceUnit) addError("sourceUnit", "请选择源单位");
+        else if (!unit || unit.status !== "启用") addError("sourceUnit", "所选源单位不是启用状态，请重新选择");
+        if (!isPositiveInteger(data.baseCoefficient)) addError("baseCoefficient", "请输入大于 0 的整数");
+        if (!data.conversionType) addError("conversionType", "请选择换算类型");
+        if (data.sourceUnit && data.baseUnit && data.sourceUnit === data.baseUnit) {
+          addError("sourceUnit", "源单位不能与基本单位相同");
+        }
+        if (data.materialCode && data.sourceUnit && records.some(function (record) {
+          return record.id !== editingId && record.materialCode === data.materialCode && record.sourceUnit === data.sourceUnit;
+        })) {
+          addError("sourceUnit", "该物料与源单位的换算关系已存在");
+        }
+
+        if (!errors.length) return true;
+        formErrorSummary.textContent = "请检查：" + errors.map(function (item) { return item.message; }).filter(function (message, index, values) {
+          return values.indexOf(message) === index;
+        }).join("；");
+        formErrorSummary.hidden = false;
+        var firstField = form.querySelector('[data-field="' + errors[0].field + '"]');
+        var firstControl = firstField ? firstField.querySelector("input, button, [tabindex]") : null;
+        if (firstControl) firstControl.focus();
+        return false;
+      }
+
+      function showToast(message, type, duration) {
+        successToast.textContent = message;
+        successToast.classList.toggle("is-error", type === "error");
+        successToast.classList.toggle("is-warning", type === "warning");
+        successToast.setAttribute("role", type === "error" ? "alert" : "status");
+        successToast.hidden = false;
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(function () { successToast.hidden = true; }, duration || 2000);
+      }
+
+      function getSelectedIds() {
+        return Array.from(body.querySelectorAll(".row-checkbox:checked")).map(function (checkbox) {
+          return checkbox.dataset.recordId;
+        });
+      }
+
+      function syncSelectedCount() {
+        var checkboxes = Array.from(body.querySelectorAll(".row-checkbox"));
+        var count = checkboxes.filter(function (checkbox) { return checkbox.checked; }).length;
+        selectedCount.textContent = count;
+        selectAll.checked = checkboxes.length > 0 && count === checkboxes.length;
+        selectAll.indeterminate = count > 0 && count < checkboxes.length;
+      }
+
+      function setSearchExpanded(expanded) {
+        searchRoot.classList.toggle("is-expanded", expanded);
+        expandSearchButton.setAttribute("aria-expanded", String(expanded));
+        advancedSearchPanel.setAttribute("aria-hidden", String(!expanded));
+        expandSearchText.textContent = expanded ? "收起" : "展开";
+        if (!expanded) {
+          closeQueryReference();
+          closeQueryConversionType();
+        }
+      }
+
+      function openConfirm(dialogTitle, message, confirmLabel, action) {
+        pendingConfirmAction = action;
+        confirmTitle.textContent = dialogTitle;
+        confirmMessage.textContent = message;
+        confirmActionButton.textContent = confirmLabel || "确定";
+        confirmModal.classList.add("is-visible");
+        confirmModal.setAttribute("aria-hidden", "false");
+        window.setTimeout(function () { confirmActionButton.focus(); }, 0);
+      }
+
+      function closeConfirm() {
+        pendingConfirmAction = null;
+        confirmModal.classList.remove("is-visible");
+        confirmModal.setAttribute("aria-hidden", "true");
+      }
+
+      function requestDelete(recordId) {
+        var record = findRecord(recordId);
+        if (!record) return;
+        if (record.referencedBy.length) {
+          showToast(record.materialCode + " 已被 " + record.referencedBy.join("、") + " 引用，无法删除", "error", 3600);
+          return;
+        }
+        openConfirm(
+          "删除确认",
+          "确定删除“" + record.materialCode + " / " + record.sourceUnit + "”的单位换算关系吗？\n删除后不可恢复。",
+          "删除",
+          function () {
+            records = records.filter(function (item) { return item.id !== recordId; });
+            persistRecords();
+            renderRows();
+            showToast("删除成功", "success");
+          }
+        );
+      }
+
+      function requestBatchDelete() {
+        var selectedIds = getSelectedIds();
+        if (!selectedIds.length) {
+          showToast("请先选择需要删除的记录", "warning");
+          return;
+        }
+        var selectedRecords = records.filter(function (record) { return selectedIds.includes(record.id); });
+        var blocked = selectedRecords.filter(function (record) { return record.referencedBy.length > 0; });
+        if (blocked.length) {
+          showToast("批量删除已全部阻断：以下记录已被引用：" + blocked.map(function (record) {
+            return record.materialCode + " / " + record.sourceUnit;
+          }).join("、"), "error", 4200);
+          return;
+        }
+        openConfirm(
+          "批量删除确认",
+          "确定删除已选择的 " + selectedRecords.length + " 条单位换算关系吗？\n删除后不可恢复。",
+          "删除",
+          function () {
+            records = records.filter(function (record) { return !selectedIds.includes(record.id); });
+            persistRecords();
+            renderRows();
+            showToast("已删除 " + selectedRecords.length + " 条记录", "success");
+          }
+        );
+      }
+
+      function handleRowAction(action, recordId) {
+        closeRowMenu();
+        if (action === "edit") openDialog(recordId);
+        if (action === "delete") requestDelete(recordId);
+      }
+
+      document.getElementById("createButton").addEventListener("click", function () { openDialog(); });
+      document.getElementById("closeDialogButton").addEventListener("click", closeDialog);
+      document.getElementById("cancelButton").addEventListener("click", closeDialog);
+      document.getElementById("searchButton").addEventListener("click", renderRows);
+      document.getElementById("resetButton").addEventListener("click", function () {
+        clearSearchFields();
+        setListViewSelection("", "列表视图（全部）", false);
+        closePersonalFilter();
+        renderRows();
+      });
+      document.getElementById("refreshButton").addEventListener("click", function () {
+        records = loadRecords();
+        renderRows();
+        showToast("数据已刷新", "success");
+      });
+      batchDeleteButton.addEventListener("click", requestBatchDelete);
+      columnDisplayButton.addEventListener("click", function (event) {
+        event.stopPropagation();
+        if (columnDisplayControl.classList.contains("is-open")) closeColumnDisplay();
+        else openColumnDisplay();
+      });
+      columnDisplayPopover.addEventListener("click", function (event) {
+        event.stopPropagation();
+      });
+      columnDisplayPopover.addEventListener("change", function (event) {
+        var checkbox = event.target.closest("[data-column-index]");
+        if (!checkbox) return;
+        var columnIndex = Number(checkbox.dataset.columnIndex);
+        if (checkbox.checked) hiddenColumnIndexes.delete(columnIndex);
+        else hiddenColumnIndexes.add(columnIndex);
+        applyColumnVisibility();
+      });
+      fullscreenButton.addEventListener("click", function () {
+        setTableFullscreen(!listTableShell.classList.contains("is-fullscreen"));
+      });
+      expandSearchButton.addEventListener("click", function () {
+        setSearchExpanded(expandSearchButton.getAttribute("aria-expanded") !== "true");
+      });
+      listViewInput.addEventListener("click", function (event) {
+        event.stopPropagation();
+        if (listViewSelect.classList.contains("is-open")) closeListViewDropdown();
+        else openListViewDropdown();
+      });
+      listViewInput.addEventListener("keydown", function (event) {
+        if (!["Enter", " ", "ArrowDown", "Escape"].includes(event.key)) return;
+        event.preventDefault();
+        if (event.key === "Escape") {
+          closeListViewDropdown();
+          return;
+        }
+        openListViewDropdown();
+        var selectedOption = listViewDropdown.querySelector(".el-select-dropdown__item.selected");
+        if (event.key === "ArrowDown" && selectedOption) selectedOption.focus();
+      });
+      listViewDropdown.addEventListener("click", function (event) {
+        event.stopPropagation();
+        var option = event.target.closest("[data-list-view]");
+        if (option) setListViewSelection(option.dataset.listView, option.dataset.listViewLabel, true);
+      });
+      listViewDropdown.addEventListener("keydown", function (event) {
+        if (!["Enter", " ", "Escape"].includes(event.key)) return;
+        event.preventDefault();
+        if (event.key === "Escape") {
+          closeListViewDropdown();
+          listViewInput.focus();
+          return;
+        }
+        var option = event.target.closest("[data-list-view]");
+        if (option) setListViewSelection(option.dataset.listView, option.dataset.listViewLabel, true);
+      });
+      personalFilterButton.addEventListener("click", function (event) {
+        event.stopPropagation();
+        if (personalFilter.classList.contains("is-open")) closePersonalFilter();
+        else openPersonalFilter();
+      });
+      personalFilterPopover.addEventListener("click", function (event) {
+        event.stopPropagation();
+      });
+      keywordInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") renderRows();
+      });
+      [queryMaterialReference, querySourceUnitReference, queryBaseUnitReference].forEach(function (trigger) {
+        trigger.addEventListener("click", function (event) {
+          event.stopPropagation();
+          toggleQueryReference(trigger.dataset.queryReferenceType);
+        });
+        trigger.addEventListener("keydown", function (event) {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          toggleQueryReference(trigger.dataset.queryReferenceType);
+        });
+      });
+      queryReferencePopover.addEventListener("click", function (event) {
+        event.stopPropagation();
+        var action = event.target.closest("[data-query-reference-action]");
+        if (action) {
+          if (action.dataset.queryReferenceAction === "clear") {
+            pendingQueryReferenceValues = [];
+            syncQueryReferenceSelection();
+          }
+          if (action.dataset.queryReferenceAction === "cancel") closeQueryReference();
+          if (action.dataset.queryReferenceAction === "confirm") {
+            var activeType = activeQueryReferenceType;
+            var selectedValues = pendingQueryReferenceValues.slice();
+            setQueryReferenceValues(activeType, selectedValues);
+            closeQueryReference();
+          }
+          return;
+        }
+        if (event.target.closest(".query-reference-checkbox-wrap")) return;
+        var row = event.target.closest("tbody [data-query-reference-value]");
+        if (!row) return;
+        var value = row.dataset.queryReferenceValue;
+        if (pendingQueryReferenceValues.includes(value)) {
+          pendingQueryReferenceValues = pendingQueryReferenceValues.filter(function (item) { return item !== value; });
+        } else {
+          pendingQueryReferenceValues.push(value);
+        }
+        syncQueryReferenceSelection();
+      });
+      queryReferencePopover.addEventListener("change", function (event) {
+        event.stopPropagation();
+        if (event.target.matches("[data-query-select-all]")) {
+          pendingQueryReferenceValues = event.target.checked
+            ? getQueryReferenceRows(activeQueryReferenceType).map(function (item) { return item.name; })
+            : [];
+          syncQueryReferenceSelection();
+          return;
+        }
+        var checkbox = event.target.closest("[data-query-reference-checkbox]");
+        if (!checkbox) return;
+        var value = checkbox.dataset.queryReferenceValue;
+        if (checkbox.checked && !pendingQueryReferenceValues.includes(value)) pendingQueryReferenceValues.push(value);
+        if (!checkbox.checked) pendingQueryReferenceValues = pendingQueryReferenceValues.filter(function (item) { return item !== value; });
+        syncQueryReferenceSelection();
+      });
+      queryConversionTypeSelect.addEventListener("click", function (event) {
+        event.stopPropagation();
+        var option = event.target.closest(".pk-option");
+        if (option) {
+          setQueryConversionType(option.dataset.value, option.textContent.trim(), true);
+          return;
+        }
+        if (event.target.closest(".pk-select-trigger") || event.target.closest(".pk-caret")) {
+          closeQueryReference();
+          var expanded = !queryConversionTypeSelect.classList.contains("is-open");
+          queryConversionTypeSelect.classList.toggle("is-open", expanded);
+          queryConversionTypeTrigger.setAttribute("aria-expanded", expanded ? "true" : "false");
+        }
+      });
+      queryConversionTypeTrigger.addEventListener("keydown", function (event) {
+        if (event.key !== "ArrowDown") return;
+        event.preventDefault();
+        closeQueryReference();
+        queryConversionTypeSelect.classList.add("is-open");
+        queryConversionTypeTrigger.setAttribute("aria-expanded", "true");
+        var selectedOption = queryConversionTypeSelect.querySelector(".pk-option.is-selected");
+        if (selectedOption) selectedOption.focus();
+      });
+      queryConversionTypeSelect.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          closeQueryConversionType();
+          queryConversionTypeTrigger.focus();
+          return;
+        }
+        var option = event.target.closest(".pk-option");
+        if (!option || (event.key !== "Enter" && event.key !== " ")) return;
+        event.preventDefault();
+        setQueryConversionType(option.dataset.value, option.textContent.trim(), true);
+        queryConversionTypeTrigger.focus();
+      });
+
+      materialReference.addEventListener("click", function (event) {
+        event.stopPropagation();
+        togglePopover("material");
+      });
+      sourceUnitReference.addEventListener("click", function (event) {
+        event.stopPropagation();
+        togglePopover("unit");
+      });
+      [materialReference, sourceUnitReference].forEach(function (reference) {
+        reference.addEventListener("keydown", function (event) {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          togglePopover(reference.dataset.conversionReference);
+        });
+      });
+
+      referencePopover.addEventListener("click", function (event) {
+        event.stopPropagation();
+        var row = event.target.closest("[data-pk-reference-value]");
+        if (!row) return;
+        if (row.dataset.referenceKind === "material") {
+          var material = materials.find(function (item) { return item.code === row.getAttribute("data-pk-reference-value"); });
+          if (!material || material.status !== "正常") return;
+          setDisplayValue(materialCodeValue, material.code, "请选择物料");
+          materialNameInput.value = material.name;
+          setDisplayValue(baseUnitValue, material.baseUnit, "由物料信息自动带出");
+          if (!sourceUnitValue.classList.contains("placeholder") && sourceUnitValue.textContent.trim() === material.baseUnit) {
+            setDisplayValue(sourceUnitValue, "", "请选择源单位");
+          }
+          form.querySelector('[data-field="materialCode"]').classList.remove("has-error");
+        } else {
+          var selectedUnit = units.find(function (item) { return item.name === row.getAttribute("data-pk-reference-value"); });
+          if (!selectedUnit || selectedUnit.status !== "启用") return;
+          setDisplayValue(sourceUnitValue, selectedUnit.name, "请选择源单位");
+          form.querySelector('[data-field="sourceUnit"]').classList.remove("has-error");
+        }
+        formErrorSummary.hidden = true;
+        closePopovers();
+      });
+
+      [sourceCoefficientInput, baseCoefficientInput].forEach(function (input) {
+        input.addEventListener("input", function () {
+          input.value = input.value.replace(/[^0-9]/g, "");
+          input.closest(".pk-field").classList.remove("has-error");
+          formErrorSummary.hidden = true;
+        });
+      });
+
+      conversionTypeSelect.addEventListener("click", function (event) {
+        event.stopPropagation();
+        var option = event.target.closest(".pk-option");
+        if (option) {
+          setConversionType(option.dataset.value);
+          conversionTypeSelect.closest(".pk-field").classList.remove("has-error");
+          formErrorSummary.hidden = true;
+          return;
+        }
+        if (event.target.closest(".pk-select-trigger") || event.target.closest(".pk-caret")) {
+          conversionTypeSelect.classList.toggle("is-open");
+        }
+      });
+
+      body.addEventListener("click", function (event) {
+        var rowMenuTrigger = event.target.closest("[data-row-menu-trigger]");
+        if (rowMenuTrigger) {
+          event.preventDefault();
+          event.stopPropagation();
+          openRowMenu(rowMenuTrigger.closest("[data-row-menu]"), false);
+          return;
+        }
+        var rowAction = event.target.closest("[data-row-action]");
+        if (rowAction) {
+          event.preventDefault();
+          event.stopPropagation();
+          handleRowAction(rowAction.dataset.rowAction, rowAction.dataset.recordId);
+          return;
+        }
+        var editButton = event.target.closest("[data-edit-id]");
+        if (editButton) openDialog(editButton.dataset.editId);
+      });
+      body.addEventListener("mouseover", function (event) {
+        var dropdown = event.target.closest("[data-row-menu]");
+        if (!dropdown || dropdown.contains(event.relatedTarget)) return;
+        openRowMenu(dropdown, false);
+      });
+      body.addEventListener("mouseout", function (event) {
+        var dropdown = event.target.closest("[data-row-menu]");
+        if (!dropdown || dropdown.contains(event.relatedTarget)) return;
+        scheduleRowMenuClose();
+      });
+      body.addEventListener("change", function (event) {
+        if (event.target.classList.contains("row-checkbox")) syncSelectedCount();
+      });
+
+      selectAll.addEventListener("change", function () {
+        body.querySelectorAll(".row-checkbox").forEach(function (checkbox) {
+          checkbox.checked = selectAll.checked;
+        });
+        syncSelectedCount();
+      });
+
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        var data = getFormData();
+        if (!validateForm(data)) return;
+        saveButton.disabled = true;
+        saveButton.textContent = "保存中...";
+        var existingRecord = editingId ? findRecord(editingId) : null;
+        var normalized = {
+          id: editingId || createId(records.length),
+          materialCode: data.materialCode,
+          materialName: data.materialName,
+          sourceCoefficient: Number(data.sourceCoefficient),
+          sourceUnit: data.sourceUnit,
+          baseCoefficient: Number(data.baseCoefficient),
+          baseUnit: data.baseUnit,
+          conversionType: data.conversionType,
+          referencedBy: existingRecord ? existingRecord.referencedBy : []
+        };
+        if (editingId) {
+          records = records.map(function (record) { return record.id === editingId ? normalized : record; });
+        } else {
+          records.push(normalized);
+        }
+        persistRecords();
+        clearSearchFields();
+        setSearchExpanded(false);
+        renderRows();
+        saveButton.disabled = false;
+        saveButton.textContent = "保存";
+        closeDialog();
+        showToast("保存成功", "success");
+      });
+
+      document.getElementById("closeConfirmButton").addEventListener("click", closeConfirm);
+      document.getElementById("cancelConfirmButton").addEventListener("click", closeConfirm);
+      confirmActionButton.addEventListener("click", function () {
+        var action = pendingConfirmAction;
+        closeConfirm();
+        if (typeof action === "function") action();
+      });
+      confirmModal.addEventListener("click", function (event) {
+        if (event.target === confirmModal) closeConfirm();
+      });
+      modal.addEventListener("click", function (event) {
+        if (event.target === modal) closeDialog();
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!event.target.closest(".conversion-reference") && !event.target.closest("[data-conversion-reference-popover]")) closePopovers();
+        if (!event.target.closest(".query-reference") && !event.target.closest("#queryReferencePopover")) closeQueryReference();
+        if (!event.target.closest("#queryConversionTypeSelect")) closeQueryConversionType();
+        if (!event.target.closest("[data-row-menu]")) closeRowMenu();
+        if (!event.target.closest("#conversionTypeSelect")) conversionTypeSelect.classList.remove("is-open");
+        if (!event.target.closest("#listViewSelect")) closeListViewDropdown();
+        if (!event.target.closest("#personalFilter")) closePersonalFilter();
+        if (!event.target.closest("#columnDisplayControl")) closeColumnDisplay();
+      });
+      document.addEventListener("keydown", function (event) {
+        var rowMenuTrigger = event.target.closest("[data-row-menu-trigger]");
+        if (rowMenuTrigger && ["Enter", " ", "ArrowDown"].includes(event.key)) {
+          event.preventDefault();
+          openRowMenu(rowMenuTrigger.closest("[data-row-menu]"), event.key === "ArrowDown");
+          return;
+        }
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s" && modal.classList.contains("is-visible")) {
+          event.preventDefault();
+          form.requestSubmit();
+          return;
+        }
+        if (event.key !== "Escape") return;
+        if (confirmModal.classList.contains("is-visible")) {
+          closeConfirm();
+          return;
+        }
+        if (columnDisplayControl.classList.contains("is-open")) {
+          closeColumnDisplay();
+          return;
+        }
+        if (listTableShell.classList.contains("is-fullscreen")) {
+          setTableFullscreen(false);
+          return;
+        }
+        if (listViewSelect.classList.contains("is-open") || personalFilter.classList.contains("is-open")) {
+          closeListViewDropdown();
+          closePersonalFilter();
+          return;
+        }
+        if (queryReferencePopover.classList.contains("is-open")) {
+          closeQueryReference();
+          return;
+        }
+        if (queryConversionTypeSelect.classList.contains("is-open")) {
+          closeQueryConversionType();
+          return;
+        }
+        if (activeRowMenu) {
+          closeRowMenu();
+          return;
+        }
+        if (!modal.classList.contains("is-visible")) return;
+        if (referencePopover.classList.contains("is-open")) closePopovers();
+        else if (conversionTypeSelect.classList.contains("is-open")) conversionTypeSelect.classList.remove("is-open");
+        else closeDialog();
+      });
+
+      document.querySelector(".purchase-table-wrap").addEventListener("scroll", closeRowMenu);
+      window.addEventListener("resize", function () {
+        closeRowMenu();
+        closePopovers();
+        closeQueryReference();
+        closeQueryConversionType();
+        closeListViewDropdown();
+        closePersonalFilter();
+        closeColumnDisplay();
+      });
+
+      document.getElementById("exportButton").title = "由低代码配置平台提供";
+      sortRecords();
+      persistRecords();
+      setListViewSelection("", "列表视图（全部）", false);
+      closePersonalFilter();
+      closeColumnDisplay();
+      setTableFullscreen(false);
+      setSearchExpanded(false);
+      renderRows();
+    })();
+  </script>
+</body>
+</html>
