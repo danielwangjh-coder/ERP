@@ -6,6 +6,10 @@
   <title>采购订单详情</title>
   <link rel="stylesheet" href="assets/vendor/prototype-kit.css">
   <style>
+    :root {
+      --stamp: #f56c6c;
+    }
+
     html,
     body {
       width: 100%;
@@ -22,27 +26,28 @@
     }
 
     button,
-    input {
+    input,
+    textarea {
       font-family: inherit;
     }
 
     .po-detail-page {
       width: 100%;
-      height: 100%;
       min-width: 920px;
+      height: 100%;
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
 
     .po-detail-toolbar {
-      min-height: 56px;
+      height: 52px;
+      min-height: 52px;
       padding: 0 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      flex: 0 0 auto;
       background: #fff;
       box-shadow: 0 2px 8px rgba(31, 45, 61, 0.08);
     }
@@ -55,10 +60,21 @@
       gap: 8px;
     }
 
+    .po-detail-toolbar .pk-toolbar-left {
+      flex: 1;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .po-detail-toolbar .pk-toolbar-left::-webkit-scrollbar {
+      display: none;
+    }
+
     .po-detail-toolbar .pk-toolbar-btn,
     .po-detail-toolbar .pk-toolbar-dropdown,
     .po-detail-toolbar .pk-toolbar-dropdown-trigger {
       height: 30px;
+      flex: 0 0 auto;
     }
 
     .po-detail-toolbar .pk-toolbar-btn.is-primary {
@@ -74,253 +90,399 @@
       overflow-y: auto;
     }
 
-    .po-detail-content {
+    .po-detail-toolbar button:disabled,
+    .po-detail-toolbar [aria-disabled="true"] {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .doc-workspace {
+      position: relative;
       min-height: 0;
-      padding: 10px 10px 0;
+      padding: 10px 10px 8px;
       display: flex;
       flex: 1;
       flex-direction: column;
+      gap: 10px;
       overflow: hidden;
     }
 
-    .po-document-head,
-    .po-document-lines {
-      position: relative;
-      background: #fff;
-    }
-
-    .po-document-head {
-      flex: 0 0 auto;
-      border-bottom: 1px solid #e7edf3;
-    }
-
-    .po-document-head .pk-tabs-nav,
-    .po-document-lines .pk-tabs-nav {
-      min-height: 42px;
+    .doc-section,
+    .detail-panel {
+      width: 100%;
       padding: 0 10px;
-      gap: 2px;
-      border-bottom: 1px solid #edf1f5;
+      overflow: hidden;
+      border: 0;
+      border-radius: 4px;
+      background: #fff;
+      box-sizing: border-box;
     }
 
-    .po-document-head .pk-tab,
-    .po-document-lines .pk-tab {
-      height: 41px;
-      padding: 0 12px;
+    .doc-section {
+      flex: 0 0 auto;
+    }
+
+    .section-tabs,
+    .detail-tabs {
+      height: 40px;
+      display: flex;
+      align-items: stretch;
+      overflow: hidden;
+      border-bottom: 1px solid #e4e7ed;
+      background: #fff;
+      white-space: nowrap;
+    }
+
+    .section-tab,
+    .detail-tab {
+      height: 40px;
+      padding: 0 20px;
+      display: inline-flex;
+      align-items: center;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      background: transparent;
+      color: #303133;
       font-size: 14px;
+      font-weight: 400;
+      line-height: 40px;
+      cursor: pointer;
     }
 
-    .po-document-head .pk-tab-panel {
-      min-height: 160px;
-      padding: 10px 12px 14px;
+    .section-tab:hover,
+    .detail-tab:hover,
+    .section-tab.is-active,
+    .detail-tab.is-active {
+      color: #409eff;
+    }
+
+    .section-tab.is-active,
+    .detail-tab.is-active {
+      border-bottom-color: #409eff;
+      font-weight: 600;
+    }
+
+    .section-pane {
+      position: relative;
+      max-height: 360px;
+      padding: 10px 0 24px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      transition: max-height 0.18s ease;
+      scrollbar-gutter: stable;
+    }
+
+    .section-pane[hidden],
+    .detail-body[hidden] {
+      display: none;
+    }
+
+    .doc-section.is-collapsed .section-pane[data-pane="basic"] {
+      max-height: 142px;
+      overflow-y: hidden;
     }
 
     .po-document-form {
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 8px 10px;
-      padding-right: 210px;
     }
 
     .po-document-form .pk-field {
       min-width: 0;
     }
 
-    .po-document-form .pk-input-shell {
-      background: #f7f8fa;
-      border-color: #eef0f3;
+    .po-document-form .pk-field.is-full {
+      grid-column: 1 / -1;
     }
 
-    .po-document-form .pk-shell-input {
-      color: #7a7f86;
+    .po-document-form .pk-textarea-shell {
+      min-height: 54px;
     }
 
-    .po-status-stamp {
+    .po-date-disabled,
+    .po-readonly .pk-input-shell[data-pk-reference-trigger],
+    .po-readonly .pk-date-input-shell {
+      pointer-events: none;
+      background: #f5f7fa;
+      color: #9ca6b5;
+    }
+
+    .po-readonly .pk-textarea-input {
+      color: #9ca6b5;
+    }
+
+    .more-line {
       position: absolute;
-      z-index: 2;
-      top: 58px;
-      right: 42px;
-      min-width: 86px;
-      height: 52px;
-      padding: 0 8px;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 14px;
+      padding: 0;
+      border: 0;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .more-line::before {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      left: 0;
+      height: 1px;
+      background: linear-gradient(to right, #409eff 0, #409eff calc(50% - 20px), transparent calc(50% - 20px), transparent calc(50% + 20px), #409eff calc(50% + 20px), #409eff 100%);
+      content: "";
+      transform: translateY(-50%);
+    }
+
+    .more-line .more-icon-bg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 28px;
+      height: 14px;
+      border-radius: 7px;
+      background: #409eff;
+      transform: translate(-50%, -50%);
+    }
+
+    .more-line::after {
+      position: absolute;
+      z-index: 1;
+      top: 50%;
+      left: 50%;
+      width: 6px;
+      height: 6px;
+      border-right: 1px solid #fff;
+      border-bottom: 1px solid #fff;
+      content: "";
+      transform: translate(-50%, -65%) rotate(45deg);
+    }
+
+    .more-line.is-expanded::after {
+      transform: translate(-50%, -35%) rotate(225deg);
+    }
+
+    .top-watermark {
+      position: absolute;
+      z-index: 20;
+      top: 104px;
+      right: 72px;
+      width: 60px;
+      height: 34px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 3px double #f18b8b;
-      border-radius: 7px;
-      color: #ef7373;
-      font-size: 24px;
+      border: 2px solid var(--stamp);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--stamp);
+      font-size: 15px;
       font-weight: 700;
-      letter-spacing: 0;
-      transform: rotate(-17deg);
-      opacity: 0.88;
+      letter-spacing: 2px;
+      opacity: 0.68;
+      pointer-events: none;
+      transform: rotate(-24deg);
     }
 
-    .po-head-collapse {
-      position: relative;
-      height: 9px;
-      border-top: 1px solid #409eff;
-    }
-
-    .po-head-collapse::before {
-      content: "";
-      position: absolute;
-      top: -1px;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-left: 7px solid transparent;
-      border-right: 7px solid transparent;
-      border-top: 7px solid #409eff;
-      transform: translateX(-50%);
-    }
-
-    .po-document-lines {
-      min-height: 0;
-      margin-top: 8px;
+    .detail-panel {
+      min-height: 300px;
+      padding-bottom: 6px;
       display: flex;
-      flex: 1 1 auto;
+      flex: 1;
       flex-direction: column;
-      overflow: hidden;
     }
 
-    .po-document-lines > .pk-tabs {
+    .detail-tabs {
+      flex: 0 0 40px;
+    }
+
+    .detail-body {
       min-height: 0;
       display: flex;
       flex: 1;
       flex-direction: column;
       overflow: hidden;
-    }
-
-    .po-document-lines .pk-tab-panel {
-      min-height: 0;
-      padding: 0;
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .po-document-lines .pk-tab-panel[hidden] {
-      display: none;
-    }
-
-    .po-table-toolbar {
-      min-height: 44px;
-      padding: 0 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      flex: 0 0 auto;
       background: #fff;
     }
 
-    .po-table-toolbar-left,
-    .po-table-toolbar-right {
+    .detail-toolbar {
+      height: 48px;
+      min-height: 48px;
+      padding: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-sizing: border-box;
+    }
+
+    .detail-toolbar .table-tools {
+      position: relative;
+      min-width: 0;
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .po-table-search {
-      width: 220px;
-      height: 30px;
-      padding: 0 10px;
-      border: 1px solid #dcdfe6;
-      border-radius: 3px;
-      outline: none;
+    .detail-toolbar .pk-grid-btn {
+      height: 28px;
     }
 
-    .po-table-search:focus {
-      border-color: #409eff;
+    .detail-toolbar button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
-    .po-detail-table-wrap {
-      min-height: 0;
-      margin: 0 10px 10px;
+    .po-column-panel {
+      position: absolute;
+      z-index: 30;
+      top: 34px;
+      right: 34px;
+      width: 156px;
+      padding: 8px 10px;
+      border: 1px solid #ebeef5;
+      border-radius: 4px;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .po-column-panel label {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #606266;
+      font-size: 12px;
+    }
+
+    .po-table-grid-wrap {
+      min-height: 180px;
       flex: 1;
       overflow: auto;
       border: 1px solid #e8eaec;
+      background: #fff;
       scrollbar-gutter: stable;
     }
 
-    .po-detail-table {
-      width: max-content;
-      min-width: 100%;
-      border: 0;
+    .po-material-table {
+      width: 2800px;
+      min-width: 2800px;
     }
 
-    .po-detail-table th,
-    .po-detail-table td {
-      height: 40px;
-      min-width: 118px;
-      padding: 0 10px;
-      border-right: 1px solid #e8eaec;
-      border-bottom: 1px solid #e8eaec;
-      text-align: left;
-      white-space: nowrap;
+    .po-summary-table {
+      width: 1500px;
+      min-width: 1500px;
     }
 
-    .po-detail-table th {
-      position: sticky;
-      z-index: 3;
-      top: 0;
-      background: #eaf8ff;
-      color: #303133;
-      font-weight: 600;
+    .po-execution-table {
+      width: 1880px;
+      min-width: 1880px;
     }
 
-    .po-detail-table th.is-index,
-    .po-detail-table td.is-index {
-      min-width: 54px;
-      width: 54px;
+    .po-static-table {
+      width: 100%;
+      min-width: 1080px;
     }
 
-    .po-detail-table th.is-check,
-    .po-detail-table td.is-check {
-      min-width: 42px;
-      width: 42px;
+    .po-material-table td,
+    .po-summary-table td,
+    .po-execution-table td,
+    .po-static-table td {
+      height: 36px;
+    }
+
+    .po-material-table .pk-table-readonly {
+      width: 100%;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .po-material-table .pk-date-input-shell {
+      width: 100%;
+      min-height: 30px;
+      border-bottom: 1px solid #ebebeb;
+    }
+
+    .po-material-table .pk-date-input-shell .value {
+      font-size: 12px;
+    }
+
+    .po-material-table .pk-table-reference,
+    .po-material-table .pk-table-field {
+      height: 30px;
+    }
+
+    .po-material-table .pk-table-input {
+      padding: 0 8px;
+    }
+
+    .po-material-table .pk-row-actions svg {
+      display: block;
+      pointer-events: none;
+    }
+
+    .po-material-table .pk-row-actions button {
+      width: 20px;
+      height: 20px;
+    }
+
+    .po-material-table.is-readonly .pk-table-input {
+      border-color: transparent;
+      background: transparent;
+      color: #666;
+      pointer-events: none;
+    }
+
+    .po-material-table.is-readonly .pk-table-reference {
+      pointer-events: none;
+    }
+
+    .po-material-table.is-readonly .pk-table-reference-suffix,
+    .po-material-table.is-readonly .pk-table-clear-btn {
+      display: none;
+    }
+
+    .po-material-table.is-readonly .pk-date-input-shell {
+      border-bottom-color: transparent;
+      pointer-events: none;
+    }
+
+    .po-empty-row td {
+      height: 138px;
+      color: #909399;
       text-align: center;
     }
 
-    .po-detail-table tfoot td {
-      position: sticky;
-      z-index: 2;
-      bottom: 0;
-      background: #fffaf0;
-      font-weight: 600;
+    .po-hidden-column {
+      display: none !important;
     }
 
-    .po-empty {
-      min-height: 138px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #909399;
+    .po-reference-popover {
+      max-height: 380px;
+      overflow: auto;
     }
 
-    .po-log-list {
-      width: 100%;
-      border-collapse: collapse;
+    .po-reference-popover .popover-table {
+      max-height: 360px;
+      overflow: auto;
     }
 
-    .po-log-list th,
-    .po-log-list td {
-      height: 36px;
-      padding: 0 12px;
-      border: 1px solid #e8eaec;
-      text-align: left;
+    .po-detail-page.is-fullscreen .detail-panel {
+      position: fixed;
+      z-index: 3000;
+      inset: 0;
+      border-radius: 0;
     }
 
-    @media (max-width: 1180px) {
-      .po-document-form {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        padding-right: 150px;
+    @media (max-height: 720px) {
+      .doc-section.is-collapsed .section-pane[data-pane="basic"] {
+        max-height: 126px;
       }
 
-      .po-status-stamp {
-        right: 24px;
-        min-width: 72px;
-        font-size: 20px;
+      .section-pane {
+        padding-top: 8px;
       }
     }
   </style>
@@ -329,7 +491,7 @@
   <main class="po-detail-page" data-testid="purchase-order-detail-page">
     <div class="po-detail-toolbar">
       <div class="pk-toolbar-left">
-        <button class="pk-toolbar-btn is-primary" type="button" data-detail-action="保存">保存</button>
+        <button class="pk-toolbar-btn is-primary" id="saveButton" type="button">保存</button>
         <button class="pk-toolbar-btn" type="button" data-detail-action="复制">复制</button>
         <div class="pk-toolbar-dropdown" data-pk-toolbar-dropdown>
           <button class="pk-toolbar-dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false"><span>关联生成</span><span class="pk-toolbar-dropdown-caret"></span></button>
@@ -352,14 +514,7 @@
             <li role="menuitem" data-detail-action="财务应付单">财务应付单</li>
           </ul>
         </div>
-        <div class="pk-toolbar-dropdown" data-pk-toolbar-dropdown>
-          <button class="pk-toolbar-dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false"><span>辅助查询</span><span class="pk-toolbar-dropdown-caret"></span></button>
-          <ul class="pk-toolbar-dropdown-menu" role="menu">
-            <li role="menuitem" data-detail-action="可用库存">可用库存</li>
-            <li role="menuitem" data-detail-action="历史采购价">历史采购价</li>
-          </ul>
-        </div>
-        <button class="pk-toolbar-btn" type="button" data-detail-action="执行关系图">执行关系图</button>
+        <button class="pk-toolbar-btn" type="button" data-detail-action="取价">取价</button>
         <button class="pk-toolbar-btn" type="button" data-detail-action="历史查询">历史查询</button>
         <button class="pk-toolbar-btn" type="button" data-detail-action="打印">打印</button>
         <button class="pk-toolbar-btn" type="button" data-detail-action="刷新">刷新</button>
@@ -371,95 +526,179 @@
       </div>
     </div>
 
-    <div class="po-detail-content">
-      <section class="po-document-head" aria-label="采购订单表头">
-        <div class="pk-tabs" data-pk-tabs>
-          <div class="pk-tabs-nav" role="tablist" aria-label="采购订单信息">
-            <button class="pk-tab is-active" type="button" role="tab" aria-selected="true" data-pk-tab="basic">基本信息</button>
-            <button class="pk-tab" type="button" role="tab" aria-selected="false" data-pk-tab="finance">财务信息</button>
-            <button class="pk-tab" type="button" role="tab" aria-selected="false" data-pk-tab="feedback">沟通及反馈(0)</button>
-            <button class="pk-tab" type="button" role="tab" aria-selected="false" data-pk-tab="attachment">附件信息(0)</button>
-            <button class="pk-tab" type="button" role="tab" aria-selected="false" data-pk-tab="approval">审批信息(0)</button>
-            <button class="pk-tab" type="button" role="tab" aria-selected="false" data-pk-tab="log">日志信息(5)</button>
-          </div>
-          <div class="pk-tab-panel" data-pk-tab-panel="basic" role="tabpanel">
-            <div class="pk-form-grid po-document-form">
-              <div class="pk-field"><div class="pk-label"><span class="pk-required">*</span><span>来源类型</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="sourceType" value="手工创建" readonly></div></div></div>
-              <div class="pk-field"><div class="pk-label"><span class="pk-required">*</span><span>业务类型</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="businessType" value="默认类型" readonly></div></div></div>
-              <div class="pk-field"><div class="pk-label"><span class="pk-required">*</span><span>单据日期</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="date" value="2026-08-07" readonly></div></div></div>
-              <div class="pk-field"><div class="pk-label"><span>单据编码</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="code" value="20260731-0611" readonly></div></div></div>
-              <div class="pk-field"><div class="pk-label"><span class="pk-required">*</span><span>供应商编码</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="supplierCode" value="000005" readonly></div></div></div>
-              <div class="pk-field"><div class="pk-label"><span>供应商名称</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="supplier" value="创维智造工业电子厂测试" readonly></div></div></div>
-              <div class="pk-field"><div class="pk-label"><span>采购员</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="buyer" value="蒋凤霞" readonly></div></div></div>
-              <div class="pk-field"><div class="pk-label"><span>采购部门</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="department" value="西南片区" readonly></div></div></div>
-              <div class="pk-field"><div class="pk-label"><span>变更次数</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" value="" readonly></div></div></div>
-              <div class="pk-field"><div class="pk-label"><span>最近变更日期</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" value="" readonly></div></div></div>
-              <div class="pk-field"><div class="pk-label"><span>单据摘要</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="summary" value="设备维修备件" readonly></div></div></div>
+    <div class="doc-workspace">
+      <div class="top-watermark" id="statusStamp">草稿</div>
+
+      <section class="doc-section is-collapsed" id="documentSection" aria-label="采购订单表头">
+        <div class="section-tabs" role="tablist" aria-label="采购订单信息">
+          <button class="section-tab is-active" type="button" role="tab" aria-selected="true" data-section-tab="basic">基本信息</button>
+          <button class="section-tab" type="button" role="tab" aria-selected="false" data-section-tab="finance">财务信息</button>
+          <button class="section-tab" type="button" role="tab" aria-selected="false" data-section-tab="feedback">沟通及反馈(0)</button>
+          <button class="section-tab" type="button" role="tab" aria-selected="false" data-section-tab="attachment">附件信息(0)</button>
+          <button class="section-tab" type="button" role="tab" aria-selected="false" data-section-tab="approval">审批信息(0)</button>
+          <button class="section-tab" type="button" role="tab" aria-selected="false" data-section-tab="log">日志信息(2)</button>
+        </div>
+
+        <div class="section-pane" data-pane="basic">
+          <div class="pk-form-grid po-document-form" id="basicForm">
+            <div class="pk-field">
+              <div class="pk-label"><span class="pk-required">*</span><span>来源类型</span><span class="pk-help">?</span></div>
+              <div class="pk-control"><div class="pk-input-shell has-clear-value" data-pk-reference-trigger="sourceType" data-header-reference="sourceType" tabindex="0" aria-haspopup="true" aria-expanded="false"><span class="value">手工创建</span><span class="suffix-button">...</span></div></div>
+            </div>
+            <div class="pk-field">
+              <div class="pk-label"><span class="pk-required">*</span><span>业务类型</span></div>
+              <div class="pk-control"><div class="pk-input-shell has-clear-value" data-pk-reference-trigger="businessType" data-header-reference="businessType" tabindex="0" aria-haspopup="true" aria-expanded="false"><span class="value">默认类型</span><span class="suffix-button">...</span></div></div>
+            </div>
+            <div class="pk-field">
+              <div class="pk-label"><span class="pk-required">*</span><span>单据日期</span></div>
+              <div class="pk-control"><div class="pk-input-shell pk-date-input-shell has-clear-value" id="documentDate" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false"><span class="prefix-icon" aria-hidden="true">▣</span><span class="value" data-pk-date-value>2026-08-04</span></div></div>
+            </div>
+            <div class="pk-field">
+              <div class="pk-label"><span>单据编码</span></div>
+              <div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" id="documentCode" type="text" value="保存后自动生成" readonly></div></div>
+            </div>
+            <div class="pk-field">
+              <div class="pk-label"><span class="pk-required">*</span><span>供应商编码</span></div>
+              <div class="pk-control"><div class="pk-input-shell is-clearable" data-pk-reference-trigger="supplier" data-header-reference="supplierCode" tabindex="0" aria-haspopup="true" aria-expanded="false"><span class="value placeholder">请选择供应商</span><button class="input-clear-btn" type="button" aria-label="清除供应商"></button><span class="suffix-button">...</span></div></div>
+            </div>
+            <div class="pk-field">
+              <div class="pk-label"><span>供应商名称</span></div>
+              <div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" id="supplierName" type="text" readonly placeholder="选择供应商后自动带出"></div></div>
+            </div>
+            <div class="pk-field">
+              <div class="pk-label"><span>采购员</span></div>
+              <div class="pk-control"><div class="pk-input-shell has-clear-value" data-pk-reference-trigger="buyer" data-header-reference="buyer" tabindex="0" aria-haspopup="true" aria-expanded="false"><span class="value">王建华</span><span class="suffix-button">...</span></div></div>
+            </div>
+            <div class="pk-field">
+              <div class="pk-label"><span>采购部门</span></div>
+              <div class="pk-control"><div class="pk-input-shell has-clear-value" data-pk-reference-trigger="department" data-header-reference="department" tabindex="0" aria-haspopup="true" aria-expanded="false"><span class="value">西南片区</span><span class="suffix-button">...</span></div></div>
+            </div>
+            <div class="pk-field">
+              <div class="pk-label"><span>变更次数</span></div>
+              <div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" type="text" readonly></div></div>
+            </div>
+            <div class="pk-field">
+              <div class="pk-label"><span>最近变更日期</span></div>
+              <div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" type="text" readonly></div></div>
+            </div>
+            <div class="pk-field is-full">
+              <div class="pk-label"><span>单据摘要</span></div>
+              <div class="pk-control"><div class="pk-textarea-shell"><textarea class="pk-textarea-input" id="documentSummary" maxlength="255" rows="2" data-pk-count placeholder="请输入单据摘要" aria-label="单据摘要"></textarea><span class="pk-textarea-count">0/255</span></div></div>
             </div>
           </div>
-          <div class="pk-tab-panel" data-pk-tab-panel="finance" role="tabpanel" hidden>
-            <div class="pk-form-grid po-document-form">
-              <div class="pk-field"><div class="pk-label"><span>结算供应商</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" value="测试供应商" readonly></div></div></div>
-              <div class="pk-field"><div class="pk-label"><span>结算方式</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" value="现金" readonly></div></div></div>
-              <div class="pk-field"><div class="pk-label"><span>付款条件</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" value="按金额" readonly></div></div></div>
-              <div class="pk-field"><div class="pk-label"><span>价税合计</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="taxTotal" value="10.90" readonly></div></div></div>
+          <button class="more-line" id="headerCollapseButton" type="button" aria-label="展开基本信息"><span class="more-icon-bg"></span></button>
+        </div>
+
+        <div class="section-pane" data-pane="finance" hidden>
+          <div class="pk-form-grid po-document-form" id="financeForm">
+            <div class="pk-field">
+              <div class="pk-label"><span>结算供应商</span></div>
+              <div class="pk-control"><div class="pk-input-shell is-disabled" data-pk-reference-trigger="settleSupplier" data-header-reference="settleSupplier" tabindex="0" aria-haspopup="true" aria-expanded="false"><span class="value placeholder">请选择结算供应商</span><span class="suffix-button">...</span></div></div>
             </div>
-          </div>
-          <div class="pk-tab-panel" data-pk-tab-panel="feedback" role="tabpanel" hidden><div class="po-empty">暂无沟通及反馈</div></div>
-          <div class="pk-tab-panel" data-pk-tab-panel="attachment" role="tabpanel" hidden><div class="po-empty">暂无附件</div></div>
-          <div class="pk-tab-panel" data-pk-tab-panel="approval" role="tabpanel" hidden><div class="po-empty">暂无审批记录</div></div>
-          <div class="pk-tab-panel" data-pk-tab-panel="log" role="tabpanel" hidden>
-            <table class="po-log-list"><thead><tr><th>操作时间</th><th>操作人</th><th>操作</th></tr></thead><tbody><tr><td>2026-08-07 10:26:41</td><td>蒋凤霞</td><td>提交采购订单</td></tr><tr><td>2026-08-07 10:28:19</td><td>系统管理员</td><td>审批结束，单据进入执行中</td></tr></tbody></table>
+            <div class="pk-field">
+              <div class="pk-label"><span>结算方式</span></div>
+              <div class="pk-control"><div class="pk-input-shell is-disabled" data-pk-reference-trigger="settleMethod" data-header-reference="settleMethod" tabindex="0" aria-haspopup="true" aria-expanded="false"><span class="value placeholder">请选择结算方式</span><span class="suffix-button">...</span></div></div>
+            </div>
+            <div class="pk-field">
+              <div class="pk-label"><span>付款条件</span></div>
+              <div class="pk-control"><div class="pk-input-shell is-disabled" data-pk-reference-trigger="paymentTerm" data-header-reference="paymentTerm" tabindex="0" aria-haspopup="true" aria-expanded="false"><span class="value placeholder">请选择付款条件</span><span class="suffix-button">...</span></div></div>
+            </div>
+            <div class="pk-field">
+              <div class="pk-label"><span>价税合计</span></div>
+              <div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" id="headerTaxTotal" type="text" value="0.00" readonly></div></div>
+            </div>
           </div>
         </div>
-        <div class="po-status-stamp" data-detail-field="documentStatus">执行中</div>
-        <div class="po-head-collapse" aria-hidden="true"></div>
+
+        <div class="section-pane" data-pane="feedback" hidden><div class="pk-textarea-shell"><textarea class="pk-textarea-input" maxlength="255" rows="3" placeholder="输入评论"></textarea><span class="pk-textarea-count">0/255</span></div></div>
+        <div class="section-pane" data-pane="attachment" hidden><div class="po-empty-row">暂无附件</div></div>
+        <div class="section-pane" data-pane="approval" hidden><div class="po-empty-row">暂无审批信息</div></div>
+        <div class="section-pane" data-pane="log" hidden>
+          <div class="po-table-grid-wrap" style="height: 142px;"><table class="pk-erp-table po-static-table"><thead><tr><th><div class="cell">序号</div></th><th><div class="cell">操作人</div></th><th><div class="cell">业务实体</div></th><th><div class="cell">操作</div></th><th><div class="cell">操作时间</div></th><th><div class="cell">备注</div></th></tr></thead><tbody><tr><td><div class="cell">1</div></td><td><div class="cell">王建华</div></td><td><div class="cell">采购订单</div></td><td><div class="cell">[+]保存</div></td><td><div class="cell">2026-08-04 12:20:18</div></td><td><div class="cell">采购订单表头</div></td></tr><tr><td><div class="cell">2</div></td><td><div class="cell">王建华</div></td><td><div class="cell">采购订单明细</div></td><td><div class="cell">[+]保存</div></td><td><div class="cell">2026-08-04 12:20:18</div></td><td><div class="cell">物料明细</div></td></tr></tbody></table></div>
+        </div>
       </section>
 
-      <section class="po-document-lines" aria-label="采购订单子表">
-        <div class="pk-tabs" data-pk-tabs>
-          <div class="pk-tabs-nav" role="tablist" aria-label="采购订单明细">
-            <button class="pk-tab is-active" type="button" role="tab" aria-selected="true" data-pk-tab="material">物料明细</button>
-            <button class="pk-tab" type="button" role="tab" aria-selected="false" data-pk-tab="summary">物料汇总</button>
-            <button class="pk-tab" type="button" role="tab" aria-selected="false" data-pk-tab="payment">付款计划</button>
-            <button class="pk-tab" type="button" role="tab" aria-selected="false" data-pk-tab="terms">条款信息</button>
-            <button class="pk-tab" type="button" role="tab" aria-selected="false" data-pk-tab="execution">执行情况</button>
-          </div>
+      <section class="detail-panel" id="detailPanel" aria-label="采购订单明细">
+        <div class="detail-tabs" role="tablist" aria-label="采购订单子表">
+          <button class="detail-tab is-active" type="button" role="tab" aria-selected="true" data-detail-tab="material">物料明细</button>
+          <button class="detail-tab" type="button" role="tab" aria-selected="false" data-detail-tab="summary">物料汇总</button>
+          <button class="detail-tab" type="button" role="tab" aria-selected="false" data-detail-tab="payment">付款计划</button>
+          <button class="detail-tab" type="button" role="tab" aria-selected="false" data-detail-tab="terms">条款信息</button>
+          <button class="detail-tab" type="button" role="tab" aria-selected="false" data-detail-tab="execution">执行情况</button>
+        </div>
 
-          <div class="pk-tab-panel" data-pk-tab-panel="material" role="tabpanel">
-            <div class="po-table-toolbar"><div class="po-table-toolbar-left"></div><div class="po-table-toolbar-right"><input class="po-table-search" type="search" placeholder="请输入关键字搜索" aria-label="物料明细搜索"><button class="pk-grid-icon-btn" type="button" title="列展示" aria-label="列展示">☷</button><button class="pk-list-toolbar-btn" type="button" data-detail-action="物料明细全屏">全屏</button></div></div>
-            <div class="po-detail-table-wrap">
-              <table class="pk-erp-table po-detail-table">
-                <thead><tr><th class="is-index">序号</th><th class="is-check"><input class="pk-table-checkbox" type="checkbox" aria-label="全选物料明细"></th><th>* 物料编码</th><th>物料名称</th><th>规格</th><th>型号</th><th>计量单位</th><th>* 工厂</th><th>期望到货日期</th><th>赠品</th><th>数量</th><th>单价</th><th>金额</th><th>税率</th><th>税额</th><th>含税单价</th><th>含税金额</th><th>价税合计</th><th>来源单号</th><th>行备注</th></tr></thead>
-                <tbody id="materialBody"><tr><td class="is-index">1</td><td class="is-check"><input class="pk-table-checkbox" type="checkbox" aria-label="选择第1行"></td><td>2333333X</td><td>2333</td><td></td><td></td><td>顶</td><td>成都精密仪器工厂</td><td>2026-08-21</td><td>否</td><td>1.00</td><td>9.650000</td><td>9.65</td><td>13%</td><td>1.25</td><td>10.900000</td><td>10.90</td><td>10.90</td><td></td><td></td></tr></tbody>
-                <tfoot><tr><td class="is-index">合计</td><td class="is-check"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>1.00</td><td></td><td>9.65</td><td></td><td>1.25</td><td></td><td>10.90</td><td>10.90</td><td></td><td></td></tr></tfoot>
-              </table>
+        <div class="detail-body" data-detail-pane="material">
+          <div class="detail-toolbar">
+            <div class="table-tools"><button class="pk-grid-btn pk-grid-btn--primary" id="addLineButton" type="button">新建</button></div>
+            <div class="table-tools">
+              <div class="pk-grid-search"><span aria-hidden="true">⌕</span><input id="materialSearch" type="search" placeholder="请输入关键字搜索" aria-label="请输入关键字搜索"></div>
+              <button class="pk-grid-icon-btn" id="columnButton" type="button" title="列设置" aria-label="列设置">☰</button>
+              <button class="pk-grid-icon-btn" id="fullscreenButton" type="button" title="全屏" aria-label="全屏">⛶</button>
+              <div class="po-column-panel" id="columnPanel" hidden>
+                <label><input class="pk-checkbox" type="checkbox" data-column-toggle="spec" checked>规格</label>
+                <label><input class="pk-checkbox" type="checkbox" data-column-toggle="model" checked>型号</label>
+                <label><input class="pk-checkbox" type="checkbox" data-column-toggle="sourceNo" checked>来源单号</label>
+                <label><input class="pk-checkbox" type="checkbox" data-column-toggle="rowRemark" checked>行备注</label>
+              </div>
             </div>
           </div>
-
-          <div class="pk-tab-panel" data-pk-tab-panel="summary" role="tabpanel" hidden>
-            <div class="po-table-toolbar"><div class="po-table-toolbar-left"><button class="pk-list-toolbar-btn" type="button" data-detail-action="导出物料汇总">导出</button></div><div class="po-table-toolbar-right"><input class="po-table-search" type="search" placeholder="请输入关键字搜索" aria-label="物料汇总搜索"><button class="pk-list-toolbar-btn" type="button" data-detail-action="物料汇总全屏">全屏</button></div></div>
-            <div class="po-detail-table-wrap"><table class="pk-erp-table po-detail-table"><thead><tr><th class="is-index">序号</th><th>物料编码</th><th>物料名称</th><th>规格</th><th>型号</th><th>计量单位</th><th>数量</th><th>单价</th><th>金额</th><th>税额</th><th>含税单价</th><th>含税金额</th><th>价税合计</th><th>品牌</th><th>材质/牌号</th><th>颜色</th><th>版本</th><th>阶段标记</th><th>图号</th><th>质量等级</th><th>温度范围</th></tr></thead><tbody><tr><td class="is-index">1</td><td>2333333X</td><td>2333</td><td></td><td></td><td>顶</td><td>1.00</td><td>9.650000</td><td>9.65</td><td>1.25</td><td>10.900000</td><td>10.90</td><td>10.90</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody><tfoot><tr><td class="is-index">合计</td><td></td><td></td><td></td><td></td><td></td><td>1.00</td><td></td><td>9.65</td><td>1.25</td><td></td><td>10.90</td><td>10.90</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tfoot></table></div>
+          <div class="po-table-grid-wrap">
+            <table class="pk-erp-table po-material-table" id="materialTable">
+              <colgroup>
+                <col style="width:104px"><col style="width:64px"><col style="width:56px"><col style="width:140px"><col style="width:180px"><col style="width:120px"><col style="width:120px"><col style="width:90px"><col style="width:160px"><col style="width:150px"><col style="width:76px"><col style="width:110px"><col style="width:120px"><col style="width:120px"><col style="width:90px"><col style="width:120px"><col style="width:130px"><col style="width:130px"><col style="width:130px"><col style="width:150px"><col style="width:160px">
+              </colgroup>
+              <thead id="materialHead"></thead>
+              <tbody id="materialBody"></tbody>
+              <tfoot id="materialFoot"></tfoot>
+            </table>
           </div>
+        </div>
 
-          <div class="pk-tab-panel" data-pk-tab-panel="payment" role="tabpanel" hidden>
-            <div class="po-table-toolbar"><div class="po-table-toolbar-left"><button class="pk-list-toolbar-btn" type="button" data-detail-action="新建付款计划">新建</button><button class="pk-list-toolbar-btn" type="button" data-detail-action="导出付款计划">导出</button></div><div class="po-table-toolbar-right"><input class="po-table-search" type="search" placeholder="请输入关键字搜索" aria-label="付款计划搜索"><button class="pk-list-toolbar-btn" type="button" data-detail-action="付款计划全屏">全屏</button></div></div>
-            <div class="po-detail-table-wrap"><table class="pk-erp-table po-detail-table"><thead><tr><th>操作</th><th class="is-index">序号</th><th class="is-check"><input class="pk-table-checkbox" type="checkbox" aria-label="全选付款计划"></th><th>付款计划编码</th><th>* 款项名称</th><th>* 计划付款比例（%）</th><th>计划付款金额</th><th>预付款</th><th>到期日期确认方式</th><th>到期日</th><th>行备注</th><th>实际付款金额</th><th>累计折让金额</th><th>未付款金额</th><th>付款状态</th></tr></thead><tbody><tr class="po-empty-table-row"><td><span class="po-empty">暂无数据</span></td><td class="is-index"></td><td class="is-check"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody><tfoot><tr><td>合计</td><td class="is-index"></td><td class="is-check"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tfoot></table></div>
-          </div>
+        <div class="detail-body" data-detail-pane="summary" hidden>
+          <div class="detail-toolbar"><div class="table-tools"></div><div class="table-tools"><div class="pk-grid-search"><span aria-hidden="true">⌕</span><input type="search" placeholder="请输入关键字搜索"></div><button class="pk-grid-icon-btn" type="button" title="列设置" aria-label="列设置">☰</button><button class="pk-grid-icon-btn" type="button" data-pane-fullscreen title="全屏" aria-label="全屏">⛶</button></div></div>
+          <div class="po-table-grid-wrap"><table class="pk-erp-table po-summary-table"><thead><tr><th><div class="cell">序号</div></th><th><div class="cell">物料编码</div></th><th><div class="cell">物料名称</div></th><th><div class="cell">规格</div></th><th><div class="cell">型号</div></th><th><div class="cell">计量单位</div></th><th><div class="cell">数量</div></th><th><div class="cell">单价</div></th><th><div class="cell">金额</div></th><th><div class="cell">税额</div></th><th><div class="cell">含税金额</div></th><th><div class="cell">价税合计</div></th></tr></thead><tbody id="summaryBody"></tbody><tfoot id="summaryFoot"></tfoot></table></div>
+        </div>
 
-          <div class="pk-tab-panel" data-pk-tab-panel="terms" role="tabpanel" hidden>
-            <div class="po-table-toolbar"><div class="po-table-toolbar-left"><button class="pk-list-toolbar-btn" type="button" data-detail-action="导出条款">导出</button></div><div class="po-table-toolbar-right"><input class="po-table-search" type="search" placeholder="请输入关键字搜索" aria-label="条款信息搜索"><button class="pk-list-toolbar-btn" type="button" data-detail-action="条款信息全屏">全屏</button></div></div>
-            <div class="po-detail-table-wrap"><table class="pk-erp-table po-detail-table"><thead><tr><th class="is-index">序号</th><th class="is-check"><input class="pk-table-checkbox" type="checkbox" aria-label="全选条款"></th><th>条款编码</th><th>条款名称</th><th>条例类型</th><th>条款内容</th><th>行备注</th></tr></thead><tbody><tr class="po-empty-table-row"><td class="is-index"><span class="po-empty">暂无数据</span></td><td class="is-check"></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div>
-          </div>
+        <div class="detail-body" data-detail-pane="payment" hidden>
+          <div class="detail-toolbar"><div class="table-tools"><button class="pk-grid-btn" type="button" data-detail-action="新建付款计划">新建</button><button class="pk-grid-btn" type="button" data-detail-action="导出付款计划">导出</button></div><div class="table-tools"><div class="pk-grid-search"><span aria-hidden="true">⌕</span><input type="search" placeholder="请输入关键字搜索"></div><button class="pk-grid-icon-btn" type="button" data-pane-fullscreen title="全屏" aria-label="全屏">⛶</button></div></div>
+          <div class="po-table-grid-wrap"><table class="pk-erp-table po-static-table"><thead><tr><th><div class="cell">操作</div></th><th><div class="cell">序号</div></th><th><div class="cell">付款计划编码</div></th><th><div class="cell"><span class="required">*</span>款项名称</div></th><th><div class="cell"><span class="required">*</span>计划付款比例（%）</div></th><th><div class="cell">计划付款金额</div></th><th><div class="cell">预付款</div></th><th><div class="cell">到期日</div></th><th><div class="cell">行备注</div></th></tr></thead><tbody><tr class="po-empty-row"><td colspan="9">暂无数据</td></tr></tbody><tfoot><tr><td><div class="cell">合计</div></td><td colspan="8"></td></tr></tfoot></table></div>
+        </div>
 
-          <div class="pk-tab-panel" data-pk-tab-panel="execution" role="tabpanel" hidden>
-            <div class="po-table-toolbar"><div class="po-table-toolbar-left"><button class="pk-list-toolbar-btn" type="button" data-detail-action="关闭">关闭</button><button class="pk-list-toolbar-btn" type="button" data-detail-action="反关闭">反关闭</button></div><div class="po-table-toolbar-right"><input class="po-table-search" type="search" placeholder="请输入关键字搜索" aria-label="执行情况搜索"><button class="pk-list-toolbar-btn" type="button" data-detail-action="执行情况全屏">全屏</button></div></div>
-            <div class="po-detail-table-wrap"><table class="pk-erp-table po-detail-table"><thead><tr><th class="is-index">序号</th><th class="is-check"><input class="pk-table-checkbox" type="checkbox" aria-label="全选执行情况"></th><th>物料编码</th><th>物料名称</th><th>规格</th><th>型号</th><th>计量单位</th><th>数量</th><th>金额</th><th>折扣额</th><th>税额</th><th>价税合计</th><th>累计收货数量</th><th>累计入库数量</th><th>累计入库金额</th><th>累计退货申请数量</th><th>累计退货数量</th><th>累计退货金额</th><th>累计需补货数量</th><th>实际入库数量</th><th>实入差异数量</th><th>实入差异率%</th><th>提前/逾期天数</th><th>逾期状态</th><th>累计开票数量（蓝字）</th><th>累计开票金额（蓝字）</th><th>实际开票数量</th><th>实际开票金额</th><th>实际预付金额</th><th>实际付款金额</th><th>未付款数量</th><th>未付款金额</th><th>行状态</th><th>关闭分类</th><th>关闭原因</th><th>关闭人</th><th>关闭时间</th><th>品牌</th><th>材质/牌号</th><th>颜色</th><th>版本</th><th>阶段标记</th><th>图号</th><th>质量等级</th><th>温度范围</th></tr></thead><tbody><tr><td class="is-index">1</td><td class="is-check"><input class="pk-table-checkbox" type="checkbox" aria-label="选择第1行执行情况"></td><td>2333333X</td><td>2333</td><td></td><td></td><td>顶</td><td>1.00</td><td>9.65</td><td>0.00</td><td>1.25</td><td>10.90</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>-1.00</td><td>-100.00%</td><td></td><td></td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>1.00</td><td>10.90</td><td data-line-status>执行中</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody><tfoot><tr><td class="is-index">合计</td><td class="is-check"></td><td></td><td></td><td></td><td></td><td></td><td>1.00</td><td>9.65</td><td>0.00</td><td>1.25</td><td>10.90</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tfoot></table></div>
-          </div>
+        <div class="detail-body" data-detail-pane="terms" hidden>
+          <div class="detail-toolbar"><div class="table-tools"><button class="pk-grid-btn" type="button" data-detail-action="导出条款">导出</button></div><div class="table-tools"><div class="pk-grid-search"><span aria-hidden="true">⌕</span><input type="search" placeholder="请输入关键字搜索"></div><button class="pk-grid-icon-btn" type="button" data-pane-fullscreen title="全屏" aria-label="全屏">⛶</button></div></div>
+          <div class="po-table-grid-wrap"><table class="pk-erp-table po-static-table"><thead><tr><th><div class="cell">序号</div></th><th><div class="cell">条款编码</div></th><th><div class="cell">条款名称</div></th><th><div class="cell">条款类型</div></th><th><div class="cell">条款内容</div></th><th><div class="cell">行备注</div></th></tr></thead><tbody><tr class="po-empty-row"><td colspan="6">暂无数据</td></tr></tbody></table></div>
+        </div>
+
+        <div class="detail-body" data-detail-pane="execution" hidden>
+          <div class="detail-toolbar"><div class="table-tools"><button class="pk-grid-btn" type="button" data-detail-action="关闭">关闭</button><button class="pk-grid-btn" type="button" data-detail-action="反关闭">反关闭</button></div><div class="table-tools"><div class="pk-grid-search"><span aria-hidden="true">⌕</span><input type="search" placeholder="请输入关键字搜索"></div><button class="pk-grid-icon-btn" type="button" data-pane-fullscreen title="全屏" aria-label="全屏">⛶</button></div></div>
+          <div class="po-table-grid-wrap"><table class="pk-erp-table po-execution-table"><thead><tr><th><div class="cell">序号</div></th><th><div class="cell">物料编码</div></th><th><div class="cell">物料名称</div></th><th><div class="cell">计量单位</div></th><th><div class="cell">数量</div></th><th><div class="cell">金额</div></th><th><div class="cell">税额</div></th><th><div class="cell">价税合计</div></th><th><div class="cell">累计收货数量</div></th><th><div class="cell">累计入库数量</div></th><th><div class="cell">实际入库数量</div></th><th><div class="cell">未付款数量</div></th><th><div class="cell">未付款金额</div></th><th><div class="cell">行状态</div></th></tr></thead><tbody id="executionBody"></tbody><tfoot id="executionFoot"></tfoot></table></div>
         </div>
       </section>
     </div>
   </main>
+
+  <div class="pk-reference-popover po-reference-popover" data-pk-reference-popover aria-hidden="true"><span class="popper-arrow"></span><div class="popover-table"><table><thead></thead><tbody></tbody></table></div></div>
+  <div class="pk-date-panel" data-pk-date-panel aria-hidden="true">
+    <div class="pk-date-panel-head"><button type="button" data-pk-date-nav="prev">‹</button><span>2026 年 8 月</span><button type="button" data-pk-date-nav="next">›</button></div>
+    <div class="pk-date-weekdays"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+    <div class="pk-date-days"><button class="is-muted" type="button">26</button><button class="is-muted" type="button">27</button><button class="is-muted" type="button">28</button><button class="is-muted" type="button">29</button><button class="is-muted" type="button">30</button><button class="is-muted" type="button">31</button><button type="button">1</button><button type="button">2</button><button type="button">3</button><button class="is-selected" type="button">4</button><button type="button">5</button><button type="button">6</button><button type="button">7</button><button type="button">8</button><button type="button">9</button><button type="button">10</button><button type="button">11</button><button type="button">12</button><button type="button">13</button><button type="button">14</button><button type="button">15</button><button type="button">16</button><button type="button">17</button><button type="button">18</button><button type="button">19</button><button type="button">20</button><button type="button">21</button><button type="button">22</button><button type="button">23</button><button type="button">24</button><button type="button">25</button><button type="button">26</button><button type="button">27</button><button type="button">28</button><button type="button">29</button><button type="button">30</button><button type="button">31</button><button class="is-muted" type="button">1</button><button class="is-muted" type="button">2</button><button class="is-muted" type="button">3</button><button class="is-muted" type="button">4</button><button class="is-muted" type="button">5</button></div>
+    <div class="pk-time-panel" data-pk-time-panel><span class="pk-time-label">时间</span><input class="pk-time-picker" type="time" step="1" value="09:30:00" data-pk-time-picker aria-label="选择时间"><button class="pk-time-confirm" type="button" data-pk-date-confirm>确定</button></div>
+  </div>
+
+  <script type="application/json" data-pk-reference-data>
+    {
+      "sourceType": {"valueKey":"name","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"name","label":"来源类型","width":"220px"}],"rows":[{"seq":"1","name":"手工创建"},{"seq":"2","name":"采购申请单"},{"seq":"3","name":"MRP历史"}]},
+      "businessType": {"valueKey":"name","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"name","label":"业务类型","width":"220px"}],"rows":[{"seq":"1","name":"默认类型"},{"seq":"2","name":"生产采购"},{"seq":"3","name":"备件采购"}]},
+      "supplier": {"valueKey":"code","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"code","label":"供应商编码","width":"180px"},{"key":"name","label":"供应商名称","width":"280px"},{"key":"shortName","label":"供应商简称","width":"180px"}],"rows":[{"seq":"1","code":"000005","name":"创维智造工业电子厂测试","shortName":"创维智造","settleSupplier":"测试供应商","settleMethod":"现金","paymentTerm":"按金额"},{"seq":"2","code":"000002","name":"测试供应商","shortName":"测试供应商","settleSupplier":"测试供应商","settleMethod":"银行转账","paymentTerm":"月结30天"}]},
+      "buyer": {"valueKey":"name","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"code","label":"用户编码","width":"180px"},{"key":"name","label":"采购员","width":"180px"},{"key":"department","label":"采购部门","width":"220px"}],"rows":[{"seq":"1","code":"U-001","name":"王建华","department":"西南片区"},{"seq":"2","code":"U-002","name":"蒋凤霞","department":"西南片区"},{"seq":"3","code":"U-003","name":"刘鑫","department":"东北地区"}]},
+      "department": {"valueKey":"name","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"code","label":"部门编码","width":"180px"},{"key":"name","label":"部门名称","width":"220px"}],"rows":[{"seq":"1","code":"DEP-SW","name":"西南片区"},{"seq":"2","code":"DEP-NE","name":"东北地区"},{"seq":"3","code":"DEP-E","name":"华东片区"}]},
+      "settleSupplier": {"valueKey":"name","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"code","label":"供应商编码","width":"180px"},{"key":"name","label":"结算供应商","width":"260px"}],"rows":[{"seq":"1","code":"000002","name":"测试供应商"},{"seq":"2","code":"000005","name":"创维智造工业电子厂测试"}]},
+      "settleMethod": {"valueKey":"name","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"name","label":"结算方式","width":"220px"}],"rows":[{"seq":"1","name":"现金"},{"seq":"2","name":"银行转账"},{"seq":"3","name":"承兑汇票"}]},
+      "paymentTerm": {"valueKey":"name","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"name","label":"付款条件","width":"220px"}],"rows":[{"seq":"1","name":"按金额"},{"seq":"2","name":"月结30天"},{"seq":"3","name":"货到付款"}]},
+      "materialCode": {"valueKey":"materialCode","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"materialCode","label":"物料编码","width":"180px"},{"key":"materialName","label":"物料名称","width":"240px"},{"key":"spec","label":"规格","width":"180px"},{"key":"model","label":"型号","width":"160px"}],"rows":[{"seq":"1","materialCode":"000000","materialName":"自动化测试专用物料","spec":"","model":"","unit":"个","factory":"成都工厂","unitPrice":21.39},{"seq":"2","materialCode":"00000001","materialName":"yyy-测试物料","spec":"规格","model":"型号","unit":"个","factory":"成都工厂","unitPrice":18.6},{"seq":"3","materialCode":"000001","materialName":"测试物料0516","spec":"12","model":"252","unit":"个","factory":"成都工厂","unitPrice":88.5},{"seq":"4","materialCode":"000002","materialName":"原材料1","spec":"原材料1规格","model":"原材料1型号","unit":"千克","factory":"成都工厂","unitPrice":36},{"seq":"5","materialCode":"000003","materialName":"原材料2","spec":"","model":"","unit":"件","factory":"成都工厂","unitPrice":52}]},
+      "factory": {"valueKey":"name","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"code","label":"工厂编码","width":"180px"},{"key":"name","label":"工厂名称","width":"240px"}],"rows":[{"seq":"1","code":"FAC-001","name":"成都工厂"},{"seq":"2","code":"FAC-002","name":"上海工厂"},{"seq":"3","code":"FAC-003","name":"苏州工厂"}]}
+    }
+  </script>
 
   <div class="pk-message-host" data-pk-message-host aria-live="polite" aria-atomic="true"></div>
   <script src="assets/vendor/prototype-kit.js"></script>
@@ -473,64 +712,415 @@
         sourceType: "手工创建",
         businessType: "默认类型",
         supplier: "创维智造工业电子厂测试",
+        supplierCode: "000005",
         buyer: "蒋凤霞",
         department: "西南片区",
         summary: "设备维修备件",
         documentStatus: "执行中",
-        taxTotal: 10.9
+        settleSupplier: "测试供应商",
+        settleMethod: "现金",
+        paymentTerm: "按金额",
+        lines: [{ code: "000001", name: "测试物料0516", spec: "12", model: "252", unit: "个", factory: "成都工厂", deliveryDate: "2026-08-21", quantity: 1, unitPrice: 9.65, taxRate: 13 }]
       };
+
+      var order = readOrder();
+      var isEditable = order.documentStatus === "草稿";
+      var lines = normalizeLines(order.lines);
+      var hiddenColumns = new Set();
+      var lastDateShell = null;
+
+      var materialColumns = [
+        { key: "ops", label: "操作" }, { key: "index", label: "序号" }, { key: "select", label: "" },
+        { key: "materialCode", label: "物料编码", required: true }, { key: "materialName", label: "物料名称" },
+        { key: "spec", label: "规格" }, { key: "model", label: "型号" }, { key: "unit", label: "计量单位" },
+        { key: "factory", label: "工厂", required: true }, { key: "deliveryDate", label: "期望到货日期" },
+        { key: "gift", label: "赠品" }, { key: "quantity", label: "数量" }, { key: "unitPrice", label: "单价" },
+        { key: "amount", label: "金额" }, { key: "taxRate", label: "税率%" }, { key: "taxAmount", label: "税额" },
+        { key: "taxUnitPrice", label: "含税单价" }, { key: "taxIncludedAmount", label: "含税金额" },
+        { key: "priceTaxTotal", label: "价税合计" }, { key: "sourceNo", label: "来源单号" }, { key: "rowRemark", label: "行备注" }
+      ];
 
       function readOrder() {
         try {
-          return Object.assign({}, fallbackOrder, JSON.parse(sessionStorage.getItem("erp.purchase-order.detail") || "{}"));
+          var storedOrder = JSON.parse(sessionStorage.getItem("erp.purchase-order.detail") || "{}");
+          var mergedOrder = Object.assign({}, fallbackOrder, storedOrder);
+          if (Object.prototype.hasOwnProperty.call(storedOrder, "supplier") && !storedOrder.supplier) {
+            mergedOrder.supplierCode = "";
+            mergedOrder.settleSupplier = "";
+            mergedOrder.settleMethod = "";
+            mergedOrder.paymentTerm = "";
+          }
+          return mergedOrder;
         } catch (error) {
-          return fallbackOrder;
+          return Object.assign({}, fallbackOrder);
         }
       }
 
-      function writeField(name, value) {
-        document.querySelectorAll('[data-detail-field="' + name + '"]').forEach(function (node) {
-          if ("value" in node) node.value = value == null ? "" : String(value);
-          else node.textContent = value == null ? "" : String(value);
+      function number(value) {
+        var result = Number(value);
+        return Number.isFinite(result) ? result : 0;
+      }
+
+      function money(value) {
+        return number(value).toFixed(2);
+      }
+
+      function escapeHtml(value) {
+        return String(value == null ? "" : value).replace(/[&<>\"]/g, function (character) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[character];
+        });
+      }
+
+      function emptyLine() {
+        return { materialCode: "", materialName: "", spec: "", model: "", unit: "", factory: "", deliveryDate: order.date || "2026-08-04", gift: false, quantity: 1, unitPrice: 0, amount: 0, taxRate: 13, taxAmount: 0, taxUnitPrice: 0, taxIncludedAmount: 0, priceTaxTotal: 0, sourceNo: "", rowRemark: "" };
+      }
+
+      function calculateLine(line) {
+        line.quantity = Math.max(0, number(line.quantity));
+        line.unitPrice = Math.max(0, number(line.unitPrice));
+        line.taxRate = Math.max(0, number(line.taxRate));
+        var effectiveUnitPrice = line.gift ? 0 : line.unitPrice;
+        line.amount = line.quantity * effectiveUnitPrice;
+        line.taxAmount = line.amount * line.taxRate / 100;
+        line.taxUnitPrice = effectiveUnitPrice * (1 + line.taxRate / 100);
+        line.taxIncludedAmount = line.amount + line.taxAmount;
+        line.priceTaxTotal = line.taxIncludedAmount;
+        return line;
+      }
+
+      function normalizeLines(source) {
+        var items = Array.isArray(source) && source.length ? source : [emptyLine()];
+        return items.map(function (item) {
+          var taxPrice = number(item.taxPrice);
+          var line = Object.assign(emptyLine(), item, {
+            materialCode: item.materialCode || item.code || "",
+            materialName: item.materialName || item.name || "",
+            deliveryDate: item.deliveryDate || item.expectedDate || order.date || "2026-08-04",
+            quantity: item.quantity == null ? 1 : item.quantity,
+            unitPrice: item.unitPrice == null ? (taxPrice ? taxPrice / 1.13 : 0) : item.unitPrice,
+            taxRate: item.taxRate == null ? 13 : item.taxRate
+          });
+          return calculateLine(line);
         });
       }
 
       function notify(message, type) {
-        if (window.PrototypeKit && typeof window.PrototypeKit.message === "function") {
-          window.PrototypeKit.message(message, type || "info", 2200);
-        }
+        if (window.PrototypeKit && typeof window.PrototypeKit.message === "function") window.PrototypeKit.message(message, type || "info", 2200);
       }
 
-      var order = readOrder();
-      writeField("code", order.code);
-      writeField("date", order.date);
-      writeField("sourceType", order.sourceType);
-      writeField("businessType", order.businessType);
-      writeField("supplier", order.supplier);
-      writeField("supplierCode", order.supplier ? "000005" : "");
-      writeField("buyer", order.buyer);
-      writeField("department", order.department);
-      writeField("summary", order.summary);
-      writeField("documentStatus", order.documentStatus);
-      writeField("taxTotal", Number(order.taxTotal || 0).toFixed(2));
-      document.title = "采购订单详情 - " + order.code;
-      document.querySelectorAll("[data-line-status]").forEach(function (cell) { cell.textContent = order.documentStatus; });
+      function setReferenceValue(key, value, disabled) {
+        var shell = document.querySelector('[data-header-reference="' + key + '"]');
+        if (!shell) return;
+        var node = shell.querySelector(".value");
+        var text = value == null ? "" : String(value);
+        node.textContent = text || shell.dataset.placeholder || (key === "supplierCode" ? "请选择供应商" : "请选择");
+        node.classList.toggle("placeholder", !text);
+        shell.classList.toggle("has-clear-value", Boolean(text));
+        shell.classList.toggle("is-disabled", Boolean(disabled));
+      }
 
-      document.addEventListener("click", function (event) {
-        var action = event.target.closest("[data-detail-action]");
-        if (!action) return;
-        var label = action.dataset.detailAction;
-        if (label === "刷新") {
-          notify("数据已刷新", "success");
+      function syncHeader() {
+        document.getElementById("documentCode").value = order.code || "保存后自动生成";
+        document.querySelector("#documentDate [data-pk-date-value]").textContent = order.date || "2026-08-04";
+        setReferenceValue("sourceType", order.sourceType || "", !isEditable);
+        setReferenceValue("businessType", order.businessType || "", !isEditable);
+        setReferenceValue("supplierCode", order.supplierCode || (order.supplier ? "000005" : ""), !isEditable);
+        document.getElementById("supplierName").value = order.supplier || "";
+        setReferenceValue("buyer", order.buyer || "王建华", !isEditable);
+        setReferenceValue("department", order.department || "西南片区", !isEditable);
+        setReferenceValue("settleSupplier", order.settleSupplier || (order.supplier ? "测试供应商" : ""), !isEditable || !order.supplier);
+        setReferenceValue("settleMethod", order.settleMethod || (order.supplier ? "现金" : ""), !isEditable || !order.supplier);
+        setReferenceValue("paymentTerm", order.paymentTerm || (order.supplier ? "按金额" : ""), !isEditable || !order.supplier);
+        document.getElementById("documentSummary").value = order.summary || "";
+        document.getElementById("documentSummary").readOnly = !isEditable;
+        document.getElementById("basicForm").classList.toggle("po-readonly", !isEditable);
+        document.getElementById("financeForm").classList.toggle("po-readonly", !isEditable);
+        document.getElementById("statusStamp").textContent = order.documentStatus || "草稿";
+        document.getElementById("saveButton").disabled = !isEditable;
+        document.getElementById("addLineButton").disabled = !isEditable;
+        document.title = "采购订单详情 - " + (order.code || "新建");
+        updateTotals();
+      }
+
+      function headerCell(column) {
+        var hidden = hiddenColumns.has(column.key) ? " po-hidden-column" : "";
+        var required = column.required ? '<span class="required">*</span>' : "";
+        return '<th class="' + hidden.trim() + '" data-column-key="' + column.key + '"><div class="cell">' + required + escapeHtml(column.label) + "</div></th>";
+      }
+
+      function actionButtons(index) {
+        if (!isEditable) return '<span class="pk-table-readonly"></span>';
+        return '<div class="pk-row-actions">'
+          + '<button type="button" data-row-action="add" data-row-index="' + index + '" title="新增行" aria-label="新增行"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>'
+          + '<button type="button" data-row-action="copy" data-row-index="' + index + '" title="复制行" aria-label="复制行"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>'
+          + '<button class="is-danger" type="button" data-row-action="delete" data-row-index="' + index + '" title="删除行" aria-label="删除行"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>'
+          + "</div>";
+      }
+
+      function referenceCell(source, value, label, index) {
+        var text = value || "";
+        return '<div class="pk-table-reference' + (text ? " has-clear-value" : "") + '" data-pk-reference-trigger="' + source + '" data-row-index="' + index + '" tabindex="0" aria-haspopup="true" aria-expanded="false"><input class="pk-table-reference-input" value="' + escapeHtml(text) + '" readonly placeholder="请选择' + escapeHtml(label) + '" aria-label="' + escapeHtml(label) + '"><button class="pk-table-clear-btn" type="button" aria-label="清除"></button><span class="pk-table-reference-suffix">...</span></div>';
+      }
+
+      function inputCell(key, value, index, inputMode) {
+        return '<div class="pk-table-field has-clear-value"><input class="pk-table-input" type="text" ' + (inputMode ? 'inputmode="' + inputMode + '" ' : "") + 'value="' + escapeHtml(value) + '" data-line-field="' + key + '" data-row-index="' + index + '" aria-label="' + key + '"' + (isEditable ? "" : " readonly") + '></div>';
+      }
+
+      function materialCell(column, line, index) {
+        var hidden = hiddenColumns.has(column.key) ? " po-hidden-column" : "";
+        var content = "";
+        if (column.key === "ops") content = actionButtons(index);
+        else if (column.key === "index") content = String(index + 1);
+        else if (column.key === "select") content = '<input class="pk-table-checkbox" type="checkbox" aria-label="选择第 ' + (index + 1) + ' 行">';
+        else if (column.key === "materialCode") content = referenceCell("materialCode", line.materialCode, "物料编码", index);
+        else if (column.key === "factory") content = referenceCell("factory", line.factory, "工厂", index);
+        else if (column.key === "deliveryDate") content = '<div class="pk-input-shell pk-date-input-shell has-clear-value" data-line-date="' + index + '" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false"><span class="prefix-icon" aria-hidden="true">▣</span><span class="value" data-pk-date-value>' + escapeHtml(line.deliveryDate) + "</span></div>";
+        else if (column.key === "gift") content = '<input class="pk-checkbox" type="checkbox" data-line-field="gift" data-row-index="' + index + '" aria-label="赠品"' + (line.gift ? " checked" : "") + (isEditable ? "" : " disabled") + ">";
+        else if (["quantity", "unitPrice", "taxRate"].indexOf(column.key) !== -1) content = inputCell(column.key, column.key === "unitPrice" ? money(line[column.key]) : line[column.key], index, "decimal");
+        else if (column.key === "rowRemark") content = inputCell(column.key, line[column.key], index, "");
+        else if (["amount", "taxAmount", "taxUnitPrice", "taxIncludedAmount", "priceTaxTotal"].indexOf(column.key) !== -1) content = '<span class="pk-table-readonly">' + money(line[column.key]) + "</span>";
+        else content = '<span class="pk-table-readonly">' + escapeHtml(line[column.key]) + "</span>";
+        return '<td class="' + hidden.trim() + '" data-column-key="' + column.key + '"><div class="cell">' + content + "</div></td>";
+      }
+
+      function renderMaterialTable() {
+        document.getElementById("materialHead").innerHTML = "<tr>" + materialColumns.map(headerCell).join("") + "</tr>";
+        document.getElementById("materialBody").innerHTML = lines.map(function (line, index) {
+          return '<tr data-material-row="' + index + '">' + materialColumns.map(function (column) { return materialCell(column, line, index); }).join("") + "</tr>";
+        }).join("");
+        var totals = getTotals();
+        document.getElementById("materialFoot").innerHTML = '<tr>' + materialColumns.map(function (column) {
+          var value = column.key === "ops" ? "合计" : column.key === "quantity" ? money(totals.quantity) : ["amount", "taxAmount", "taxIncludedAmount", "priceTaxTotal"].indexOf(column.key) !== -1 ? money(totals[column.key]) : "";
+          return '<td class="' + (hiddenColumns.has(column.key) ? "po-hidden-column" : "") + '" data-column-key="' + column.key + '"><div class="cell">' + value + "</div></td>";
+        }).join("") + "</tr>";
+        document.getElementById("materialTable").classList.toggle("is-readonly", !isEditable);
+        if (window.PrototypeKit) window.PrototypeKit.init(document);
+        renderSummary();
+        renderExecution();
+        updateTotals();
+      }
+
+      function getTotals() {
+        return lines.reduce(function (totals, line) {
+          ["quantity", "amount", "taxAmount", "taxIncludedAmount", "priceTaxTotal"].forEach(function (key) { totals[key] += number(line[key]); });
+          return totals;
+        }, { quantity: 0, amount: 0, taxAmount: 0, taxIncludedAmount: 0, priceTaxTotal: 0 });
+      }
+
+      function updateTotals() {
+        document.getElementById("headerTaxTotal").value = money(getTotals().priceTaxTotal);
+      }
+
+      function renderSummary() {
+        var totals = getTotals();
+        document.getElementById("summaryBody").innerHTML = lines.map(function (line, index) {
+          return "<tr>" + [index + 1, line.materialCode, line.materialName, line.spec, line.model, line.unit, money(line.quantity), money(line.unitPrice), money(line.amount), money(line.taxAmount), money(line.taxIncludedAmount), money(line.priceTaxTotal)].map(function (value) { return '<td><div class="cell">' + escapeHtml(value) + "</div></td>"; }).join("") + "</tr>";
+        }).join("");
+        document.getElementById("summaryFoot").innerHTML = '<tr><td><div class="cell">合计</div></td><td colspan="5"></td><td><div class="cell">' + money(totals.quantity) + '</div></td><td></td><td><div class="cell">' + money(totals.amount) + '</div></td><td><div class="cell">' + money(totals.taxAmount) + '</div></td><td><div class="cell">' + money(totals.taxIncludedAmount) + '</div></td><td><div class="cell">' + money(totals.priceTaxTotal) + "</div></td></tr>";
+      }
+
+      function renderExecution() {
+        var totals = getTotals();
+        document.getElementById("executionBody").innerHTML = lines.map(function (line, index) {
+          var values = [index + 1, line.materialCode, line.materialName, line.unit, money(line.quantity), money(line.amount), money(line.taxAmount), money(line.priceTaxTotal), "0.00", "0.00", "0.00", money(line.quantity), money(line.priceTaxTotal), order.documentStatus || "草稿"];
+          return "<tr>" + values.map(function (value) { return '<td><div class="cell">' + escapeHtml(value) + "</div></td>"; }).join("") + "</tr>";
+        }).join("");
+        document.getElementById("executionFoot").innerHTML = '<tr><td><div class="cell">合计</div></td><td colspan="3"></td><td><div class="cell">' + money(totals.quantity) + '</div></td><td><div class="cell">' + money(totals.amount) + '</div></td><td><div class="cell">' + money(totals.taxAmount) + '</div></td><td><div class="cell">' + money(totals.priceTaxTotal) + '</div></td><td colspan="6"></td></tr>';
+      }
+
+      function activateTab(selector, paneSelector, key) {
+        document.querySelectorAll(selector).forEach(function (tab) {
+          var active = tab.dataset.sectionTab === key || tab.dataset.detailTab === key;
+          tab.classList.toggle("is-active", active);
+          tab.setAttribute("aria-selected", active ? "true" : "false");
+        });
+        document.querySelectorAll(paneSelector).forEach(function (pane) {
+          pane.hidden = (pane.dataset.pane || pane.dataset.detailPane) !== key;
+        });
+      }
+
+      function saveOrder() {
+        order.summary = document.getElementById("documentSummary").value.trim();
+        var missing = !order.sourceType ? "来源类型" : !order.businessType ? "业务类型" : !order.date ? "单据日期" : !order.supplier ? "供应商" : "";
+        if (!missing) {
+          var invalidLine = lines.findIndex(function (line) { return !line.materialCode || !line.factory; });
+          if (invalidLine !== -1) missing = "第 " + (invalidLine + 1) + " 行的物料编码和工厂";
+        }
+        if (missing) {
+          notify("请完善" + missing, "warning");
           return;
         }
-        if (label === "保存") {
-          notify("采购订单已保存", "success");
+        if (!order.code || order.code === "保存后自动生成") order.code = "20260804-0619";
+        order.taxTotal = getTotals().priceTaxTotal;
+        order.lines = lines.map(function (line) { return Object.assign({}, line, { code: line.materialCode, name: line.materialName, deliveryDate: line.deliveryDate }); });
+        sessionStorage.setItem("erp.purchase-order.detail", JSON.stringify(order));
+        syncHeader();
+        notify("采购订单已保存", "success");
+      }
+
+      document.addEventListener("pk:reference-change", function (event) {
+        var trigger = event.target.closest("[data-pk-reference-trigger]");
+        if (!trigger || !event.detail) return;
+        var row = event.detail.row || {};
+        var headerKey = trigger.dataset.headerReference;
+        if (headerKey) {
+          if (headerKey === "supplierCode") {
+            order.supplierCode = row.code || event.detail.value;
+            order.supplier = row.name || "";
+            order.settleSupplier = row.settleSupplier || "";
+            order.settleMethod = row.settleMethod || "";
+            order.paymentTerm = row.paymentTerm || "";
+          } else {
+            order[headerKey] = event.detail.value;
+            if (headerKey === "buyer" && row.department) order.department = row.department;
+          }
+          syncHeader();
           return;
         }
-        notify("已选择“" + label + "”", "info");
+        var rowIndex = Number(trigger.dataset.rowIndex);
+        if (!Number.isInteger(rowIndex) || !lines[rowIndex]) return;
+        if (event.detail.source === "materialCode") {
+          Object.assign(lines[rowIndex], { materialCode: row.materialCode || "", materialName: row.materialName || "", spec: row.spec || "", model: row.model || "", unit: row.unit || "", factory: row.factory || "", unitPrice: row.unitPrice == null ? lines[rowIndex].unitPrice : row.unitPrice });
+        }
+        if (event.detail.source === "factory") lines[rowIndex].factory = row.name || event.detail.value;
+        calculateLine(lines[rowIndex]);
+        renderMaterialTable();
       });
 
+      document.addEventListener("input", function (event) {
+        var input = event.target.closest("[data-line-field]");
+        if (!input || !isEditable) return;
+        var index = Number(input.dataset.rowIndex);
+        var key = input.dataset.lineField;
+        if (!lines[index]) return;
+        lines[index][key] = key === "gift" ? input.checked : input.value;
+        calculateLine(lines[index]);
+        if (["quantity", "unitPrice", "taxRate", "gift"].indexOf(key) !== -1) {
+          var row = input.closest("tr");
+          ["amount", "taxAmount", "taxUnitPrice", "taxIncludedAmount", "priceTaxTotal"].forEach(function (field) {
+            var cell = row.querySelector('[data-column-key="' + field + '"] .pk-table-readonly');
+            if (cell) cell.textContent = money(lines[index][field]);
+          });
+          renderSummary();
+          renderExecution();
+          updateTotals();
+          var foot = document.getElementById("materialFoot");
+          var totals = getTotals();
+          ["quantity", "amount", "taxAmount", "taxIncludedAmount", "priceTaxTotal"].forEach(function (field) {
+            var cell = foot.querySelector('[data-column-key="' + field + '"] .cell');
+            if (cell) cell.textContent = money(totals[field]);
+          });
+        }
+      });
+
+      document.addEventListener("change", function (event) {
+        if (event.target.matches('[data-line-field="gift"]')) event.target.dispatchEvent(new Event("input", { bubbles: true }));
+        var toggle = event.target.closest("[data-column-toggle]");
+        if (toggle) {
+          if (toggle.checked) hiddenColumns.delete(toggle.dataset.columnToggle);
+          else hiddenColumns.add(toggle.dataset.columnToggle);
+          renderMaterialTable();
+        }
+      });
+
+      document.addEventListener("click", function (event) {
+        var sectionTab = event.target.closest("[data-section-tab]");
+        if (sectionTab) {
+          activateTab("[data-section-tab]", "[data-pane]", sectionTab.dataset.sectionTab);
+          document.getElementById("statusStamp").style.display = ["basic", "finance"].indexOf(sectionTab.dataset.sectionTab) !== -1 ? "flex" : "none";
+          return;
+        }
+        var detailTab = event.target.closest("[data-detail-tab]");
+        if (detailTab) {
+          activateTab("[data-detail-tab]", "[data-detail-pane]", detailTab.dataset.detailTab);
+          return;
+        }
+        var rowAction = event.target.closest("[data-row-action]");
+        if (rowAction && isEditable) {
+          var index = Number(rowAction.dataset.rowIndex);
+          if (rowAction.dataset.rowAction === "add") lines.splice(index + 1, 0, emptyLine());
+          if (rowAction.dataset.rowAction === "copy") lines.splice(index + 1, 0, calculateLine(Object.assign({}, lines[index])));
+          if (rowAction.dataset.rowAction === "delete") {
+            if (lines.length === 1) lines[0] = emptyLine();
+            else lines.splice(index, 1);
+          }
+          renderMaterialTable();
+          return;
+        }
+        if (event.target.closest("#addLineButton") && isEditable) {
+          lines.push(emptyLine());
+          renderMaterialTable();
+          return;
+        }
+        if (event.target.closest("#columnButton")) {
+          document.getElementById("columnPanel").hidden = !document.getElementById("columnPanel").hidden;
+          return;
+        }
+        if (!event.target.closest("#columnPanel")) document.getElementById("columnPanel").hidden = true;
+        var action = event.target.closest("[data-detail-action]");
+        if (action) {
+          if (action.dataset.detailAction === "刷新") location.reload();
+          else notify("已选择“" + action.dataset.detailAction + "”", "info");
+        }
+      });
+
+      document.getElementById("saveButton").addEventListener("click", saveOrder);
+      document.getElementById("headerCollapseButton").addEventListener("click", function () {
+        var expanded = document.getElementById("documentSection").classList.toggle("is-collapsed") === false;
+        this.classList.toggle("is-expanded", expanded);
+        this.setAttribute("aria-label", expanded ? "收起基本信息" : "展开基本信息");
+      });
+
+      document.getElementById("materialSearch").addEventListener("input", function () {
+        var keyword = this.value.trim().toLowerCase();
+        document.querySelectorAll("[data-material-row]").forEach(function (row) {
+          row.hidden = keyword && row.textContent.toLowerCase().indexOf(keyword) === -1;
+        });
+      });
+
+      function toggleFullscreen() {
+        document.querySelector(".po-detail-page").classList.toggle("is-fullscreen");
+      }
+
+      document.getElementById("fullscreenButton").addEventListener("click", toggleFullscreen);
+      document.querySelectorAll("[data-pane-fullscreen]").forEach(function (button) { button.addEventListener("click", toggleFullscreen); });
+
+      document.addEventListener("click", function (event) {
+        var shell = event.target.closest(".pk-date-input-shell");
+        if (shell) lastDateShell = shell;
+        var day = event.target.closest(".pk-date-days button:not(.is-muted)");
+        if (!day || !lastDateShell || !isEditable) return;
+        window.setTimeout(function () {
+          var value = (order.date || "2026-08-04").slice(0, 7) + "-" + String(day.textContent.trim()).padStart(2, "0");
+          var valueNode = lastDateShell.querySelector("[data-pk-date-value]");
+          if (valueNode) valueNode.textContent = value;
+          if (lastDateShell.id === "documentDate") {
+            var previousDate = order.date;
+            order.date = value;
+            lines.forEach(function (line) { if (!line.deliveryDate || line.deliveryDate === previousDate) line.deliveryDate = value; });
+            renderMaterialTable();
+          } else if (lastDateShell.dataset.lineDate) {
+            var index = Number(lastDateShell.dataset.lineDate);
+            if (lines[index]) lines[index].deliveryDate = value;
+          }
+        }, 0);
+      }, true);
+
+      var supplierClearButton = document.querySelector('[data-header-reference="supplierCode"] .input-clear-btn');
+      supplierClearButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!isEditable) return;
+        order.supplierCode = "";
+        order.supplier = "";
+        order.settleSupplier = "";
+        order.settleMethod = "";
+        order.paymentTerm = "";
+        syncHeader();
+      });
+
+      syncHeader();
+      renderMaterialTable();
       if (window.PrototypeKit) window.PrototypeKit.init(document);
     })();
   </script>
