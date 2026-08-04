@@ -149,7 +149,15 @@
                   "purchase-order",
                   "采购订单",
                   "#/supply-chain-management/purchase-management/purchase-execution/purchase-order",
-                  "采购订单-列表.html"
+                  "采购订单-列表.html",
+                  [
+                    {
+                      id: "purchase-order-detail",
+                      label: "采购订单详情",
+                      route: "#/supply-chain-management/purchase-management/purchase-execution/purchase-order/detail",
+                      page: "采购订单-详情.html"
+                    }
+                  ]
                 ),
                 leaf("purchase-order-change", "采购订单变更单", "#/supply-chain-management/purchase-management/purchase-execution/purchase-order-change"),
                 leaf("purchase-receipt", "采购收货单", "#/supply-chain-management/purchase-management/purchase-execution/purchase-receipt"),

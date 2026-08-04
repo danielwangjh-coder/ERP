@@ -21,6 +21,29 @@
       font-family: var(--pk-font, "Microsoft YaHei", Arial, sans-serif);
     }
 
+    .srm-prototype {
+      width: 100%;
+      min-width: 760px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: #f7f8fa;
+    }
+
+    .layout,
+    .content {
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex: 1;
+    }
+
+    .content {
+      position: relative;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
     button,
     input,
     select {
@@ -40,14 +63,44 @@
       flex-wrap: wrap;
     }
 
-    .po-dropdown-btn::after {
+    .po-list-toolbar .pk-toolbar-dropdown,
+    .po-list-toolbar .pk-toolbar-dropdown-trigger {
+      height: 28px;
+    }
+
+    .po-list-toolbar .pk-toolbar-dropdown-trigger {
+      border-radius: 3px;
+    }
+
+    .po-list-toolbar .pk-toolbar-dropdown-menu {
+      top: 33px;
+      min-width: 150px;
+      max-height: 286px;
+      overflow-y: auto;
+      scrollbar-gutter: stable;
+    }
+
+    .po-list-toolbar .pk-toolbar-dropdown-menu--wide {
+      min-width: 194px;
+    }
+
+    .po-list-toolbar .pk-toolbar-dropdown-menu li {
+      min-height: 34px;
+      height: auto;
+      padding: 0 18px;
+      gap: 12px;
+      font-size: 14px;
+    }
+
+    .po-related-query-item::before {
       content: "";
-      width: 0;
-      height: 0;
-      margin-left: 6px;
-      border-right: 4px solid transparent;
-      border-left: 4px solid transparent;
-      border-top: 5px solid currentColor;
+      width: 9px;
+      height: 9px;
+      flex: 0 0 9px;
+      margin-left: 2px;
+      border-top: 2px solid #aab4bf;
+      border-left: 2px solid #aab4bf;
+      transform: rotate(45deg);
     }
 
     .po-detail-toggle {
@@ -138,6 +191,97 @@
       font-weight: 600;
     }
 
+    .po-reference-popover {
+      width: min(680px, calc(100vw - 24px));
+      min-height: 0;
+      padding: 0;
+      border-radius: 4px;
+    }
+
+    .po-reference-popover .popover-table {
+      height: auto;
+      max-height: 360px;
+      border: 0;
+    }
+
+    .po-reference-popover table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .po-reference-popover th,
+    .po-reference-popover td {
+      height: 36px;
+      padding: 0 12px;
+      border-right: 1px solid #e8eaec;
+      border-bottom: 1px solid #e8eaec;
+      color: #606266;
+      font-size: 14px;
+      font-weight: 400;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .po-reference-popover th {
+      height: 40px;
+      background: #eaf8ff;
+      color: #303133;
+      font-weight: 600;
+    }
+
+    .po-reference-popover tbody tr {
+      cursor: pointer;
+    }
+
+    .po-reference-popover tbody tr:hover td,
+    .po-reference-popover tbody tr.is-selected td {
+      background: #eaf5fd;
+    }
+
+    .po-reference-pagination {
+      min-height: 38px;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      color: #606266;
+      border-top: 1px solid #ebeef5;
+      background: #fff;
+      font-size: 13px;
+    }
+
+    .po-reference-page {
+      min-width: 24px;
+      height: 24px;
+      border: 0;
+      border-radius: 2px;
+      background: transparent;
+      color: #606266;
+    }
+
+    .po-reference-page.is-active {
+      background: #409eff;
+      color: #fff;
+    }
+
+    .po-approval-select {
+      width: 100%;
+    }
+
+    .po-approval-select .pk-select-trigger {
+      width: 100%;
+      justify-content: flex-start;
+      color: #909399;
+    }
+
+    .po-approval-select .pk-menu {
+      width: 100%;
+    }
+
     @media (max-width: 1180px) {
       .pk-query-summary {
         align-items: flex-start;
@@ -155,8 +299,10 @@
   </style>
 </head>
 <body>
-  <main class="pk-list-page po-list-page" data-pk-list-workbench>
-    <section class="pk-query-panel" aria-label="采购订单查询">
+  <div class="srm-prototype" data-testid="purchase-order-page">
+    <div class="layout">
+  <main class="content pk-list-page po-list-page" data-pk-list-workbench>
+    <section class="ddp-search pk-query-panel" aria-label="采购订单查询">
       <div class="pk-query-summary">
         <div class="pk-query-left">
           <select class="pk-query-view" id="listView" aria-label="列表视图">
@@ -208,33 +354,33 @@
           </div>
           <div class="pk-query-field">
             <label id="sourceTypeLabel">来源类型</label>
-            <div class="pk-input-shell" data-pk-query-reference-trigger="sourceType" data-pk-placeholder="请选择来源类型" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="sourceTypeLabel">
-              <input type="hidden" value="[]" data-pk-query-reference-input>
-              <span class="value placeholder" data-pk-query-reference-value>请选择来源类型</span>
+            <div class="pk-input-shell" data-po-query-reference-trigger="sourceType" data-pk-placeholder="请选择来源类型" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="sourceTypeLabel">
+              <input type="hidden" value="[]" data-po-query-reference-input>
+              <span class="value placeholder" data-po-query-reference-value>请选择来源类型</span>
               <span class="suffix-button">...</span>
             </div>
           </div>
           <div class="pk-query-field">
             <label id="contractTypeLabel">合同类型</label>
-            <div class="pk-input-shell" data-pk-query-reference-trigger="contractType" data-pk-placeholder="请选择合同类型" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="contractTypeLabel">
-              <input type="hidden" value="[]" data-pk-query-reference-input>
-              <span class="value placeholder" data-pk-query-reference-value>请选择合同类型</span>
+            <div class="pk-input-shell" data-po-query-reference-trigger="contractType" data-pk-placeholder="请选择合同类型" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="contractTypeLabel">
+              <input type="hidden" value="[]" data-po-query-reference-input>
+              <span class="value placeholder" data-po-query-reference-value>请选择合同类型</span>
               <span class="suffix-button">...</span>
             </div>
           </div>
           <div class="pk-query-field">
             <label id="businessTypeLabel">业务类型</label>
-            <div class="pk-input-shell" data-pk-query-reference-trigger="businessType" data-pk-placeholder="请选择业务类型" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="businessTypeLabel">
-              <input type="hidden" value="[]" data-pk-query-reference-input>
-              <span class="value placeholder" data-pk-query-reference-value>请选择业务类型</span>
+            <div class="pk-input-shell" data-po-query-reference-trigger="businessType" data-pk-placeholder="请选择业务类型" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="businessTypeLabel">
+              <input type="hidden" value="[]" data-po-query-reference-input>
+              <span class="value placeholder" data-po-query-reference-value>请选择业务类型</span>
               <span class="suffix-button">...</span>
             </div>
           </div>
           <div class="pk-query-field">
             <label id="supplierLabel">供应商</label>
-            <div class="pk-input-shell" data-pk-query-reference-trigger="supplier" data-pk-placeholder="请选择供应商" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="supplierLabel">
-              <input type="hidden" value="[]" data-pk-query-reference-input>
-              <span class="value placeholder" data-pk-query-reference-value>请选择供应商</span>
+            <div class="pk-input-shell" data-po-query-reference-trigger="supplier" data-pk-placeholder="请选择供应商" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="supplierLabel">
+              <input type="hidden" value="[]" data-po-query-reference-input>
+              <span class="value placeholder" data-po-query-reference-value>请选择供应商</span>
               <span class="suffix-button">...</span>
             </div>
           </div>
@@ -248,17 +394,17 @@
           </div>
           <div class="pk-query-field">
             <label id="buyerLabel">采购员</label>
-            <div class="pk-input-shell" data-pk-query-reference-trigger="buyer" data-pk-placeholder="请选择采购员" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="buyerLabel">
-              <input type="hidden" value="[]" data-pk-query-reference-input>
-              <span class="value placeholder" data-pk-query-reference-value>请选择采购员</span>
+            <div class="pk-input-shell" data-po-query-reference-trigger="buyer" data-pk-placeholder="请选择采购员" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="buyerLabel">
+              <input type="hidden" value="[]" data-po-query-reference-input>
+              <span class="value placeholder" data-po-query-reference-value>请选择采购员</span>
               <span class="suffix-button">...</span>
             </div>
           </div>
           <div class="pk-query-field">
             <label id="departmentLabel">采购部门</label>
-            <div class="pk-input-shell" data-pk-query-reference-trigger="department" data-pk-placeholder="请选择采购部门" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="departmentLabel">
-              <input type="hidden" value="[]" data-pk-query-reference-input>
-              <span class="value placeholder" data-pk-query-reference-value>请选择采购部门</span>
+            <div class="pk-input-shell" data-po-query-reference-trigger="department" data-pk-placeholder="请选择采购部门" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="departmentLabel">
+              <input type="hidden" value="[]" data-po-query-reference-input>
+              <span class="value placeholder" data-po-query-reference-value>请选择采购部门</span>
               <span class="suffix-button">...</span>
             </div>
           </div>
@@ -268,18 +414,26 @@
           </div>
           <div class="pk-query-field">
             <label id="documentStatusLabel">单据状态</label>
-            <div class="pk-input-shell" data-pk-query-reference-trigger="documentStatus" data-pk-placeholder="请选择单据状态" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="documentStatusLabel">
-              <input type="hidden" value="[]" data-pk-query-reference-input>
-              <span class="value placeholder" data-pk-query-reference-value>请选择单据状态</span>
+            <div class="pk-input-shell" data-po-query-reference-trigger="documentStatus" data-pk-placeholder="请选择单据状态" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="documentStatusLabel">
+              <input type="hidden" value="[]" data-po-query-reference-input>
+              <span class="value placeholder" data-po-query-reference-value>请选择单据状态</span>
               <span class="suffix-button">...</span>
             </div>
           </div>
           <div class="pk-query-field">
             <label id="approvalStatusLabel">审批状态</label>
-            <div class="pk-input-shell" data-pk-query-reference-trigger="approvalStatus" data-pk-placeholder="请选择审批状态" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="approvalStatusLabel">
-              <input type="hidden" value="[]" data-pk-query-reference-input>
-              <span class="value placeholder" data-pk-query-reference-value>请选择审批状态</span>
-              <span class="suffix-button">...</span>
+            <div class="pk-select po-approval-select" id="approvalStatusSelect">
+              <input id="approvalStatusInput" type="hidden" value="">
+              <button class="pk-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="approvalStatusLabel approvalStatusValue"><span id="approvalStatusValue" data-pk-value>请选择审批状态</span></button>
+              <span class="pk-caret" aria-hidden="true"></span>
+              <ul class="pk-menu" role="listbox" aria-label="审批状态">
+                <li class="pk-option" data-value="待审批" role="option" aria-selected="false" tabindex="0">待审批</li>
+                <li class="pk-option" data-value="审批中" role="option" aria-selected="false" tabindex="-1">审批中</li>
+                <li class="pk-option" data-value="已结束" role="option" aria-selected="false" tabindex="-1">已结束</li>
+                <li class="pk-option" data-value="已拒绝" role="option" aria-selected="false" tabindex="-1">已拒绝</li>
+                <li class="pk-option" data-value="已撤回" role="option" aria-selected="false" tabindex="-1">已撤回</li>
+                <li class="pk-option" data-value="已终止" role="option" aria-selected="false" tabindex="-1">已终止</li>
+              </ul>
             </div>
           </div>
           <div class="pk-query-mode">
@@ -289,22 +443,53 @@
       </div>
     </section>
 
-    <section class="pk-list-surface">
-      <div class="pk-list-toolbar po-list-toolbar">
-        <div class="pk-list-toolbar-left">
-          <button class="pk-list-toolbar-btn is-primary" id="createButton" type="button" data-pk-dialog-open="purchaseOrderDetailDialog">新增</button>
-          <button class="pk-list-toolbar-btn po-dropdown-btn" type="button" data-po-action="import">导入</button>
+    <section class="list-table-shell pk-list-surface" aria-label="采购订单列表">
+      <div class="list-toolbar pk-list-toolbar po-list-toolbar">
+        <div class="list-toolbar-left pk-list-toolbar-left">
+          <button class="pk-list-toolbar-btn is-primary" id="createButton" type="button">新增</button>
+          <div class="pk-toolbar-dropdown" data-pk-toolbar-dropdown>
+            <button class="pk-toolbar-dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false"><span>导入</span><span class="pk-toolbar-dropdown-caret"></span></button>
+            <ul class="pk-toolbar-dropdown-menu" role="menu">
+              <li role="menuitem" data-po-menu-action="下载导入模板">下载导入模板</li>
+              <li role="menuitem" data-po-menu-action="导入">导入</li>
+            </ul>
+          </div>
           <button class="pk-list-toolbar-btn" type="button" data-po-action="void">作废</button>
           <button class="pk-list-toolbar-btn" type="button" data-po-action="cancel-void">取消作废</button>
           <button class="pk-list-toolbar-btn" type="button" data-po-action="delete">删除</button>
           <button class="pk-list-toolbar-btn" type="button" data-po-action="submit">提交</button>
-          <button class="pk-list-toolbar-btn po-dropdown-btn" type="button" data-po-action="related-generate">关联生成</button>
-          <button class="pk-list-toolbar-btn po-dropdown-btn" type="button" data-po-action="related-query">关联查询</button>
+          <div class="pk-toolbar-dropdown" data-pk-toolbar-dropdown>
+            <button class="pk-toolbar-dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false"><span>关联生成</span><span class="pk-toolbar-dropdown-caret"></span></button>
+            <ul class="pk-toolbar-dropdown-menu pk-toolbar-dropdown-menu--wide" role="menu">
+              <li role="menuitem" data-po-menu-action="采购收货单">采购收货单</li>
+              <li role="menuitem" data-po-menu-action="采购入库单">采购入库单</li>
+              <li role="menuitem" data-po-menu-action="期初预付款单">期初预付款单</li>
+              <li role="menuitem" data-po-menu-action="预付款单">预付款单</li>
+              <li role="menuitem" data-po-menu-action="采购订单变更单">采购订单变更单</li>
+              <li role="menuitem" data-po-menu-action="期初财务应付单">期初财务应付单</li>
+              <li role="menuitem" data-po-menu-action="资产租赁">资产租赁</li>
+            </ul>
+          </div>
+          <div class="pk-toolbar-dropdown" data-pk-toolbar-dropdown>
+            <button class="pk-toolbar-dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false"><span>关联查询</span><span class="pk-toolbar-dropdown-caret"></span></button>
+            <ul class="pk-toolbar-dropdown-menu pk-toolbar-dropdown-menu--wide" role="menu">
+              <li class="po-related-query-item" role="menuitem" data-po-menu-action="批生产计划">批生产计划</li>
+              <li class="po-related-query-item" role="menuitem" data-po-menu-action="委外申请单">委外申请单</li>
+              <li class="po-related-query-item" role="menuitem" data-po-menu-action="委外工单">委外工单</li>
+              <li class="po-related-query-item" role="menuitem" data-po-menu-action="生产工单">生产工单</li>
+              <li class="po-related-query-item" role="menuitem" data-po-menu-action="采购申请单">采购申请单</li>
+              <li class="po-related-query-item" role="menuitem" data-po-menu-action="生产计划">生产计划</li>
+              <li class="po-related-query-item" role="menuitem" data-po-menu-action="销售订单">销售订单</li>
+              <li class="po-related-query-item" role="menuitem" data-po-menu-action="MRP历史">MRP历史</li>
+              <li class="po-related-query-item" role="menuitem" data-po-menu-action="采购合同（SRM）">采购合同（SRM）</li>
+              <li class="po-related-query-item" role="menuitem" data-po-menu-action="期初财务应付单">期初财务应付单</li>
+            </ul>
+          </div>
           <button class="pk-list-toolbar-btn" type="button" data-po-action="export">导出</button>
           <button class="pk-list-toolbar-btn" type="button" data-po-action="print">打印</button>
           <button class="pk-list-toolbar-btn" type="button" data-po-action="refresh">刷新</button>
         </div>
-        <div class="pk-list-toolbar-right">
+        <div class="list-toolbar-right pk-list-toolbar-right">
           <label class="po-detail-toggle"><input class="pk-checkbox" id="showDetails" type="checkbox">显示明细</label>
           <div class="pk-column-manager" data-pk-column-manager>
             <button class="pk-grid-icon-btn" type="button" data-pk-column-trigger aria-label="列展示" title="列展示" aria-haspopup="true" aria-expanded="false">☷</button>
@@ -332,9 +517,9 @@
         </div>
       </div>
 
-      <div class="pk-list-table-wrap">
-        <div class="pk-list-table-inner">
-          <table class="pk-list-table" data-pk-list-table>
+      <div class="purchase-table-wrap pk-list-table-wrap">
+        <div class="purchase-table-inner pk-list-table-inner">
+          <table class="purchase-list-table pk-list-table" data-pk-list-table>
             <colgroup>
               <col style="width: 58px"><col style="width: 58px"><col style="width: 44px"><col style="width: 150px"><col style="width: 120px"><col style="width: 110px"><col style="width: 110px"><col style="width: 120px"><col style="width: 210px"><col style="width: 100px"><col style="width: 110px"><col style="width: 100px"><col style="width: 120px"><col style="width: 110px"><col style="width: 130px"><col style="width: 180px"><col style="width: 100px"><col style="width: 100px"><col style="width: 110px">
             </colgroup>
@@ -366,7 +551,7 @@
         </div>
       </div>
 
-      <footer class="pk-list-footer">
+      <footer class="list-footer-bar pk-list-footer">
         <span class="pk-list-selected">已勾选 <strong id="selectedCount" data-pk-list-selected-count>0</strong> 条</span>
         <span class="pk-list-result-summary" id="resultSummary">当前显示 0 条</span>
         <div class="pk-pagination" aria-label="分页">
@@ -381,22 +566,19 @@
         </div>
       </footer>
 
-      <div class="pk-query-reference-popover" data-pk-query-reference-popover role="dialog" aria-label="选择查询条件" aria-hidden="true" hidden>
-        <span class="pk-query-reference-arrow" aria-hidden="true"></span>
-        <div class="pk-query-reference-table-wrap">
-          <table class="pk-list-table" data-pk-query-reference-table></table>
+      <div class="pk-reference-popover po-reference-popover" id="poReferencePopover" role="dialog" aria-label="选择查询条件" aria-hidden="true">
+        <span class="popper-arrow" aria-hidden="true"></span>
+        <div class="popover-table">
+          <table>
+            <colgroup><col style="width: 64px"><col style="width: 130px"><col style="width: 180px"><col style="width: 190px"><col style="width: 116px"></colgroup>
+            <thead><tr><th>序号</th><th>编码</th><th>名称</th><th>创建时间</th><th>创建人</th></tr></thead>
+            <tbody id="poReferenceBody"></tbody>
+          </table>
         </div>
-        <footer class="pk-query-reference-footer">
-          <span data-pk-query-reference-count>已选 0 项</span>
-          <div class="pk-query-reference-actions">
-            <button class="pk-query-reference-btn" type="button" data-pk-query-reference-action="clear">清空</button>
-            <button class="pk-query-reference-btn" type="button" data-pk-query-reference-action="cancel">取消</button>
-            <button class="pk-query-reference-btn is-primary" type="button" data-pk-query-reference-action="confirm">确定</button>
-          </div>
-        </footer>
+        <div class="po-reference-pagination" id="poReferencePagination" hidden></div>
       </div>
 
-      <script type="application/json" data-pk-query-reference-data>
+      <script type="application/json" data-po-query-reference-data-legacy>
         {
           "sourceType": {
             "valueKey": "name",
@@ -442,51 +624,6 @@
       </script>
     </section>
   </main>
-
-  <div class="pk-dialog-mask" id="purchaseOrderDetailDialog" aria-hidden="true">
-    <div class="pk-dialog pk-dialog--document-detail" role="dialog" aria-modal="true" aria-labelledby="purchaseOrderDetailTitle">
-      <div class="pk-dialog-header">
-        <h2 class="pk-dialog-title" id="purchaseOrderDetailTitle">采购订单详情</h2>
-        <button class="pk-dialog-close" type="button" data-pk-dialog-close aria-label="关闭"></button>
-      </div>
-      <div class="pk-dialog-body">
-        <div class="pk-document-summary">
-          <div class="pk-document-summary-item"><span>单据编码</span><strong id="detailCode"></strong></div>
-          <div class="pk-document-summary-item"><span>供应商</span><strong id="detailSupplier"></strong></div>
-          <div class="pk-document-summary-item"><span>采购部门</span><strong id="detailDepartment"></strong></div>
-          <div class="pk-document-summary-item"><span>单据状态</span><strong id="detailStatus"></strong></div>
-        </div>
-        <div class="pk-document-tabs" data-pk-document-tabs role="tablist">
-          <button class="pk-document-tab is-active" type="button" data-pk-document-tab="lines" role="tab" aria-selected="true">物料明细</button>
-          <button class="pk-document-tab" type="button" data-pk-document-tab="history" role="tab" aria-selected="false">审批记录</button>
-        </div>
-        <div class="pk-document-content" data-pk-document-panel="lines">
-          <div class="pk-list-table-wrap">
-            <div class="pk-list-table-inner">
-              <table class="pk-list-table">
-                <colgroup><col style="width: 70px"><col style="width: 180px"><col style="width: 240px"><col style="width: 110px"><col style="width: 100px"><col style="width: 120px"><col style="width: 130px"></colgroup>
-                <thead><tr><th>序号</th><th>物料编码</th><th>物料名称</th><th>数量</th><th>单位</th><th>含税单价</th><th>交货日期</th></tr></thead>
-                <tbody id="detailLineBody"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        <div class="pk-document-content" data-pk-document-panel="history" hidden>
-          <div class="pk-list-table-wrap">
-            <div class="pk-list-table-inner">
-              <table class="pk-list-table">
-                <colgroup><col style="width: 160px"><col style="width: 140px"><col style="width: 120px"><col style="width: 190px"></colgroup>
-                <thead><tr><th>节点</th><th>处理人</th><th>结果</th><th>处理时间</th></tr></thead>
-                <tbody id="detailApprovalBody"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="pk-dialog-footer">
-        <button class="pk-dialog-btn" id="detailPrintButton" type="button">打印</button>
-        <button class="pk-dialog-btn" type="button" data-pk-dialog-close>关闭</button>
-      </div>
     </div>
   </div>
 
@@ -547,6 +684,73 @@
       var tableBody = document.getElementById("orderTableBody");
       var selectAll = document.getElementById("selectAll");
       var showDetails = document.getElementById("showDetails");
+      var referencePopover = document.getElementById("poReferencePopover");
+      var referenceBody = document.getElementById("poReferenceBody");
+      var referencePagination = document.getElementById("poReferencePagination");
+      var activeReferenceTrigger = null;
+      var approvalStatusInput = document.getElementById("approvalStatusInput");
+      var approvalStatusValue = document.getElementById("approvalStatusValue");
+      var detailRoute = "#/supply-chain-management/purchase-management/purchase-execution/purchase-order/detail";
+
+      var referenceData = {
+        sourceType: {
+          total: 10,
+          rows: [
+            ["000000000", "手工创建", "2026-08-04 12:14:12", "系统管理员"],
+            ["", "MRP历史", "2026-01-07 17:25:36", "系统管理员"],
+            ["", "批生产计划", "2023-11-13 16:05:32", "系统管理员"],
+            ["", "委外工单", "2022-05-17 14:39:33", "系统管理员"],
+            ["", "委外申请单", "2022-05-17 14:39:23", "系统管理员"],
+            ["", "采购合同（SRM）", "2024-02-26 10:52:43", "系统管理员"],
+            ["", "生产计划", "2022-01-05 10:25:27", "系统管理员"],
+            ["", "采购申请单", "2021-10-20 10:27:16", "系统管理员"],
+            ["", "生产工单", "2021-12-15 11:39:38", "系统管理员"],
+            ["", "销售订单", "2021-10-25 11:37:10", "系统管理员"]
+          ]
+        },
+        contractType: { total: 1, rows: [["0", "普通合同", "2025-09-22 11:08:21", ""]] },
+        businessType: { total: 1, rows: [["default", "默认类型", "2021-11-26 16:50:42", ""]] },
+        supplier: {
+          total: 66,
+          rows: [
+            ["000005", "创维智造工业电子厂测试", "2025-05-22 10:47:03", "赖婷婷"],
+            ["000009", "绿源化工原料有限公司", "2025-05-22 11:18:22", "赖婷婷"],
+            ["000012", "供应商A", "2025-06-05 16:57:50", "邓媛"],
+            ["000013", "供应商无组织id", "2025-06-11 09:04:16", "Admin"],
+            ["000017", "华鑫源供应商", "2025-07-02 11:30:24", "赖婷婷"]
+          ]
+        },
+        buyer: {
+          total: 106,
+          rows: [
+            ["000012", "zz55", "2025-05-16 09:59:38", "SuperAdmin"],
+            ["000011", "叶议檐", "2025-05-16 10:21:00", "Admin"],
+            ["000001", "邓媛", "2025-05-16 10:26:44", "Admin"],
+            ["000002", "联想控股股份有限公司", "2025-05-16 11:18:04", "联想控股股份有限公司"],
+            ["000003", "陈琳", "2025-05-16 11:19:44", "Admin"]
+          ]
+        },
+        department: {
+          total: 59,
+          rows: [
+            ["000001", "实习部门", "2025-05-19 14:44:52", "赖婷婷"],
+            ["000002", "开发部门", "2025-05-19 14:45:04", "赖婷婷"],
+            ["000003", "西南片区", "2025-05-19 14:45:15", "赖婷婷"],
+            ["000004", "销售部门", "2025-05-19 14:45:33", "赖婷婷"],
+            ["000007", "四川地区", "2025-05-20 16:43:06", "赖婷婷"]
+          ]
+        },
+        documentStatus: {
+          total: 7,
+          rows: [
+            ["0", "草稿", "2021-12-03 10:31:49", ""],
+            ["1", "已作废", "2021-12-03 10:36:01", ""],
+            ["2", "已提交", "2021-12-03 10:36:11", ""],
+            ["3", "执行中", "2021-12-03 10:36:18", ""],
+            ["4", "已关闭", "2022-04-26 18:12:14", ""]
+          ]
+        }
+      };
 
       function escapeHtml(value) {
         return String(value == null ? "" : value).replace(/[&<>\"]/g, function (character) {
@@ -564,9 +768,78 @@
         }
       }
 
+      function openDetail(order) {
+        var selectedOrder = order || {
+          id: "PO-NEW",
+          code: "保存后自动生成",
+          date: "2026-08-04",
+          sourceType: "手工创建",
+          businessType: "默认类型",
+          supplier: "",
+          buyer: "",
+          department: "",
+          documentStatus: "草稿",
+          approvalStatus: "待审批",
+          summary: "",
+          taxTotal: 0,
+          lines: []
+        };
+        try {
+          sessionStorage.setItem("erp.purchase-order.detail", JSON.stringify(selectedOrder));
+        } catch (error) {
+          // The detail page falls back to its deterministic sample record.
+        }
+        if (window.parent && window.parent !== window) window.parent.location.hash = detailRoute;
+        else window.location.hash = detailRoute;
+      }
+
+      function positionReferencePopover(trigger) {
+        var rect = trigger.getBoundingClientRect();
+        var width = Math.min(680, window.innerWidth - 24);
+        var left = Math.min(Math.max(12, rect.left), window.innerWidth - width - 12);
+        var top = rect.bottom + 8;
+        referencePopover.style.width = width + "px";
+        referencePopover.style.left = left + "px";
+        referencePopover.style.top = top + "px";
+        var arrow = referencePopover.querySelector(".popper-arrow");
+        if (arrow) arrow.style.left = Math.max(18, Math.min(width - 26, rect.left + rect.width / 2 - left - 6)) + "px";
+      }
+
+      function closeReferencePopover() {
+        if (activeReferenceTrigger) activeReferenceTrigger.setAttribute("aria-expanded", "false");
+        activeReferenceTrigger = null;
+        referencePopover.classList.remove("is-open");
+        referencePopover.setAttribute("aria-hidden", "true");
+      }
+
+      function openReferencePopover(trigger) {
+        var source = trigger.dataset.poQueryReferenceTrigger;
+        var config = referenceData[source];
+        if (!config) return;
+        if (activeReferenceTrigger && activeReferenceTrigger !== trigger) activeReferenceTrigger.setAttribute("aria-expanded", "false");
+        activeReferenceTrigger = trigger;
+        var selected = parseReferenceValues(source)[0] || "";
+        referenceBody.innerHTML = config.rows.map(function (row, index) {
+          var selectedClass = row[1] === selected ? ' class="is-selected"' : "";
+          return "<tr" + selectedClass + ' data-po-reference-value="' + escapeHtml(row[1]) + '"><td>' + (index + 1) + "</td><td>" + escapeHtml(row[0]) + "</td><td>" + escapeHtml(row[1]) + "</td><td>" + escapeHtml(row[2]) + "</td><td>" + escapeHtml(row[3]) + "</td></tr>";
+        }).join("");
+        if (config.total > config.rows.length) {
+          var pages = Math.ceil(config.total / config.rows.length);
+          referencePagination.hidden = false;
+          referencePagination.innerHTML = "<span>共 " + config.total + " 条</span><button class=\"po-reference-page is-active\" type=\"button\">1</button><button class=\"po-reference-page\" type=\"button\">2</button><span>…</span><button class=\"po-reference-page\" type=\"button\">" + pages + "</button>";
+        } else {
+          referencePagination.hidden = true;
+          referencePagination.innerHTML = "";
+        }
+        positionReferencePopover(trigger);
+        trigger.setAttribute("aria-expanded", "true");
+        referencePopover.classList.add("is-open");
+        referencePopover.setAttribute("aria-hidden", "false");
+      }
+
       function parseReferenceValues(source) {
-        var trigger = document.querySelector('[data-pk-query-reference-trigger="' + source + '"]');
-        var input = trigger ? trigger.querySelector("[data-pk-query-reference-input]") : null;
+        var trigger = document.querySelector('[data-po-query-reference-trigger="' + source + '"]');
+        var input = trigger ? trigger.querySelector("[data-po-query-reference-input]") : null;
         if (!input) return [];
         try {
           var parsed = JSON.parse(input.value || "[]");
@@ -577,10 +850,10 @@
       }
 
       function setReferenceValues(source, values) {
-        var trigger = document.querySelector('[data-pk-query-reference-trigger="' + source + '"]');
+        var trigger = document.querySelector('[data-po-query-reference-trigger="' + source + '"]');
         if (!trigger) return;
-        var input = trigger.querySelector("[data-pk-query-reference-input]");
-        var valueNode = trigger.querySelector("[data-pk-query-reference-value]");
+        var input = trigger.querySelector("[data-po-query-reference-input]");
+        var valueNode = trigger.querySelector("[data-po-query-reference-value]");
         var placeholder = trigger.dataset.pkPlaceholder || "请选择";
         if (input) input.value = JSON.stringify(values || []);
         if (valueNode) {
@@ -619,7 +892,7 @@
             && matchesReference(order.department, "department")
             && (!summary || order.summary.toLowerCase().indexOf(summary) >= 0)
             && matchesReference(order.documentStatus, "documentStatus")
-            && matchesReference(order.approvalStatus, "approvalStatus");
+            && (!approvalStatusInput.value || order.approvalStatus === approvalStatusInput.value);
         });
       }
 
@@ -633,10 +906,10 @@
       function orderRowMarkup(order, index) {
         var checked = selectedIds.has(order.id) ? " checked" : "";
         return '<tr data-order-row="' + escapeHtml(order.id) + '">'
-          + '<td><div class="pk-row-menu" data-pk-row-menu><button class="pk-row-menu-trigger" type="button" data-pk-row-menu-trigger aria-label="第 ' + (index + 1) + ' 行操作" aria-haspopup="true" aria-expanded="false">...</button><div class="pk-row-menu-popover" data-pk-row-menu-panel hidden><button type="button" data-po-detail="' + escapeHtml(order.id) + '" data-pk-dialog-open="purchaseOrderDetailDialog">查看</button><button type="button" data-po-row-action="copy" data-order-id="' + escapeHtml(order.id) + '">复制编码</button></div></div></td>'
+          + '<td><div class="pk-row-menu" data-pk-row-menu><button class="pk-row-menu-trigger" type="button" data-pk-row-menu-trigger aria-label="第 ' + (index + 1) + ' 行操作" aria-haspopup="true" aria-expanded="false">...</button><div class="pk-row-menu-popover" data-pk-row-menu-panel hidden><button type="button" data-po-detail="' + escapeHtml(order.id) + '">查看</button><button type="button" data-po-row-action="copy" data-order-id="' + escapeHtml(order.id) + '">复制编码</button></div></div></td>'
           + "<td>" + (index + 1) + "</td>"
           + '<td class="is-center"><input class="pk-table-checkbox" type="checkbox" data-pk-list-row-select data-order-id="' + escapeHtml(order.id) + '" aria-label="选择第 ' + (index + 1) + ' 行"' + checked + "></td>"
-          + '<td><button class="pk-list-link" type="button" data-po-detail="' + escapeHtml(order.id) + '" data-pk-dialog-open="purchaseOrderDetailDialog">' + escapeHtml(order.code) + "</button></td>"
+          + '<td><button class="pk-list-link" type="button" data-po-detail="' + escapeHtml(order.id) + '">' + escapeHtml(order.code) + "</button></td>"
           + "<td>" + escapeHtml(order.date) + "</td>"
           + "<td>" + escapeHtml(order.sourceType) + "</td>"
           + "<td>" + escapeHtml(order.contractType) + "</td>"
@@ -678,8 +951,14 @@
         ["quickSearch", "queryCode", "queryDateFrom", "queryDateTo", "queryQuantity", "queryTaxTotal", "querySummary"].forEach(function (id) {
           document.getElementById(id).value = "";
         });
-        ["sourceType", "contractType", "businessType", "supplier", "buyer", "department", "documentStatus", "approvalStatus"].forEach(function (source) {
+        ["sourceType", "contractType", "businessType", "supplier", "buyer", "department", "documentStatus"].forEach(function (source) {
           setReferenceValues(source, []);
+        });
+        approvalStatusInput.value = "";
+        approvalStatusValue.textContent = "请选择审批状态";
+        document.querySelectorAll("#approvalStatusSelect .pk-option").forEach(function (option) {
+          option.classList.remove("is-selected");
+          option.setAttribute("aria-selected", "false");
         });
         var label = document.querySelector("[data-pk-query-filter-label]");
         if (label) label.textContent = "选择过滤器";
@@ -699,26 +978,6 @@
         mask.classList.remove("is-visible");
         mask.setAttribute("aria-hidden", "true");
         document.body.classList.toggle("pk-dialog-open", !!document.querySelector(".pk-dialog-mask.is-visible"));
-      }
-
-      function prepareDetail(order) {
-        var isNew = !order;
-        document.getElementById("purchaseOrderDetailTitle").textContent = isNew ? "新增采购订单" : "采购订单详情";
-        document.getElementById("detailCode").textContent = isNew ? "保存后自动生成" : order.code;
-        document.getElementById("detailSupplier").textContent = isNew ? "请选择供应商" : order.supplier;
-        document.getElementById("detailDepartment").textContent = isNew ? "当前采购组织" : (order.department || "-");
-        document.getElementById("detailStatus").textContent = isNew ? "草稿" : order.documentStatus;
-        ["detailCode", "detailSupplier", "detailDepartment"].forEach(function (id) {
-          document.getElementById(id).classList.toggle("po-summary-empty", isNew);
-        });
-        var lines = isNew ? [{ code: "", name: "", quantity: 0, unit: "", taxPrice: 0, deliveryDate: "" }] : order.lines;
-        document.getElementById("detailLineBody").innerHTML = lines.map(function (line, index) {
-          return "<tr><td>" + (index + 1) + "</td><td>" + escapeHtml(line.code) + "</td><td>" + escapeHtml(line.name) + "</td><td>" + formatNumber(line.quantity) + "</td><td>" + escapeHtml(line.unit) + "</td><td>" + formatNumber(line.taxPrice) + "</td><td>" + escapeHtml(line.deliveryDate) + "</td></tr>";
-        }).join("");
-        var approvals = isNew ? [] : order.approvals;
-        document.getElementById("detailApprovalBody").innerHTML = approvals.length
-          ? approvals.map(function (approval) { return "<tr><td>" + escapeHtml(approval.node) + "</td><td>" + escapeHtml(approval.owner) + "</td><td>" + escapeHtml(approval.result) + "</td><td>" + escapeHtml(approval.time) + "</td></tr>"; }).join("")
-          : '<tr class="po-dialog-empty-row"><td colspan="4">暂无审批记录</td></tr>';
       }
 
       function selectedOrders() {
@@ -771,14 +1030,14 @@
       }
 
       document.getElementById("createButton").addEventListener("click", function () {
-        prepareDetail(null);
-      }, true);
+        openDetail(null);
+      });
 
       tableBody.addEventListener("click", function (event) {
         var detailButton = event.target.closest("[data-po-detail]");
         if (detailButton) {
           var order = orders.find(function (item) { return item.id === detailButton.dataset.poDetail; });
-          prepareDetail(order || null);
+          openDetail(order || null);
           return;
         }
         var rowAction = event.target.closest("[data-po-row-action]");
@@ -828,7 +1087,34 @@
         renderTable();
       });
 
+      document.querySelectorAll("[data-po-query-reference-trigger]").forEach(function (trigger) {
+        trigger.addEventListener("click", function (event) {
+          event.stopPropagation();
+          if (activeReferenceTrigger === trigger && referencePopover.classList.contains("is-open")) closeReferencePopover();
+          else openReferencePopover(trigger);
+        });
+        trigger.addEventListener("keydown", function (event) {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          openReferencePopover(trigger);
+        });
+      });
+
+      referenceBody.addEventListener("click", function (event) {
+        var row = event.target.closest("[data-po-reference-value]");
+        if (!row || !activeReferenceTrigger) return;
+        setReferenceValues(activeReferenceTrigger.dataset.poQueryReferenceTrigger, [row.dataset.poReferenceValue]);
+        closeReferencePopover();
+      });
+
+      document.getElementById("approvalStatusSelect").addEventListener("pk:select-change", function (event) {
+        approvalStatusInput.value = event.detail && event.detail.value ? event.detail.value : "";
+        approvalStatusValue.textContent = approvalStatusInput.value || "请选择审批状态";
+      });
+
       document.addEventListener("click", function (event) {
+        if (activeReferenceTrigger && !referencePopover.contains(event.target) && !activeReferenceTrigger.contains(event.target)) closeReferencePopover();
+
         var preset = event.target.closest("[data-po-preset]");
         if (preset) {
           clearFilters();
@@ -837,6 +1123,15 @@
           if (preset.dataset.poPreset === "closed") setReferenceValues("documentStatus", ["已关闭"]);
           selectedIds.clear();
           renderTable();
+          return;
+        }
+
+        var menuAction = event.target.closest("[data-po-menu-action]");
+        if (menuAction) {
+          var label = menuAction.dataset.poMenuAction;
+          if (label === "下载导入模板") notify("采购订单导入模板已准备下载", "success");
+          else if (label === "导入") notify("已打开采购订单导入入口", "info");
+          else notify("已选择“" + label + "”", "info");
           return;
         }
 
@@ -851,9 +1146,6 @@
         } else if (action === "save-filter") notify("当前查询方案已保存", "success");
         else if (action === "save-filter-as") notify("已另存为个人查询方案", "success");
         else if (action === "advanced-mode") notify("高级检索条件已保留", "info");
-        else if (action === "import") notify("已打开采购订单导入入口", "info");
-        else if (action === "related-generate") notify("请选择关联生成的目标单据", "info");
-        else if (action === "related-query") notify("已打开关联单据查询", "info");
         else if (action === "export") notify("已生成当前查询结果的导出任务", "success");
         else if (action === "print") notify("已打开采购订单列表打印预览", "info");
       });
@@ -865,10 +1157,6 @@
         closeMask("deleteMessageBox");
         renderTable();
         notify("已删除 " + deleteCount + " 条采购订单", "success");
-      });
-
-      document.getElementById("detailPrintButton").addEventListener("click", function () {
-        notify("已打开采购订单打印预览", "info");
       });
 
       if (window.PrototypeKit) window.PrototypeKit.init(document);

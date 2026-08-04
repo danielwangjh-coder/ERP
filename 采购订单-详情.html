@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>采购订单详情</title>
+  <link rel="stylesheet" href="assets/vendor/prototype-kit.css">
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    body {
+      background: #f5f6f7;
+      color: #606266;
+      font-family: var(--pk-font, "Microsoft YaHei", Arial, sans-serif);
+      font-size: 14px;
+    }
+
+    button,
+    input {
+      font-family: inherit;
+    }
+
+    .po-detail-page {
+      width: 100%;
+      height: 100%;
+      min-width: 920px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .po-detail-toolbar {
+      min-height: 56px;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex: 0 0 auto;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(31, 45, 61, 0.08);
+    }
+
+    .po-detail-toolbar .pk-toolbar-left,
+    .po-detail-toolbar .pk-toolbar-right {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .po-detail-toolbar .pk-toolbar-btn,
+    .po-detail-toolbar .pk-toolbar-dropdown,
+    .po-detail-toolbar .pk-toolbar-dropdown-trigger {
+      height: 30px;
+    }
+
+    .po-detail-toolbar .pk-toolbar-btn.is-primary {
+      border-color: #409eff;
+      background: #409eff;
+      color: #fff;
+    }
+
+    .po-detail-toolbar .pk-toolbar-dropdown-menu {
+      top: 35px;
+      min-width: 170px;
+      max-height: 286px;
+      overflow-y: auto;
+    }
+
+    .po-detail-content {
+      min-height: 0;
+      padding: 10px 10px 0;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .po-document-head,
+    .po-document-lines {
+      position: relative;
+      background: #fff;
+    }
+
+    .po-document-head {
+      flex: 0 0 auto;
+      border-bottom: 1px solid #e7edf3;
+    }
+
+    .po-document-head .pk-tabs-nav,
+    .po-document-lines .pk-tabs-nav {
+      min-height: 42px;
+      padding: 0 10px;
+      gap: 2px;
+      border-bottom: 1px solid #edf1f5;
+    }
+
+    .po-document-head .pk-tab,
+    .po-document-lines .pk-tab {
+      height: 41px;
+      padding: 0 12px;
+      font-size: 14px;
+    }
+
+    .po-document-head .pk-tab-panel {
+      min-height: 160px;
+      padding: 10px 12px 14px;
+    }
+
+    .po-document-form {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px 10px;
+      padding-right: 210px;
+    }
+
+    .po-document-form .pk-field {
+      min-width: 0;
+    }
+
+    .po-document-form .pk-input-shell {
+      background: #f7f8fa;
+      border-color: #eef0f3;
+    }
+
+    .po-document-form .pk-shell-input {
+      color: #7a7f86;
+    }
+
+    .po-status-stamp {
+      position: absolute;
+      z-index: 2;
+      top: 58px;
+      right: 42px;
+      min-width: 86px;
+      height: 52px;
+      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px double #f18b8b;
+      border-radius: 7px;
+      color: #ef7373;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0;
+      transform: rotate(-17deg);
+      opacity: 0.88;
+    }
+
+    .po-head-collapse {
+      position: relative;
+      height: 9px;
+      border-top: 1px solid #409eff;
+    }
+
+    .po-head-collapse::before {
+      content: "";
+      position: absolute;
+      top: -1px;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-top: 7px solid #409eff;
+      transform: translateX(-50%);
+    }
+
+    .po-document-lines {
+      min-height: 0;
+      margin-top: 8px;
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .po-document-lines > .pk-tabs {
+      min-height: 0;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .po-document-lines .pk-tab-panel {
+      min-height: 0;
+      padding: 0;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .po-document-lines .pk-tab-panel[hidden] {
+      display: none;
+    }
+
+    .po-table-toolbar {
+      min-height: 44px;
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex: 0 0 auto;
+      background: #fff;
+    }
+
+    .po-table-toolbar-left,
+    .po-table-toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .po-table-search {
+      width: 220px;
+      height: 30px;
+      padding: 0 10px;
+      border: 1px solid #dcdfe6;
+      border-radius: 3px;
+      outline: none;
+    }
+
+    .po-table-search:focus {
+      border-color: #409eff;
+    }
+
+    .po-detail-table-wrap {
+      min-height: 0;
+      margin: 0 10px 10px;
+      flex: 1;
+      overflow: auto;
+      border: 1px solid #e8eaec;
+      scrollbar-gutter: stable;
+    }
+
+    .po-detail-table {
+      width: max-content;
+      min-width: 100%;
+      border: 0;
+    }
+
+    .po-detail-table th,
+    .po-detail-table td {
+      height: 40px;
+      min-width: 118px;
+      padding: 0 10px;
+      border-right: 1px solid #e8eaec;
+      border-bottom: 1px solid #e8eaec;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .po-detail-table th {
+      position: sticky;
+      z-index: 3;
+      top: 0;
+      background: #eaf8ff;
+      color: #303133;
+      font-weight: 600;
+    }
+
+    .po-detail-table th.is-index,
+    .po-detail-table td.is-index {
+      min-width: 54px;
+      width: 54px;
+    }
+
+    .po-detail-table th.is-check,
+    .po-detail-table td.is-check {
+      min-width: 42px;
+      width: 42px;
+      text-align: center;
+    }
+
+    .po-detail-table tfoot td {
+      position: sticky;
+      z-index: 2;
+      bottom: 0;
+      background: #fffaf0;
+      font-weight: 600;
+    }
+
+    .po-empty {
+      min-height: 138px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #909399;
+    }
+
+    .po-log-list {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .po-log-list th,
+    .po-log-list td {
+      height: 36px;
+      padding: 0 12px;
+      border: 1px solid #e8eaec;
+      text-align: left;
+    }
+
+    @media (max-width: 1180px) {
+      .po-document-form {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        padding-right: 150px;
+      }
+
+      .po-status-stamp {
+        right: 24px;
+        min-width: 72px;
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="po-detail-page" data-testid="purchase-order-detail-page">
+    <div class="po-detail-toolbar">
+      <div class="pk-toolbar-left">
+        <button class="pk-toolbar-btn is-primary" type="button" data-detail-action="保存">保存</button>
+        <button class="pk-toolbar-btn" type="button" data-detail-action="复制">复制</button>
+        <div class="pk-toolbar-dropdown" data-pk-toolbar-dropdown>
+          <button class="pk-toolbar-dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false"><span>关联生成</span><span class="pk-toolbar-dropdown-caret"></span></button>
+          <ul class="pk-toolbar-dropdown-menu" role="menu">
+            <li role="menuitem" data-detail-action="采购收货单">采购收货单</li>
+            <li role="menuitem" data-detail-action="采购入库单">采购入库单</li>
+            <li role="menuitem" data-detail-action="期初预付款单">期初预付款单</li>
+            <li role="menuitem" data-detail-action="预付款单">预付款单</li>
+            <li role="menuitem" data-detail-action="采购订单变更单">采购订单变更单</li>
+            <li role="menuitem" data-detail-action="期初财务应付单">期初财务应付单</li>
+            <li role="menuitem" data-detail-action="资产租赁">资产租赁</li>
+          </ul>
+        </div>
+        <div class="pk-toolbar-dropdown" data-pk-toolbar-dropdown>
+          <button class="pk-toolbar-dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false"><span>关联查询</span><span class="pk-toolbar-dropdown-caret"></span></button>
+          <ul class="pk-toolbar-dropdown-menu" role="menu">
+            <li role="menuitem" data-detail-action="采购申请单">采购申请单</li>
+            <li role="menuitem" data-detail-action="采购合同（SRM）">采购合同（SRM）</li>
+            <li role="menuitem" data-detail-action="采购入库单">采购入库单</li>
+            <li role="menuitem" data-detail-action="财务应付单">财务应付单</li>
+          </ul>
+        </div>
+        <div class="pk-toolbar-dropdown" data-pk-toolbar-dropdown>
+          <button class="pk-toolbar-dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false"><span>辅助查询</span><span class="pk-toolbar-dropdown-caret"></span></button>
+          <ul class="pk-toolbar-dropdown-menu" role="menu">
+            <li role="menuitem" data-detail-action="可用库存">可用库存</li>
+            <li role="menuitem" data-detail-action="历史采购价">历史采购价</li>
+          </ul>
+        </div>
+        <button class="pk-toolbar-btn" type="button" data-detail-action="执行关系图">执行关系图</button>
+        <button class="pk-toolbar-btn" type="button" data-detail-action="历史查询">历史查询</button>
+        <button class="pk-toolbar-btn" type="button" data-detail-action="打印">打印</button>
+        <button class="pk-toolbar-btn" type="button" data-detail-action="刷新">刷新</button>
+        <button class="pk-toolbar-btn" type="button" data-detail-action="评论">评论</button>
+      </div>
+      <div class="pk-toolbar-right">
+        <button class="pk-toolbar-btn" type="button" data-detail-action="上一条">上一条</button>
+        <button class="pk-toolbar-btn" type="button" data-detail-action="下一条">下一条</button>
+      </div>
+    </div>
+
+    <div class="po-detail-content">
+      <section class="po-document-head" aria-label="采购订单表头">
+        <div class="pk-tabs" data-pk-tabs>
+          <div class="pk-tabs-nav" role="tablist" aria-label="采购订单信息">
+            <button class="pk-tab is-active" type="button" role="tab" aria-selected="true" data-pk-tab="basic">基本信息</button>
+            <button class="pk-tab" type="button" role="tab" aria-selected="false" data-pk-tab="finance">财务信息</button>
+            <button class="pk-tab" type="button" role="tab" aria-selected="false" data-pk-tab="feedback">沟通及反馈(0)</button>
+            <button class="pk-tab" type="button" role="tab" aria-selected="false" data-pk-tab="attachment">附件信息(0)</button>
+            <button class="pk-tab" type="button" role="tab" aria-selected="false" data-pk-tab="approval">审批信息(0)</button>
+            <button class="pk-tab" type="button" role="tab" aria-selected="false" data-pk-tab="log">日志信息(5)</button>
+          </div>
+          <div class="pk-tab-panel" data-pk-tab-panel="basic" role="tabpanel">
+            <div class="pk-form-grid po-document-form">
+              <div class="pk-field"><div class="pk-label"><span class="pk-required">*</span><span>来源类型</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="sourceType" value="手工创建" readonly></div></div></div>
+              <div class="pk-field"><div class="pk-label"><span class="pk-required">*</span><span>业务类型</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="businessType" value="默认类型" readonly></div></div></div>
+              <div class="pk-field"><div class="pk-label"><span class="pk-required">*</span><span>单据日期</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="date" value="2026-08-07" readonly></div></div></div>
+              <div class="pk-field"><div class="pk-label"><span>单据编码</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="code" value="20260731-0611" readonly></div></div></div>
+              <div class="pk-field"><div class="pk-label"><span class="pk-required">*</span><span>供应商编码</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="supplierCode" value="000005" readonly></div></div></div>
+              <div class="pk-field"><div class="pk-label"><span>供应商名称</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="supplier" value="创维智造工业电子厂测试" readonly></div></div></div>
+              <div class="pk-field"><div class="pk-label"><span>采购员</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="buyer" value="蒋凤霞" readonly></div></div></div>
+              <div class="pk-field"><div class="pk-label"><span>采购部门</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="department" value="西南片区" readonly></div></div></div>
+              <div class="pk-field"><div class="pk-label"><span>变更次数</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" value="" readonly></div></div></div>
+              <div class="pk-field"><div class="pk-label"><span>最近变更日期</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" value="" readonly></div></div></div>
+              <div class="pk-field"><div class="pk-label"><span>单据摘要</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="summary" value="设备维修备件" readonly></div></div></div>
+            </div>
+          </div>
+          <div class="pk-tab-panel" data-pk-tab-panel="finance" role="tabpanel" hidden>
+            <div class="pk-form-grid po-document-form">
+              <div class="pk-field"><div class="pk-label"><span>结算供应商</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" value="测试供应商" readonly></div></div></div>
+              <div class="pk-field"><div class="pk-label"><span>结算方式</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" value="现金" readonly></div></div></div>
+              <div class="pk-field"><div class="pk-label"><span>付款条件</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" value="按金额" readonly></div></div></div>
+              <div class="pk-field"><div class="pk-label"><span>价税合计</span></div><div class="pk-control"><div class="pk-input-shell is-disabled"><input class="pk-shell-input" data-detail-field="taxTotal" value="10.90" readonly></div></div></div>
+            </div>
+          </div>
+          <div class="pk-tab-panel" data-pk-tab-panel="feedback" role="tabpanel" hidden><div class="po-empty">暂无沟通及反馈</div></div>
+          <div class="pk-tab-panel" data-pk-tab-panel="attachment" role="tabpanel" hidden><div class="po-empty">暂无附件</div></div>
+          <div class="pk-tab-panel" data-pk-tab-panel="approval" role="tabpanel" hidden><div class="po-empty">暂无审批记录</div></div>
+          <div class="pk-tab-panel" data-pk-tab-panel="log" role="tabpanel" hidden>
+            <table class="po-log-list"><thead><tr><th>操作时间</th><th>操作人</th><th>操作</th></tr></thead><tbody><tr><td>2026-08-07 10:26:41</td><td>蒋凤霞</td><td>提交采购订单</td></tr><tr><td>2026-08-07 10:28:19</td><td>系统管理员</td><td>审批结束，单据进入执行中</td></tr></tbody></table>
+          </div>
+        </div>
+        <div class="po-status-stamp" data-detail-field="documentStatus">执行中</div>
+        <div class="po-head-collapse" aria-hidden="true"></div>
+      </section>
+
+      <section class="po-document-lines" aria-label="采购订单子表">
+        <div class="pk-tabs" data-pk-tabs>
+          <div class="pk-tabs-nav" role="tablist" aria-label="采购订单明细">
+            <button class="pk-tab is-active" type="button" role="tab" aria-selected="true" data-pk-tab="material">物料明细</button>
+            <button class="pk-tab" type="button" role="tab" aria-selected="false" data-pk-tab="summary">物料汇总</button>
+            <button class="pk-tab" type="button" role="tab" aria-selected="false" data-pk-tab="payment">付款计划</button>
+            <button class="pk-tab" type="button" role="tab" aria-selected="false" data-pk-tab="terms">条款信息</button>
+            <button class="pk-tab" type="button" role="tab" aria-selected="false" data-pk-tab="execution">执行情况</button>
+          </div>
+
+          <div class="pk-tab-panel" data-pk-tab-panel="material" role="tabpanel">
+            <div class="po-table-toolbar"><div class="po-table-toolbar-left"></div><div class="po-table-toolbar-right"><input class="po-table-search" type="search" placeholder="请输入关键字搜索" aria-label="物料明细搜索"><button class="pk-grid-icon-btn" type="button" title="列展示" aria-label="列展示">☷</button><button class="pk-list-toolbar-btn" type="button" data-detail-action="物料明细全屏">全屏</button></div></div>
+            <div class="po-detail-table-wrap">
+              <table class="pk-erp-table po-detail-table">
+                <thead><tr><th class="is-index">序号</th><th class="is-check"><input class="pk-table-checkbox" type="checkbox" aria-label="全选物料明细"></th><th>* 物料编码</th><th>物料名称</th><th>规格</th><th>型号</th><th>计量单位</th><th>* 工厂</th><th>期望到货日期</th><th>赠品</th><th>数量</th><th>单价</th><th>金额</th><th>税率</th><th>税额</th><th>含税单价</th><th>含税金额</th><th>价税合计</th><th>来源单号</th><th>行备注</th></tr></thead>
+                <tbody id="materialBody"><tr><td class="is-index">1</td><td class="is-check"><input class="pk-table-checkbox" type="checkbox" aria-label="选择第1行"></td><td>2333333X</td><td>2333</td><td></td><td></td><td>顶</td><td>成都精密仪器工厂</td><td>2026-08-21</td><td>否</td><td>1.00</td><td>9.650000</td><td>9.65</td><td>13%</td><td>1.25</td><td>10.900000</td><td>10.90</td><td>10.90</td><td></td><td></td></tr></tbody>
+                <tfoot><tr><td class="is-index">合计</td><td class="is-check"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>1.00</td><td></td><td>9.65</td><td></td><td>1.25</td><td></td><td>10.90</td><td>10.90</td><td></td><td></td></tr></tfoot>
+              </table>
+            </div>
+          </div>
+
+          <div class="pk-tab-panel" data-pk-tab-panel="summary" role="tabpanel" hidden>
+            <div class="po-table-toolbar"><div class="po-table-toolbar-left"><button class="pk-list-toolbar-btn" type="button" data-detail-action="导出物料汇总">导出</button></div><div class="po-table-toolbar-right"><input class="po-table-search" type="search" placeholder="请输入关键字搜索" aria-label="物料汇总搜索"><button class="pk-list-toolbar-btn" type="button" data-detail-action="物料汇总全屏">全屏</button></div></div>
+            <div class="po-detail-table-wrap"><table class="pk-erp-table po-detail-table"><thead><tr><th class="is-index">序号</th><th>物料编码</th><th>物料名称</th><th>规格</th><th>型号</th><th>计量单位</th><th>数量</th><th>单价</th><th>金额</th><th>税额</th><th>含税单价</th><th>含税金额</th><th>价税合计</th><th>品牌</th><th>材质/牌号</th><th>颜色</th><th>版本</th><th>阶段标记</th><th>图号</th><th>质量等级</th><th>温度范围</th></tr></thead><tbody><tr><td class="is-index">1</td><td>2333333X</td><td>2333</td><td></td><td></td><td>顶</td><td>1.00</td><td>9.650000</td><td>9.65</td><td>1.25</td><td>10.900000</td><td>10.90</td><td>10.90</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody><tfoot><tr><td class="is-index">合计</td><td></td><td></td><td></td><td></td><td></td><td>1.00</td><td></td><td>9.65</td><td>1.25</td><td></td><td>10.90</td><td>10.90</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tfoot></table></div>
+          </div>
+
+          <div class="pk-tab-panel" data-pk-tab-panel="payment" role="tabpanel" hidden>
+            <div class="po-table-toolbar"><div class="po-table-toolbar-left"><button class="pk-list-toolbar-btn" type="button" data-detail-action="新建付款计划">新建</button><button class="pk-list-toolbar-btn" type="button" data-detail-action="导出付款计划">导出</button></div><div class="po-table-toolbar-right"><input class="po-table-search" type="search" placeholder="请输入关键字搜索" aria-label="付款计划搜索"><button class="pk-list-toolbar-btn" type="button" data-detail-action="付款计划全屏">全屏</button></div></div>
+            <div class="po-detail-table-wrap"><table class="pk-erp-table po-detail-table"><thead><tr><th>操作</th><th class="is-index">序号</th><th class="is-check"><input class="pk-table-checkbox" type="checkbox" aria-label="全选付款计划"></th><th>付款计划编码</th><th>* 款项名称</th><th>* 计划付款比例（%）</th><th>计划付款金额</th><th>预付款</th><th>到期日期确认方式</th><th>到期日</th><th>行备注</th><th>实际付款金额</th><th>累计折让金额</th><th>未付款金额</th><th>付款状态</th></tr></thead><tbody><tr class="po-empty-table-row"><td><span class="po-empty">暂无数据</span></td><td class="is-index"></td><td class="is-check"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody><tfoot><tr><td>合计</td><td class="is-index"></td><td class="is-check"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tfoot></table></div>
+          </div>
+
+          <div class="pk-tab-panel" data-pk-tab-panel="terms" role="tabpanel" hidden>
+            <div class="po-table-toolbar"><div class="po-table-toolbar-left"><button class="pk-list-toolbar-btn" type="button" data-detail-action="导出条款">导出</button></div><div class="po-table-toolbar-right"><input class="po-table-search" type="search" placeholder="请输入关键字搜索" aria-label="条款信息搜索"><button class="pk-list-toolbar-btn" type="button" data-detail-action="条款信息全屏">全屏</button></div></div>
+            <div class="po-detail-table-wrap"><table class="pk-erp-table po-detail-table"><thead><tr><th class="is-index">序号</th><th class="is-check"><input class="pk-table-checkbox" type="checkbox" aria-label="全选条款"></th><th>条款编码</th><th>条款名称</th><th>条例类型</th><th>条款内容</th><th>行备注</th></tr></thead><tbody><tr class="po-empty-table-row"><td class="is-index"><span class="po-empty">暂无数据</span></td><td class="is-check"></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div>
+          </div>
+
+          <div class="pk-tab-panel" data-pk-tab-panel="execution" role="tabpanel" hidden>
+            <div class="po-table-toolbar"><div class="po-table-toolbar-left"><button class="pk-list-toolbar-btn" type="button" data-detail-action="关闭">关闭</button><button class="pk-list-toolbar-btn" type="button" data-detail-action="反关闭">反关闭</button></div><div class="po-table-toolbar-right"><input class="po-table-search" type="search" placeholder="请输入关键字搜索" aria-label="执行情况搜索"><button class="pk-list-toolbar-btn" type="button" data-detail-action="执行情况全屏">全屏</button></div></div>
+            <div class="po-detail-table-wrap"><table class="pk-erp-table po-detail-table"><thead><tr><th class="is-index">序号</th><th class="is-check"><input class="pk-table-checkbox" type="checkbox" aria-label="全选执行情况"></th><th>物料编码</th><th>物料名称</th><th>规格</th><th>型号</th><th>计量单位</th><th>数量</th><th>金额</th><th>折扣额</th><th>税额</th><th>价税合计</th><th>累计收货数量</th><th>累计入库数量</th><th>累计入库金额</th><th>累计退货申请数量</th><th>累计退货数量</th><th>累计退货金额</th><th>累计需补货数量</th><th>实际入库数量</th><th>实入差异数量</th><th>实入差异率%</th><th>提前/逾期天数</th><th>逾期状态</th><th>累计开票数量（蓝字）</th><th>累计开票金额（蓝字）</th><th>实际开票数量</th><th>实际开票金额</th><th>实际预付金额</th><th>实际付款金额</th><th>未付款数量</th><th>未付款金额</th><th>行状态</th><th>关闭分类</th><th>关闭原因</th><th>关闭人</th><th>关闭时间</th><th>品牌</th><th>材质/牌号</th><th>颜色</th><th>版本</th><th>阶段标记</th><th>图号</th><th>质量等级</th><th>温度范围</th></tr></thead><tbody><tr><td class="is-index">1</td><td class="is-check"><input class="pk-table-checkbox" type="checkbox" aria-label="选择第1行执行情况"></td><td>2333333X</td><td>2333</td><td></td><td></td><td>顶</td><td>1.00</td><td>9.65</td><td>0.00</td><td>1.25</td><td>10.90</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>-1.00</td><td>-100.00%</td><td></td><td></td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>1.00</td><td>10.90</td><td data-line-status>执行中</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody><tfoot><tr><td class="is-index">合计</td><td class="is-check"></td><td></td><td></td><td></td><td></td><td></td><td>1.00</td><td>9.65</td><td>0.00</td><td>1.25</td><td>10.90</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tfoot></table></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="pk-message-host" data-pk-message-host aria-live="polite" aria-atomic="true"></div>
+  <script src="assets/vendor/prototype-kit.js"></script>
+  <script>
+    (function () {
+      "use strict";
+
+      var fallbackOrder = {
+        code: "20260731-0611",
+        date: "2026-08-07",
+        sourceType: "手工创建",
+        businessType: "默认类型",
+        supplier: "创维智造工业电子厂测试",
+        buyer: "蒋凤霞",
+        department: "西南片区",
+        summary: "设备维修备件",
+        documentStatus: "执行中",
+        taxTotal: 10.9
+      };
+
+      function readOrder() {
+        try {
+          return Object.assign({}, fallbackOrder, JSON.parse(sessionStorage.getItem("erp.purchase-order.detail") || "{}"));
+        } catch (error) {
+          return fallbackOrder;
+        }
+      }
+
+      function writeField(name, value) {
+        document.querySelectorAll('[data-detail-field="' + name + '"]').forEach(function (node) {
+          if ("value" in node) node.value = value == null ? "" : String(value);
+          else node.textContent = value == null ? "" : String(value);
+        });
+      }
+
+      function notify(message, type) {
+        if (window.PrototypeKit && typeof window.PrototypeKit.message === "function") {
+          window.PrototypeKit.message(message, type || "info", 2200);
+        }
+      }
+
+      var order = readOrder();
+      writeField("code", order.code);
+      writeField("date", order.date);
+      writeField("sourceType", order.sourceType);
+      writeField("businessType", order.businessType);
+      writeField("supplier", order.supplier);
+      writeField("supplierCode", order.supplier ? "000005" : "");
+      writeField("buyer", order.buyer);
+      writeField("department", order.department);
+      writeField("summary", order.summary);
+      writeField("documentStatus", order.documentStatus);
+      writeField("taxTotal", Number(order.taxTotal || 0).toFixed(2));
+      document.title = "采购订单详情 - " + order.code;
+      document.querySelectorAll("[data-line-status]").forEach(function (cell) { cell.textContent = order.documentStatus; });
+
+      document.addEventListener("click", function (event) {
+        var action = event.target.closest("[data-detail-action]");
+        if (!action) return;
+        var label = action.dataset.detailAction;
+        if (label === "刷新") {
+          notify("数据已刷新", "success");
+          return;
+        }
+        if (label === "保存") {
+          notify("采购订单已保存", "success");
+          return;
+        }
+        notify("已选择“" + label + "”", "info");
+      });
+
+      if (window.PrototypeKit) window.PrototypeKit.init(document);
+    })();
+  </script>
+</body>
+</html>
