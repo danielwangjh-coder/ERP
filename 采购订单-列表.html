@@ -115,6 +115,15 @@
       font-size: 14px;
     }
 
+    .po-list-page .pk-row-menu-popover {
+      width: 140px;
+      min-width: 140px;
+    }
+
+    .po-list-page .pk-row-menu-popover button {
+      display: block;
+    }
+
     .po-related-query-item::before {
       content: "";
       width: 9px;
@@ -624,6 +633,25 @@
     </div>
   </div>
 
+  <div class="pk-dialog-mask pk-messagebox-mask" id="rowEditDialog" aria-hidden="true">
+    <div class="pk-dialog pk-dialog--messagebox" role="dialog" aria-modal="true" aria-labelledby="rowEditDialogTitle">
+      <div class="pk-dialog-header">
+        <h2 class="pk-dialog-title" id="rowEditDialogTitle">修改单据编码</h2>
+        <button class="pk-dialog-close" type="button" data-pk-dialog-close aria-label="关闭"></button>
+      </div>
+      <div class="pk-messagebox-body pk-filter-dialog-body">
+        <label class="pk-filter-dialog-field">
+          <span id="rowEditFieldLabel">单据编码</span>
+          <input class="pk-filter-name-field" id="rowEditFieldInput" type="text" maxlength="40" autocomplete="off">
+        </label>
+      </div>
+      <div class="pk-dialog-footer">
+        <button class="pk-dialog-btn is-primary" id="confirmRowEditButton" type="button">确定</button>
+        <button class="pk-dialog-btn" type="button" data-pk-dialog-close>取消</button>
+      </div>
+    </div>
+  </div>
+
   <div class="pk-message-host" data-pk-message-host aria-live="polite" aria-atomic="true"></div>
 
   <script src="assets/vendor/prototype-kit.js"></script>
@@ -669,6 +697,11 @@
       var activeReferenceTrigger = null;
       var approvalStatusInput = document.getElementById("approvalStatusInput");
       var approvalStatusValue = document.getElementById("approvalStatusValue");
+      var rowEditDialogTitle = document.getElementById("rowEditDialogTitle");
+      var rowEditFieldLabel = document.getElementById("rowEditFieldLabel");
+      var rowEditFieldInput = document.getElementById("rowEditFieldInput");
+      var activeRowEditOrder = null;
+      var activeRowEditField = "";
       var detailRoute = "#/supply-chain-management/purchase-management/purchase-execution/purchase-order/detail";
 
       var referenceData = {
@@ -878,7 +911,7 @@
       function orderRowMarkup(order, index) {
         var checked = selectedIds.has(order.id) ? " checked" : "";
         return '<tr data-order-row="' + escapeHtml(order.id) + '">'
-          + '<td><div class="pk-row-menu" data-pk-row-menu><button class="pk-row-menu-trigger" type="button" data-pk-row-menu-trigger aria-label="第 ' + (index + 1) + ' 行操作" aria-haspopup="true" aria-expanded="false">...</button><div class="pk-row-menu-popover" data-pk-row-menu-panel hidden><button type="button" data-po-detail="' + escapeHtml(order.id) + '">查看</button><button type="button" data-po-row-action="copy" data-order-id="' + escapeHtml(order.id) + '">复制编码</button></div></div></td>'
+          + '<td><div class="pk-row-menu" data-pk-row-menu><button class="pk-row-menu-trigger" type="button" data-pk-row-menu-trigger aria-label="第 ' + (index + 1) + ' 行操作" aria-haspopup="true" aria-expanded="false">...</button><div class="pk-row-menu-popover" data-pk-row-menu-panel hidden><button type="button" data-po-row-action="copy" data-order-id="' + escapeHtml(order.id) + '">复制</button><button type="button" data-po-row-action="edit-code" data-order-id="' + escapeHtml(order.id) + '">修改单据编码</button><button type="button" data-po-row-action="edit-summary" data-order-id="' + escapeHtml(order.id) + '">修改单据摘要</button></div></div></td>'
           + "<td>" + (index + 1) + "</td>"
           + '<td class="is-center"><input class="pk-table-checkbox" type="checkbox" data-pk-list-row-select data-order-id="' + escapeHtml(order.id) + '" aria-label="选择第 ' + (index + 1) + ' 行"' + checked + "></td>"
           + '<td><button class="pk-list-link" type="button" data-po-detail="' + escapeHtml(order.id) + '">' + escapeHtml(order.code) + "</button></td>"
@@ -1001,6 +1034,73 @@
         openMask("deleteMessageBox");
       }
 
+      function nextCopiedIdentity() {
+        var maxSequence = orders.reduce(function (maximum, order) {
+          var match = String(order.code || "").match(/-(\d{4})$/);
+          return match ? Math.max(maximum, Number(match[1])) : maximum;
+        }, 0);
+        var sequence = String(maxSequence + 1).padStart(4, "0");
+        return { id: "PO-" + sequence, code: "20260804-" + sequence };
+      }
+
+      function copyOrder(sourceOrder) {
+        var identity = nextCopiedIdentity();
+        var copiedOrder = Object.assign({}, sourceOrder, identity, {
+          date: "2026-08-04",
+          documentStatus: "草稿",
+          approvalStatus: "待审批",
+          lines: sourceOrder.lines.map(function (line) { return Object.assign({}, line); }),
+          approvals: []
+        });
+        var sourceIndex = orders.findIndex(function (order) { return order.id === sourceOrder.id; });
+        orders.splice(sourceIndex + 1, 0, copiedOrder);
+        renderTable();
+        notify("已复制为采购订单 " + copiedOrder.code, "success");
+      }
+
+      function openRowEditDialog(order, field) {
+        activeRowEditOrder = order;
+        activeRowEditField = field;
+        var isCode = field === "code";
+        rowEditDialogTitle.textContent = isCode ? "修改单据编码" : "修改单据摘要";
+        rowEditFieldLabel.textContent = isCode ? "单据编码" : "单据摘要";
+        rowEditFieldInput.maxLength = isCode ? 40 : 255;
+        rowEditFieldInput.placeholder = isCode ? "请输入单据编码" : "请输入单据摘要";
+        rowEditFieldInput.value = isCode ? order.code : order.summary;
+        openMask("rowEditDialog");
+        window.setTimeout(function () {
+          rowEditFieldInput.focus();
+          rowEditFieldInput.select();
+        }, 0);
+      }
+
+      function confirmRowEdit() {
+        if (!activeRowEditOrder || !activeRowEditField) return;
+        var value = rowEditFieldInput.value.trim();
+        if (activeRowEditField === "code") {
+          if (!value) {
+            notify("请输入单据编码", "warning");
+            rowEditFieldInput.focus();
+            return;
+          }
+          var duplicate = orders.find(function (order) { return order !== activeRowEditOrder && order.code === value; });
+          if (duplicate) {
+            notify("单据编码已存在，请重新输入", "warning");
+            rowEditFieldInput.focus();
+            return;
+          }
+          activeRowEditOrder.code = value;
+          notify("单据编码修改成功", "success");
+        } else {
+          activeRowEditOrder.summary = value;
+          notify("单据摘要修改成功", "success");
+        }
+        closeMask("rowEditDialog");
+        activeRowEditOrder = null;
+        activeRowEditField = "";
+        renderTable();
+      }
+
       document.getElementById("createButton").addEventListener("click", function () {
         openDetail(null);
       });
@@ -1013,10 +1113,12 @@
           return;
         }
         var rowAction = event.target.closest("[data-po-row-action]");
-        if (rowAction && rowAction.dataset.poRowAction === "copy") {
-          var copyOrder = orders.find(function (item) { return item.id === rowAction.dataset.orderId; });
-          if (copyOrder) notify("已复制单据编码 " + copyOrder.code, "success");
-        }
+        if (!rowAction) return;
+        var rowOrder = orders.find(function (item) { return item.id === rowAction.dataset.orderId; });
+        if (!rowOrder) return;
+        if (rowAction.dataset.poRowAction === "copy") copyOrder(rowOrder);
+        else if (rowAction.dataset.poRowAction === "edit-code") openRowEditDialog(rowOrder, "code");
+        else if (rowAction.dataset.poRowAction === "edit-summary") openRowEditDialog(rowOrder, "summary");
       }, true);
 
       tableBody.addEventListener("change", function (event) {
@@ -1123,6 +1225,13 @@
         closeMask("deleteMessageBox");
         renderTable();
         notify("已删除 " + deleteCount + " 条采购订单", "success");
+      });
+
+      document.getElementById("confirmRowEditButton").addEventListener("click", confirmRowEdit);
+      rowEditFieldInput.addEventListener("keydown", function (event) {
+        if (event.key !== "Enter") return;
+        event.preventDefault();
+        confirmRowEdit();
       });
 
       if (window.PrototypeKit) window.PrototypeKit.init(document);
