@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>采购订单</title>
+  <link rel="stylesheet" href="assets/vendor/prototype-kit.css">
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      background: #f7f8fa;
+      color: #2f3a4a;
+      font-family: var(--pk-font, "Microsoft YaHei", Arial, sans-serif);
+    }
+
+    button,
+    input,
+    select {
+      font-family: inherit;
+    }
+
+    .po-list-page {
+      width: 100%;
+      height: 100%;
+    }
+
+    .po-list-toolbar {
+      align-items: flex-start;
+    }
+
+    .po-list-toolbar .pk-list-toolbar-left {
+      flex-wrap: wrap;
+    }
+
+    .po-dropdown-btn::after {
+      content: "";
+      width: 0;
+      height: 0;
+      margin-left: 6px;
+      border-right: 4px solid transparent;
+      border-left: 4px solid transparent;
+      border-top: 5px solid currentColor;
+    }
+
+    .po-detail-toggle {
+      min-height: 28px;
+      padding: 0 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #606266;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .po-date-range {
+      height: 28px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 12px minmax(0, 1fr);
+      align-items: center;
+      gap: 4px;
+    }
+
+    .po-date-range input {
+      min-width: 0;
+      padding: 0 4px;
+      font-size: 12px;
+    }
+
+    .po-date-range span {
+      color: #909399;
+      text-align: center;
+    }
+
+    .po-inline-detail td {
+      height: auto;
+      padding: 0 !important;
+      background: #fbfdff !important;
+    }
+
+    .po-inline-detail-wrap {
+      padding: 10px 16px 12px 120px;
+      border-bottom: 1px solid #d9edf9;
+    }
+
+    .po-inline-detail-title {
+      margin-bottom: 8px;
+      color: #606266;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .po-inline-detail-table {
+      width: 100%;
+      min-width: 680px;
+      border-spacing: 0;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .po-inline-detail-table th,
+    .po-inline-detail-table td {
+      height: 34px;
+      padding: 5px 8px !important;
+      border: 1px solid #e8eaec;
+      background: #fff !important;
+      font-size: 12px;
+      font-weight: 400;
+      text-align: left;
+    }
+
+    .po-inline-detail-table th {
+      background: #f5f7fa !important;
+      color: #606266;
+      font-weight: 600;
+    }
+
+    .po-summary-empty {
+      color: #c0c4cc;
+      font-weight: 400 !important;
+    }
+
+    .po-dialog-empty-row td {
+      color: #909399;
+      text-align: center !important;
+    }
+
+    .po-messagebox-code {
+      color: #409eff;
+      font-weight: 600;
+    }
+
+    @media (max-width: 1180px) {
+      .pk-query-summary {
+        align-items: flex-start;
+      }
+
+      .pk-query-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .pk-query-input {
+        width: 210px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="pk-list-page po-list-page" data-pk-list-workbench>
+    <section class="pk-query-panel" aria-label="采购订单查询">
+      <div class="pk-query-summary">
+        <div class="pk-query-left">
+          <select class="pk-query-view" id="listView" aria-label="列表视图">
+            <option value="all">列表视图（全部）</option>
+          </select>
+          <div class="pk-query-filter" data-pk-query-filter>
+            <button class="pk-query-filter-btn" type="button" data-pk-query-filter-trigger aria-haspopup="true" aria-expanded="false">
+              <span data-pk-query-filter-label>选择过滤器</span>
+            </button>
+            <div class="pk-query-filter-panel" data-pk-query-filter-panel hidden>
+              <div class="pk-query-filter-title">预设过滤器</div>
+              <div class="pk-query-filter-list">
+                <button class="pk-query-filter-option" type="button" data-pk-query-filter-value data-po-preset="all">全部采购订单</button>
+                <button class="pk-query-filter-option" type="button" data-pk-query-filter-value data-po-preset="draft">待提交订单</button>
+                <button class="pk-query-filter-option" type="button" data-pk-query-filter-value data-po-preset="executing">执行中订单</button>
+                <button class="pk-query-filter-option" type="button" data-pk-query-filter-value data-po-preset="closed">已关闭订单</button>
+              </div>
+              <div class="pk-query-filter-title">个人过滤器</div>
+              <div class="pk-query-filter-empty">暂无过滤器</div>
+            </div>
+          </div>
+        </div>
+        <div class="pk-query-actions">
+          <input class="pk-query-input" id="quickSearch" type="search" placeholder="请输入关键字搜索" aria-label="请输入关键字搜索">
+          <button class="pk-query-btn is-primary" id="searchButton" type="button">搜索</button>
+          <button class="pk-query-btn" id="resetButton" type="button">重置</button>
+          <button class="pk-query-btn is-text" type="button" data-pk-query-toggle data-pk-expand-label="展开" data-pk-collapse-label="收起" aria-expanded="false">展开</button>
+          <button class="pk-query-btn is-text" type="button" data-po-action="save-filter">保存</button>
+          <button class="pk-query-btn is-text" type="button" data-po-action="save-filter-as">另存为</button>
+        </div>
+      </div>
+
+      <div class="pk-query-advanced" data-pk-query-advanced hidden>
+        <div class="pk-query-tabs" role="tablist" aria-label="查询属性分类">
+          <button class="pk-query-tab is-active" type="button" role="tab" aria-selected="true">普通属性</button>
+        </div>
+        <div class="pk-query-grid">
+          <div class="pk-query-field">
+            <label for="queryCode">单据编码</label>
+            <input id="queryCode" type="text" placeholder="请输入单据编码">
+          </div>
+          <div class="pk-query-field">
+            <label>单据日期</label>
+            <div class="po-date-range">
+              <input id="queryDateFrom" type="date" aria-label="单据日期开始">
+              <span>-</span>
+              <input id="queryDateTo" type="date" aria-label="单据日期结束">
+            </div>
+          </div>
+          <div class="pk-query-field">
+            <label id="sourceTypeLabel">来源类型</label>
+            <div class="pk-input-shell" data-pk-query-reference-trigger="sourceType" data-pk-placeholder="请选择来源类型" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="sourceTypeLabel">
+              <input type="hidden" value="[]" data-pk-query-reference-input>
+              <span class="value placeholder" data-pk-query-reference-value>请选择来源类型</span>
+              <span class="suffix-button">...</span>
+            </div>
+          </div>
+          <div class="pk-query-field">
+            <label id="contractTypeLabel">合同类型</label>
+            <div class="pk-input-shell" data-pk-query-reference-trigger="contractType" data-pk-placeholder="请选择合同类型" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="contractTypeLabel">
+              <input type="hidden" value="[]" data-pk-query-reference-input>
+              <span class="value placeholder" data-pk-query-reference-value>请选择合同类型</span>
+              <span class="suffix-button">...</span>
+            </div>
+          </div>
+          <div class="pk-query-field">
+            <label id="businessTypeLabel">业务类型</label>
+            <div class="pk-input-shell" data-pk-query-reference-trigger="businessType" data-pk-placeholder="请选择业务类型" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="businessTypeLabel">
+              <input type="hidden" value="[]" data-pk-query-reference-input>
+              <span class="value placeholder" data-pk-query-reference-value>请选择业务类型</span>
+              <span class="suffix-button">...</span>
+            </div>
+          </div>
+          <div class="pk-query-field">
+            <label id="supplierLabel">供应商</label>
+            <div class="pk-input-shell" data-pk-query-reference-trigger="supplier" data-pk-placeholder="请选择供应商" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="supplierLabel">
+              <input type="hidden" value="[]" data-pk-query-reference-input>
+              <span class="value placeholder" data-pk-query-reference-value>请选择供应商</span>
+              <span class="suffix-button">...</span>
+            </div>
+          </div>
+          <div class="pk-query-field">
+            <label for="queryQuantity">数量</label>
+            <input id="queryQuantity" type="number" min="0" step="0.01" placeholder="请输入数量">
+          </div>
+          <div class="pk-query-field">
+            <label for="queryTaxTotal">价税合计</label>
+            <input id="queryTaxTotal" type="number" min="0" step="0.01" placeholder="请输入价税合计">
+          </div>
+          <div class="pk-query-field">
+            <label id="buyerLabel">采购员</label>
+            <div class="pk-input-shell" data-pk-query-reference-trigger="buyer" data-pk-placeholder="请选择采购员" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="buyerLabel">
+              <input type="hidden" value="[]" data-pk-query-reference-input>
+              <span class="value placeholder" data-pk-query-reference-value>请选择采购员</span>
+              <span class="suffix-button">...</span>
+            </div>
+          </div>
+          <div class="pk-query-field">
+            <label id="departmentLabel">采购部门</label>
+            <div class="pk-input-shell" data-pk-query-reference-trigger="department" data-pk-placeholder="请选择采购部门" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="departmentLabel">
+              <input type="hidden" value="[]" data-pk-query-reference-input>
+              <span class="value placeholder" data-pk-query-reference-value>请选择采购部门</span>
+              <span class="suffix-button">...</span>
+            </div>
+          </div>
+          <div class="pk-query-field">
+            <label for="querySummary">单据摘要</label>
+            <input id="querySummary" type="text" placeholder="请输入单据摘要">
+          </div>
+          <div class="pk-query-field">
+            <label id="documentStatusLabel">单据状态</label>
+            <div class="pk-input-shell" data-pk-query-reference-trigger="documentStatus" data-pk-placeholder="请选择单据状态" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="documentStatusLabel">
+              <input type="hidden" value="[]" data-pk-query-reference-input>
+              <span class="value placeholder" data-pk-query-reference-value>请选择单据状态</span>
+              <span class="suffix-button">...</span>
+            </div>
+          </div>
+          <div class="pk-query-field">
+            <label id="approvalStatusLabel">审批状态</label>
+            <div class="pk-input-shell" data-pk-query-reference-trigger="approvalStatus" data-pk-placeholder="请选择审批状态" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="approvalStatusLabel">
+              <input type="hidden" value="[]" data-pk-query-reference-input>
+              <span class="value placeholder" data-pk-query-reference-value>请选择审批状态</span>
+              <span class="suffix-button">...</span>
+            </div>
+          </div>
+          <div class="pk-query-mode">
+            <button class="pk-query-mode-switch" type="button" data-po-action="advanced-mode">&gt;&gt;切换到高级检索</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pk-list-surface">
+      <div class="pk-list-toolbar po-list-toolbar">
+        <div class="pk-list-toolbar-left">
+          <button class="pk-list-toolbar-btn is-primary" id="createButton" type="button" data-pk-dialog-open="purchaseOrderDetailDialog">新增</button>
+          <button class="pk-list-toolbar-btn po-dropdown-btn" type="button" data-po-action="import">导入</button>
+          <button class="pk-list-toolbar-btn" type="button" data-po-action="void">作废</button>
+          <button class="pk-list-toolbar-btn" type="button" data-po-action="cancel-void">取消作废</button>
+          <button class="pk-list-toolbar-btn" type="button" data-po-action="delete">删除</button>
+          <button class="pk-list-toolbar-btn" type="button" data-po-action="submit">提交</button>
+          <button class="pk-list-toolbar-btn po-dropdown-btn" type="button" data-po-action="related-generate">关联生成</button>
+          <button class="pk-list-toolbar-btn po-dropdown-btn" type="button" data-po-action="related-query">关联查询</button>
+          <button class="pk-list-toolbar-btn" type="button" data-po-action="export">导出</button>
+          <button class="pk-list-toolbar-btn" type="button" data-po-action="print">打印</button>
+          <button class="pk-list-toolbar-btn" type="button" data-po-action="refresh">刷新</button>
+        </div>
+        <div class="pk-list-toolbar-right">
+          <label class="po-detail-toggle"><input class="pk-checkbox" id="showDetails" type="checkbox">显示明细</label>
+          <div class="pk-column-manager" data-pk-column-manager>
+            <button class="pk-grid-icon-btn" type="button" data-pk-column-trigger aria-label="列展示" title="列展示" aria-haspopup="true" aria-expanded="false">☷</button>
+            <div class="pk-column-panel" data-pk-column-panel hidden>
+              <div class="pk-column-panel-title">列展示</div>
+              <label class="pk-column-option"><input type="checkbox" data-pk-column-index="4" checked>单据编码</label>
+              <label class="pk-column-option"><input type="checkbox" data-pk-column-index="5" checked>单据日期</label>
+              <label class="pk-column-option"><input type="checkbox" data-pk-column-index="6" checked>来源类型</label>
+              <label class="pk-column-option"><input type="checkbox" data-pk-column-index="7" checked>合同类型</label>
+              <label class="pk-column-option"><input type="checkbox" data-pk-column-index="8" checked>业务类型</label>
+              <label class="pk-column-option"><input type="checkbox" data-pk-column-index="9" checked>供应商</label>
+              <label class="pk-column-option"><input type="checkbox" data-pk-column-index="10" checked>数量</label>
+              <label class="pk-column-option"><input type="checkbox" data-pk-column-index="11" checked>金额</label>
+              <label class="pk-column-option"><input type="checkbox" data-pk-column-index="12" checked>折扣额</label>
+              <label class="pk-column-option"><input type="checkbox" data-pk-column-index="13" checked>价税合计</label>
+              <label class="pk-column-option"><input type="checkbox" data-pk-column-index="14" checked>采购员</label>
+              <label class="pk-column-option"><input type="checkbox" data-pk-column-index="15" checked>采购部门</label>
+              <label class="pk-column-option"><input type="checkbox" data-pk-column-index="16" checked>单据摘要</label>
+              <label class="pk-column-option"><input type="checkbox" data-pk-column-index="17" checked>单据状态</label>
+              <label class="pk-column-option"><input type="checkbox" data-pk-column-index="18" checked>审批状态</label>
+              <label class="pk-column-option"><input type="checkbox" data-pk-column-index="19" checked>单据名称</label>
+            </div>
+          </div>
+          <button class="pk-grid-icon-btn" type="button" data-pk-list-fullscreen aria-label="全屏" title="全屏" aria-pressed="false">⛶</button>
+        </div>
+      </div>
+
+      <div class="pk-list-table-wrap">
+        <div class="pk-list-table-inner">
+          <table class="pk-list-table" data-pk-list-table>
+            <colgroup>
+              <col style="width: 58px"><col style="width: 58px"><col style="width: 44px"><col style="width: 150px"><col style="width: 120px"><col style="width: 110px"><col style="width: 110px"><col style="width: 120px"><col style="width: 210px"><col style="width: 100px"><col style="width: 110px"><col style="width: 100px"><col style="width: 120px"><col style="width: 110px"><col style="width: 130px"><col style="width: 180px"><col style="width: 100px"><col style="width: 100px"><col style="width: 110px">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>操作</th>
+                <th>序号</th>
+                <th class="is-center"><input class="pk-table-checkbox" id="selectAll" type="checkbox" data-pk-list-select-all aria-label="全选采购订单"></th>
+                <th>单据编码</th>
+                <th>单据日期</th>
+                <th>来源类型</th>
+                <th>合同类型</th>
+                <th>业务类型</th>
+                <th>供应商</th>
+                <th>数量</th>
+                <th>金额</th>
+                <th>折扣额</th>
+                <th>价税合计</th>
+                <th>采购员</th>
+                <th>采购部门</th>
+                <th>单据摘要</th>
+                <th>单据状态</th>
+                <th>审批状态</th>
+                <th>单据名称</th>
+              </tr>
+            </thead>
+            <tbody id="orderTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <footer class="pk-list-footer">
+        <span class="pk-list-selected">已勾选 <strong id="selectedCount" data-pk-list-selected-count>0</strong> 条</span>
+        <span class="pk-list-result-summary" id="resultSummary">当前显示 0 条</span>
+        <div class="pk-pagination" aria-label="分页">
+          <span id="totalCount">共 0 条</span>
+          <select class="pk-pagination-size" aria-label="每页条数"><option>50条/页</option></select>
+          <div class="pk-pagination-pages">
+            <button class="pk-pagination-btn" type="button" aria-label="上一页" disabled>‹</button>
+            <button class="pk-pagination-page is-active" type="button" aria-current="page">1</button>
+            <button class="pk-pagination-btn" type="button" aria-label="下一页" disabled>›</button>
+          </div>
+          <span>前往 <input class="pk-pagination-input" type="text" value="1" aria-label="页码"> 页</span>
+        </div>
+      </footer>
+
+      <div class="pk-query-reference-popover" data-pk-query-reference-popover role="dialog" aria-label="选择查询条件" aria-hidden="true" hidden>
+        <span class="pk-query-reference-arrow" aria-hidden="true"></span>
+        <div class="pk-query-reference-table-wrap">
+          <table class="pk-list-table" data-pk-query-reference-table></table>
+        </div>
+        <footer class="pk-query-reference-footer">
+          <span data-pk-query-reference-count>已选 0 项</span>
+          <div class="pk-query-reference-actions">
+            <button class="pk-query-reference-btn" type="button" data-pk-query-reference-action="clear">清空</button>
+            <button class="pk-query-reference-btn" type="button" data-pk-query-reference-action="cancel">取消</button>
+            <button class="pk-query-reference-btn is-primary" type="button" data-pk-query-reference-action="confirm">确定</button>
+          </div>
+        </footer>
+      </div>
+
+      <script type="application/json" data-pk-query-reference-data>
+        {
+          "sourceType": {
+            "valueKey": "name",
+            "columns": [{ "key": "name", "label": "来源类型", "width": 200 }],
+            "rows": [{ "name": "手工创建" }, { "name": "采购申请单" }, { "name": "MRP历史" }]
+          },
+          "contractType": {
+            "valueKey": "name",
+            "columns": [{ "key": "code", "label": "合同类型编码", "width": 150 }, { "key": "name", "label": "合同类型", "width": 200 }],
+            "rows": [{ "code": "CT-01", "name": "默认类型" }, { "code": "CT-02", "name": "年度采购合同" }, { "code": "CT-03", "name": "无合同" }]
+          },
+          "businessType": {
+            "valueKey": "name",
+            "columns": [{ "key": "code", "label": "业务类型编码", "width": 150 }, { "key": "name", "label": "业务类型", "width": 200 }],
+            "rows": [{ "code": "BT-01", "name": "默认类型" }, { "code": "BT-02", "name": "生产采购" }, { "code": "BT-03", "name": "备件采购" }]
+          },
+          "supplier": {
+            "valueKey": "name",
+            "columns": [{ "key": "code", "label": "供应商编码", "width": 150 }, { "key": "name", "label": "供应商", "width": 240 }],
+            "rows": [{ "code": "SUP-001", "name": "创维智造工业电子厂测试" }, { "code": "SUP-002", "name": "测试供应商" }, { "code": "SUP-003", "name": "成都四平精工有限公司" }]
+          },
+          "buyer": {
+            "valueKey": "name",
+            "columns": [{ "key": "code", "label": "人员编码", "width": 150 }, { "key": "name", "label": "采购员", "width": 180 }],
+            "rows": [{ "code": "U-001", "name": "蒋凤霞" }, { "code": "U-002", "name": "刘鑫" }, { "code": "U-003", "name": "Admin" }, { "code": "U-004", "name": "陈琳" }, { "code": "U-005", "name": "邓媛" }, { "code": "U-006", "name": "赖婷婷" }]
+          },
+          "department": {
+            "valueKey": "name",
+            "columns": [{ "key": "code", "label": "部门编码", "width": 150 }, { "key": "name", "label": "采购部门", "width": 180 }],
+            "rows": [{ "code": "DEP-01", "name": "西南片区" }, { "code": "DEP-02", "name": "华东片区" }, { "code": "DEP-03", "name": "东北地区" }]
+          },
+          "documentStatus": {
+            "valueKey": "name",
+            "columns": [{ "key": "name", "label": "单据状态", "width": 180 }],
+            "rows": [{ "name": "草稿" }, { "name": "执行中" }, { "name": "已关闭" }]
+          },
+          "approvalStatus": {
+            "valueKey": "name",
+            "columns": [{ "key": "name", "label": "审批状态", "width": 180 }],
+            "rows": [{ "name": "待审批" }, { "name": "审批中" }, { "name": "已结束" }]
+          }
+        }
+      </script>
+    </section>
+  </main>
+
+  <div class="pk-dialog-mask" id="purchaseOrderDetailDialog" aria-hidden="true">
+    <div class="pk-dialog pk-dialog--document-detail" role="dialog" aria-modal="true" aria-labelledby="purchaseOrderDetailTitle">
+      <div class="pk-dialog-header">
+        <h2 class="pk-dialog-title" id="purchaseOrderDetailTitle">采购订单详情</h2>
+        <button class="pk-dialog-close" type="button" data-pk-dialog-close aria-label="关闭"></button>
+      </div>
+      <div class="pk-dialog-body">
+        <div class="pk-document-summary">
+          <div class="pk-document-summary-item"><span>单据编码</span><strong id="detailCode"></strong></div>
+          <div class="pk-document-summary-item"><span>供应商</span><strong id="detailSupplier"></strong></div>
+          <div class="pk-document-summary-item"><span>采购部门</span><strong id="detailDepartment"></strong></div>
+          <div class="pk-document-summary-item"><span>单据状态</span><strong id="detailStatus"></strong></div>
+        </div>
+        <div class="pk-document-tabs" data-pk-document-tabs role="tablist">
+          <button class="pk-document-tab is-active" type="button" data-pk-document-tab="lines" role="tab" aria-selected="true">物料明细</button>
+          <button class="pk-document-tab" type="button" data-pk-document-tab="history" role="tab" aria-selected="false">审批记录</button>
+        </div>
+        <div class="pk-document-content" data-pk-document-panel="lines">
+          <div class="pk-list-table-wrap">
+            <div class="pk-list-table-inner">
+              <table class="pk-list-table">
+                <colgroup><col style="width: 70px"><col style="width: 180px"><col style="width: 240px"><col style="width: 110px"><col style="width: 100px"><col style="width: 120px"><col style="width: 130px"></colgroup>
+                <thead><tr><th>序号</th><th>物料编码</th><th>物料名称</th><th>数量</th><th>单位</th><th>含税单价</th><th>交货日期</th></tr></thead>
+                <tbody id="detailLineBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="pk-document-content" data-pk-document-panel="history" hidden>
+          <div class="pk-list-table-wrap">
+            <div class="pk-list-table-inner">
+              <table class="pk-list-table">
+                <colgroup><col style="width: 160px"><col style="width: 140px"><col style="width: 120px"><col style="width: 190px"></colgroup>
+                <thead><tr><th>节点</th><th>处理人</th><th>结果</th><th>处理时间</th></tr></thead>
+                <tbody id="detailApprovalBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pk-dialog-footer">
+        <button class="pk-dialog-btn" id="detailPrintButton" type="button">打印</button>
+        <button class="pk-dialog-btn" type="button" data-pk-dialog-close>关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pk-dialog-mask pk-messagebox-mask" id="deleteMessageBox" aria-hidden="true">
+    <div class="pk-dialog pk-dialog--messagebox" role="alertdialog" aria-modal="true" aria-labelledby="deleteMessageBoxTitle" aria-describedby="deleteMessageBoxText">
+      <div class="pk-dialog-header">
+        <h2 class="pk-dialog-title" id="deleteMessageBoxTitle">删除确认</h2>
+        <button class="pk-dialog-close" type="button" data-pk-dialog-close aria-label="关闭"></button>
+      </div>
+      <div class="pk-messagebox-body" id="deleteMessageBoxText">
+        <span class="pk-messagebox-icon" aria-hidden="true">!</span>
+        <p>确定删除选中的采购订单吗？删除后不可恢复。</p>
+      </div>
+      <div class="pk-dialog-footer">
+        <button class="pk-dialog-btn is-primary" id="confirmDeleteButton" type="button">删除</button>
+        <button class="pk-dialog-btn" type="button" data-pk-dialog-close>取消</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pk-message-host" data-pk-message-host aria-live="polite" aria-atomic="true"></div>
+
+  <script src="assets/vendor/prototype-kit.js"></script>
+  <script>
+    (function () {
+      "use strict";
+
+      var seedOrders = [
+        { id: "PO-0618", code: "20260804-0618", date: "2026-08-04", sourceType: "手工创建", contractType: "", businessType: "默认类型", supplier: "创维智造工业电子厂测试", quantity: 20, amount: 519.80, discount: 0, taxTotal: 519.80, buyer: "蒋凤霞", department: "西南片区", summary: "电子元件月度补货", documentStatus: "执行中", approvalStatus: "已结束", documentName: "采购订单" },
+        { id: "PO-0617", code: "20260804-0617", date: "2026-08-04", sourceType: "手工创建", contractType: "", businessType: "默认类型", supplier: "创维智造工业电子厂测试", quantity: 30, amount: 1519.80, discount: 0, taxTotal: 1519.80, buyer: "蒋凤霞", department: "西南片区", summary: "生产线常用件采购", documentStatus: "执行中", approvalStatus: "已结束", documentName: "采购订单" },
+        { id: "PO-0615", code: "20260731-0615", date: "2026-07-31", sourceType: "手工创建", contractType: "", businessType: "默认类型", supplier: "创维智造工业电子厂测试", quantity: 12, amount: 102.21, discount: 0, taxTotal: 108.00, buyer: "蒋凤霞", department: "西南片区", summary: "车间辅料补充", documentStatus: "执行中", approvalStatus: "已结束", documentName: "采购订单" },
+        { id: "PO-0614", code: "20260731-0614", date: "2026-10-08", sourceType: "手工创建", contractType: "年度采购合同", businessType: "默认类型", supplier: "创维智造工业电子厂测试", quantity: 20, amount: 188.70, discount: 0, taxTotal: 210.57, buyer: "蒋凤霞", department: "西南片区", summary: "计划调整后关闭", documentStatus: "已关闭", approvalStatus: "已结束", documentName: "采购订单" },
+        { id: "PO-0613", code: "20260731-0613", date: "2026-09-17", sourceType: "手工创建", contractType: "", businessType: "默认类型", supplier: "创维智造工业电子厂测试", quantity: 1, amount: 0, discount: 0, taxTotal: 0, buyer: "蒋凤霞", department: "西南片区", summary: "样品采购", documentStatus: "执行中", approvalStatus: "已结束", documentName: "采购订单" },
+        { id: "PO-0612", code: "20260731-0612", date: "2026-08-07", sourceType: "手工创建", contractType: "", businessType: "备件采购", supplier: "创维智造工业电子厂测试", quantity: 1, amount: 9.65, discount: 0, taxTotal: 10.90, buyer: "蒋凤霞", department: "西南片区", summary: "设备维修备件", documentStatus: "执行中", approvalStatus: "已结束", documentName: "采购订单" },
+        { id: "PO-0607", code: "20260730-0607", date: "2026-07-30", sourceType: "手工创建", contractType: "", businessType: "默认类型", supplier: "创维智造工业电子厂测试", quantity: 1, amount: 20, discount: 0, taxTotal: 21.13, buyer: "刘鑫", department: "东北地区", summary: "东北区域备件", documentStatus: "已关闭", approvalStatus: "已结束", documentName: "采购订单" },
+        { id: "PO-0601", code: "20260729-0601", date: "2026-07-29", sourceType: "手工创建", contractType: "", businessType: "生产采购", supplier: "创维智造工业电子厂测试", quantity: 12, amount: 295.17, discount: 0, taxTotal: 311.88, buyer: "Admin", department: "", summary: "待提交生产物料", documentStatus: "草稿", approvalStatus: "待审批", documentName: "采购订单" },
+        { id: "PO-0585", code: "20260716-0585", date: "2026-07-16", sourceType: "采购申请单", contractType: "", businessType: "默认类型", supplier: "创维智造工业电子厂测试", quantity: 1, amount: 0, discount: 0, taxTotal: 0, buyer: "Admin", department: "", summary: "申请转采购订单", documentStatus: "草稿", approvalStatus: "待审批", documentName: "采购订单" },
+        { id: "PO-0583", code: "20260716-0583", date: "2026-07-16", sourceType: "手工创建", contractType: "年度采购合同", businessType: "生产采购", supplier: "测试供应商", quantity: 1000, amount: 10000, discount: 0, taxTotal: 11300, buyer: "陈琳", department: "西南片区", summary: "年度框架采购", documentStatus: "已关闭", approvalStatus: "已结束", documentName: "采购订单" },
+        { id: "PO-0582", code: "20260713-0582", date: "2026-07-13", sourceType: "MRP历史", contractType: "", businessType: "生产采购", supplier: "测试供应商", quantity: 206, amount: 0, discount: 0, taxTotal: 0, buyer: "陈琳", department: "西南片区", summary: "MRP建议转单", documentStatus: "执行中", approvalStatus: "已结束", documentName: "采购订单" },
+        { id: "PO-0578", code: "20260708-0578", date: "2026-07-08", sourceType: "采购申请单", contractType: "无合同", businessType: "备件采购", supplier: "创维智造工业电子厂测试", quantity: 13, amount: 165, discount: 0, taxTotal: 178.65, buyer: "赖婷婷", department: "华东片区", summary: "华东区域备件", documentStatus: "执行中", approvalStatus: "已结束", documentName: "采购订单" }
+      ];
+
+      seedOrders.forEach(function (order, index) {
+        order.lines = [
+          { code: "MAT-" + String(index + 18).padStart(6, "0"), name: index % 2 ? "精密轴承组件" : "工业控制模块", quantity: Math.max(1, Math.min(order.quantity, 20)), unit: "个", taxPrice: order.quantity ? order.taxTotal / order.quantity : 0, deliveryDate: order.date },
+          { code: "MAT-" + String(index + 42).padStart(6, "0"), name: index % 2 ? "不锈钢紧固件" : "设备密封圈", quantity: Math.max(1, Math.min(order.quantity, 10)), unit: "个", taxPrice: order.quantity ? order.taxTotal / order.quantity : 0, deliveryDate: order.date }
+        ];
+        order.approvals = order.approvalStatus === "待审批" ? [] : [
+          { node: "采购经理审批", owner: order.buyer || "Admin", result: "通过", time: order.date + " 10:26" }
+        ];
+      });
+
+      var orders = seedOrders.map(function (order) {
+        return Object.assign({}, order, { lines: order.lines.map(function (line) { return Object.assign({}, line); }), approvals: order.approvals.map(function (approval) { return Object.assign({}, approval); }) });
+      });
+      var selectedIds = new Set();
+      var visibleOrders = [];
+      var tableBody = document.getElementById("orderTableBody");
+      var selectAll = document.getElementById("selectAll");
+      var showDetails = document.getElementById("showDetails");
+
+      function escapeHtml(value) {
+        return String(value == null ? "" : value).replace(/[&<>\"]/g, function (character) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[character];
+        });
+      }
+
+      function formatNumber(value) {
+        return Number(value || 0).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      function notify(message, type) {
+        if (window.PrototypeKit && typeof window.PrototypeKit.message === "function") {
+          window.PrototypeKit.message(message, type || "success", 2400);
+        }
+      }
+
+      function parseReferenceValues(source) {
+        var trigger = document.querySelector('[data-pk-query-reference-trigger="' + source + '"]');
+        var input = trigger ? trigger.querySelector("[data-pk-query-reference-input]") : null;
+        if (!input) return [];
+        try {
+          var parsed = JSON.parse(input.value || "[]");
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (error) {
+          return [];
+        }
+      }
+
+      function setReferenceValues(source, values) {
+        var trigger = document.querySelector('[data-pk-query-reference-trigger="' + source + '"]');
+        if (!trigger) return;
+        var input = trigger.querySelector("[data-pk-query-reference-input]");
+        var valueNode = trigger.querySelector("[data-pk-query-reference-value]");
+        var placeholder = trigger.dataset.pkPlaceholder || "请选择";
+        if (input) input.value = JSON.stringify(values || []);
+        if (valueNode) {
+          valueNode.textContent = values && values.length ? values.join("、") : placeholder;
+          valueNode.classList.toggle("placeholder", !values || values.length === 0);
+        }
+      }
+
+      function matchesReference(orderValue, source) {
+        var values = parseReferenceValues(source);
+        return values.length === 0 || values.indexOf(orderValue) >= 0;
+      }
+
+      function filterOrders() {
+        var keyword = document.getElementById("quickSearch").value.trim().toLowerCase();
+        var code = document.getElementById("queryCode").value.trim().toLowerCase();
+        var dateFrom = document.getElementById("queryDateFrom").value;
+        var dateTo = document.getElementById("queryDateTo").value;
+        var quantity = document.getElementById("queryQuantity").value;
+        var taxTotal = document.getElementById("queryTaxTotal").value;
+        var summary = document.getElementById("querySummary").value.trim().toLowerCase();
+
+        return orders.filter(function (order) {
+          var quickText = [order.code, order.supplier, order.buyer, order.summary].join(" ").toLowerCase();
+          return (!keyword || quickText.indexOf(keyword) >= 0)
+            && (!code || order.code.toLowerCase().indexOf(code) >= 0)
+            && (!dateFrom || order.date >= dateFrom)
+            && (!dateTo || order.date <= dateTo)
+            && matchesReference(order.sourceType, "sourceType")
+            && matchesReference(order.contractType, "contractType")
+            && matchesReference(order.businessType, "businessType")
+            && matchesReference(order.supplier, "supplier")
+            && (quantity === "" || Number(order.quantity) === Number(quantity))
+            && (taxTotal === "" || Number(order.taxTotal) === Number(taxTotal))
+            && matchesReference(order.buyer, "buyer")
+            && matchesReference(order.department, "department")
+            && (!summary || order.summary.toLowerCase().indexOf(summary) >= 0)
+            && matchesReference(order.documentStatus, "documentStatus")
+            && matchesReference(order.approvalStatus, "approvalStatus");
+        });
+      }
+
+      function inlineDetailMarkup(order) {
+        var rows = order.lines.map(function (line, index) {
+          return "<tr><td>" + (index + 1) + "</td><td>" + escapeHtml(line.code) + "</td><td>" + escapeHtml(line.name) + "</td><td>" + formatNumber(line.quantity) + "</td><td>" + escapeHtml(line.unit) + "</td><td>" + escapeHtml(line.deliveryDate) + "</td></tr>";
+        }).join("");
+        return '<tr class="po-inline-detail"' + (showDetails.checked ? "" : " hidden") + '><td colspan="19"><div class="po-inline-detail-wrap"><div class="po-inline-detail-title">物料明细</div><table class="po-inline-detail-table"><thead><tr><th>序号</th><th>物料编码</th><th>物料名称</th><th>数量</th><th>单位</th><th>交货日期</th></tr></thead><tbody>' + rows + "</tbody></table></div></td></tr>";
+      }
+
+      function orderRowMarkup(order, index) {
+        var checked = selectedIds.has(order.id) ? " checked" : "";
+        return '<tr data-order-row="' + escapeHtml(order.id) + '">'
+          + '<td><div class="pk-row-menu" data-pk-row-menu><button class="pk-row-menu-trigger" type="button" data-pk-row-menu-trigger aria-label="第 ' + (index + 1) + ' 行操作" aria-haspopup="true" aria-expanded="false">...</button><div class="pk-row-menu-popover" data-pk-row-menu-panel hidden><button type="button" data-po-detail="' + escapeHtml(order.id) + '" data-pk-dialog-open="purchaseOrderDetailDialog">查看</button><button type="button" data-po-row-action="copy" data-order-id="' + escapeHtml(order.id) + '">复制编码</button></div></div></td>'
+          + "<td>" + (index + 1) + "</td>"
+          + '<td class="is-center"><input class="pk-table-checkbox" type="checkbox" data-pk-list-row-select data-order-id="' + escapeHtml(order.id) + '" aria-label="选择第 ' + (index + 1) + ' 行"' + checked + "></td>"
+          + '<td><button class="pk-list-link" type="button" data-po-detail="' + escapeHtml(order.id) + '" data-pk-dialog-open="purchaseOrderDetailDialog">' + escapeHtml(order.code) + "</button></td>"
+          + "<td>" + escapeHtml(order.date) + "</td>"
+          + "<td>" + escapeHtml(order.sourceType) + "</td>"
+          + "<td>" + escapeHtml(order.contractType) + "</td>"
+          + "<td>" + escapeHtml(order.businessType) + "</td>"
+          + "<td>" + escapeHtml(order.supplier) + "</td>"
+          + "<td>" + formatNumber(order.quantity) + "</td>"
+          + "<td>" + formatNumber(order.amount) + "</td>"
+          + "<td>" + formatNumber(order.discount) + "</td>"
+          + "<td>" + formatNumber(order.taxTotal) + "</td>"
+          + "<td>" + escapeHtml(order.buyer) + "</td>"
+          + "<td>" + escapeHtml(order.department) + "</td>"
+          + "<td>" + escapeHtml(order.summary) + "</td>"
+          + "<td>" + escapeHtml(order.documentStatus) + "</td>"
+          + "<td>" + escapeHtml(order.approvalStatus) + "</td>"
+          + "<td>" + escapeHtml(order.documentName) + "</td>"
+          + "</tr>" + inlineDetailMarkup(order);
+      }
+
+      function updateSelectionState() {
+        document.getElementById("selectedCount").textContent = String(selectedIds.size);
+        var visibleIds = visibleOrders.map(function (order) { return order.id; });
+        var selectedVisibleCount = visibleIds.filter(function (id) { return selectedIds.has(id); }).length;
+        selectAll.checked = visibleIds.length > 0 && selectedVisibleCount === visibleIds.length;
+        selectAll.indeterminate = selectedVisibleCount > 0 && selectedVisibleCount < visibleIds.length;
+      }
+
+      function renderTable() {
+        visibleOrders = filterOrders();
+        tableBody.innerHTML = visibleOrders.length
+          ? visibleOrders.map(orderRowMarkup).join("")
+          : '<tr class="pk-empty-row"><td colspan="19"><div class="pk-empty"><div class="pk-empty-title">暂无采购订单</div></div></td></tr>';
+        document.getElementById("totalCount").textContent = "共 " + visibleOrders.length + " 条";
+        document.getElementById("resultSummary").textContent = "当前显示 " + visibleOrders.length + " 条";
+        updateSelectionState();
+        if (window.PrototypeKit) window.PrototypeKit.init(tableBody);
+      }
+
+      function clearFilters() {
+        ["quickSearch", "queryCode", "queryDateFrom", "queryDateTo", "queryQuantity", "queryTaxTotal", "querySummary"].forEach(function (id) {
+          document.getElementById(id).value = "";
+        });
+        ["sourceType", "contractType", "businessType", "supplier", "buyer", "department", "documentStatus", "approvalStatus"].forEach(function (source) {
+          setReferenceValues(source, []);
+        });
+        var label = document.querySelector("[data-pk-query-filter-label]");
+        if (label) label.textContent = "选择过滤器";
+      }
+
+      function openMask(id) {
+        var mask = document.getElementById(id);
+        if (!mask) return;
+        mask.classList.add("is-visible");
+        mask.setAttribute("aria-hidden", "false");
+        document.body.classList.add("pk-dialog-open");
+      }
+
+      function closeMask(id) {
+        var mask = document.getElementById(id);
+        if (!mask) return;
+        mask.classList.remove("is-visible");
+        mask.setAttribute("aria-hidden", "true");
+        document.body.classList.toggle("pk-dialog-open", !!document.querySelector(".pk-dialog-mask.is-visible"));
+      }
+
+      function prepareDetail(order) {
+        var isNew = !order;
+        document.getElementById("purchaseOrderDetailTitle").textContent = isNew ? "新增采购订单" : "采购订单详情";
+        document.getElementById("detailCode").textContent = isNew ? "保存后自动生成" : order.code;
+        document.getElementById("detailSupplier").textContent = isNew ? "请选择供应商" : order.supplier;
+        document.getElementById("detailDepartment").textContent = isNew ? "当前采购组织" : (order.department || "-");
+        document.getElementById("detailStatus").textContent = isNew ? "草稿" : order.documentStatus;
+        ["detailCode", "detailSupplier", "detailDepartment"].forEach(function (id) {
+          document.getElementById(id).classList.toggle("po-summary-empty", isNew);
+        });
+        var lines = isNew ? [{ code: "", name: "", quantity: 0, unit: "", taxPrice: 0, deliveryDate: "" }] : order.lines;
+        document.getElementById("detailLineBody").innerHTML = lines.map(function (line, index) {
+          return "<tr><td>" + (index + 1) + "</td><td>" + escapeHtml(line.code) + "</td><td>" + escapeHtml(line.name) + "</td><td>" + formatNumber(line.quantity) + "</td><td>" + escapeHtml(line.unit) + "</td><td>" + formatNumber(line.taxPrice) + "</td><td>" + escapeHtml(line.deliveryDate) + "</td></tr>";
+        }).join("");
+        var approvals = isNew ? [] : order.approvals;
+        document.getElementById("detailApprovalBody").innerHTML = approvals.length
+          ? approvals.map(function (approval) { return "<tr><td>" + escapeHtml(approval.node) + "</td><td>" + escapeHtml(approval.owner) + "</td><td>" + escapeHtml(approval.result) + "</td><td>" + escapeHtml(approval.time) + "</td></tr>"; }).join("")
+          : '<tr class="po-dialog-empty-row"><td colspan="4">暂无审批记录</td></tr>';
+      }
+
+      function selectedOrders() {
+        return orders.filter(function (order) { return selectedIds.has(order.id); });
+      }
+
+      function requireSelection() {
+        if (selectedIds.size) return true;
+        notify("请先勾选采购订单", "warning");
+        return false;
+      }
+
+      function changeStatus(action) {
+        if (!requireSelection()) return;
+        var chosen = selectedOrders();
+        if (action === "submit") {
+          var submitBlocker = chosen.find(function (order) { return order.documentStatus !== "草稿"; });
+          if (submitBlocker) {
+            notify("仅草稿订单可提交：" + submitBlocker.code, "warning");
+            return;
+          }
+          chosen.forEach(function (order) { order.documentStatus = "执行中"; order.approvalStatus = "已结束"; });
+          notify("已提交 " + chosen.length + " 条采购订单", "success");
+        } else if (action === "void") {
+          chosen.forEach(function (order) { order.documentStatus = "已关闭"; });
+          notify("已作废 " + chosen.length + " 条采购订单", "success");
+        } else if (action === "cancel-void") {
+          var cancelBlocker = chosen.find(function (order) { return order.documentStatus !== "已关闭"; });
+          if (cancelBlocker) {
+            notify("仅已关闭订单可取消作废：" + cancelBlocker.code, "warning");
+            return;
+          }
+          chosen.forEach(function (order) { order.documentStatus = "草稿"; order.approvalStatus = "待审批"; });
+          notify("已取消作废 " + chosen.length + " 条采购订单", "success");
+        }
+        selectedIds.clear();
+        renderTable();
+      }
+
+      function requestDelete() {
+        if (!requireSelection()) return;
+        var chosen = selectedOrders();
+        var blocker = chosen.find(function (order) { return order.documentStatus !== "草稿"; });
+        if (blocker) {
+          notify("仅草稿订单可删除：" + blocker.code, "warning");
+          return;
+        }
+        document.querySelector("#deleteMessageBoxText p").innerHTML = "确定删除选中的 <span class=\"po-messagebox-code\">" + chosen.length + "</span> 条采购订单吗？删除后不可恢复。";
+        openMask("deleteMessageBox");
+      }
+
+      document.getElementById("createButton").addEventListener("click", function () {
+        prepareDetail(null);
+      }, true);
+
+      tableBody.addEventListener("click", function (event) {
+        var detailButton = event.target.closest("[data-po-detail]");
+        if (detailButton) {
+          var order = orders.find(function (item) { return item.id === detailButton.dataset.poDetail; });
+          prepareDetail(order || null);
+          return;
+        }
+        var rowAction = event.target.closest("[data-po-row-action]");
+        if (rowAction && rowAction.dataset.poRowAction === "copy") {
+          var copyOrder = orders.find(function (item) { return item.id === rowAction.dataset.orderId; });
+          if (copyOrder) notify("已复制单据编码 " + copyOrder.code, "success");
+        }
+      }, true);
+
+      tableBody.addEventListener("change", function (event) {
+        var checkbox = event.target.closest("[data-order-id][data-pk-list-row-select]");
+        if (!checkbox) return;
+        if (checkbox.checked) selectedIds.add(checkbox.dataset.orderId);
+        else selectedIds.delete(checkbox.dataset.orderId);
+        updateSelectionState();
+      });
+
+      selectAll.addEventListener("change", function () {
+        visibleOrders.forEach(function (order) {
+          if (selectAll.checked) selectedIds.add(order.id);
+          else selectedIds.delete(order.id);
+        });
+        renderTable();
+      });
+
+      showDetails.addEventListener("change", function () {
+        document.querySelectorAll(".po-inline-detail").forEach(function (row) {
+          row.hidden = !showDetails.checked;
+        });
+      });
+
+      document.getElementById("searchButton").addEventListener("click", function () {
+        selectedIds.clear();
+        renderTable();
+        notify("查询完成，共 " + visibleOrders.length + " 条", "success");
+      });
+
+      document.getElementById("quickSearch").addEventListener("keydown", function (event) {
+        if (event.key !== "Enter") return;
+        selectedIds.clear();
+        renderTable();
+      });
+
+      document.getElementById("resetButton").addEventListener("click", function () {
+        clearFilters();
+        selectedIds.clear();
+        renderTable();
+      });
+
+      document.addEventListener("click", function (event) {
+        var preset = event.target.closest("[data-po-preset]");
+        if (preset) {
+          clearFilters();
+          if (preset.dataset.poPreset === "draft") setReferenceValues("documentStatus", ["草稿"]);
+          if (preset.dataset.poPreset === "executing") setReferenceValues("documentStatus", ["执行中"]);
+          if (preset.dataset.poPreset === "closed") setReferenceValues("documentStatus", ["已关闭"]);
+          selectedIds.clear();
+          renderTable();
+          return;
+        }
+
+        var actionButton = event.target.closest("[data-po-action]");
+        if (!actionButton) return;
+        var action = actionButton.dataset.poAction;
+        if (action === "delete") requestDelete();
+        else if (["submit", "void", "cancel-void"].indexOf(action) >= 0) changeStatus(action);
+        else if (action === "refresh") {
+          renderTable();
+          notify("数据已刷新", "success");
+        } else if (action === "save-filter") notify("当前查询方案已保存", "success");
+        else if (action === "save-filter-as") notify("已另存为个人查询方案", "success");
+        else if (action === "advanced-mode") notify("高级检索条件已保留", "info");
+        else if (action === "import") notify("已打开采购订单导入入口", "info");
+        else if (action === "related-generate") notify("请选择关联生成的目标单据", "info");
+        else if (action === "related-query") notify("已打开关联单据查询", "info");
+        else if (action === "export") notify("已生成当前查询结果的导出任务", "success");
+        else if (action === "print") notify("已打开采购订单列表打印预览", "info");
+      });
+
+      document.getElementById("confirmDeleteButton").addEventListener("click", function () {
+        var deleteCount = selectedIds.size;
+        orders = orders.filter(function (order) { return !selectedIds.has(order.id); });
+        selectedIds.clear();
+        closeMask("deleteMessageBox");
+        renderTable();
+        notify("已删除 " + deleteCount + " 条采购订单", "success");
+      });
+
+      document.getElementById("detailPrintButton").addEventListener("click", function () {
+        notify("已打开采购订单打印预览", "info");
+      });
+
+      if (window.PrototypeKit) window.PrototypeKit.init(document);
+      renderTable();
+    })();
+  </script>
+</body>
+</html>

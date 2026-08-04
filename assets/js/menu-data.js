@@ -145,7 +145,12 @@
               id: "purchase-execution",
               label: "采购执行",
               items: [
-                leaf("purchase-order", "采购订单", "#/supply-chain-management/purchase-management/purchase-execution/purchase-order"),
+                leaf(
+                  "purchase-order",
+                  "采购订单",
+                  "#/supply-chain-management/purchase-management/purchase-execution/purchase-order",
+                  "采购订单-列表.html"
+                ),
                 leaf("purchase-order-change", "采购订单变更单", "#/supply-chain-management/purchase-management/purchase-execution/purchase-order-change"),
                 leaf("purchase-receipt", "采购收货单", "#/supply-chain-management/purchase-management/purchase-execution/purchase-receipt"),
                 leaf("purchase-inbound", "采购入库单", "#/supply-chain-management/purchase-management/purchase-execution/purchase-inbound"),
