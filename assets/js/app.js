@@ -555,7 +555,7 @@
           ".purchase-list-table tbody tr:hover td{background:#e6f7ff!important}",
           ".srm-prototype{min-width:0!important;border:0!important}",
           ".layout{min-height:0!important}",
-          "html,body{margin:0!important;background:#fff!important}"
+          "html,body{margin:0!important}"
         ].join("");
         frameDocument.head.append(style);
       }
