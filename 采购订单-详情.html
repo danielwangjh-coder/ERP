@@ -376,8 +376,10 @@
       z-index: 30;
       top: 34px;
       right: 34px;
-      width: 156px;
+      width: 190px;
+      max-height: 360px;
       padding: 8px 10px;
+      overflow-y: auto;
       border: 1px solid #ebeef5;
       border-radius: 4px;
       background: #fff;
@@ -407,8 +409,8 @@
     }
 
     .po-material-table {
-      width: 2800px;
-      min-width: 2800px;
+      width: 5830px;
+      min-width: 5830px;
     }
 
     .po-summary-table {
@@ -729,19 +731,12 @@
               <div class="pk-grid-search"><span aria-hidden="true">⌕</span><input id="materialSearch" type="search" placeholder="请输入关键字搜索" aria-label="请输入关键字搜索"></div>
               <button class="pk-grid-icon-btn" id="columnButton" type="button" title="列设置" aria-label="列设置">☰</button>
               <button class="pk-grid-icon-btn" id="fullscreenButton" type="button" title="全屏" aria-label="全屏">⛶</button>
-              <div class="po-column-panel" id="columnPanel" hidden>
-                <label><input class="pk-checkbox" type="checkbox" data-column-toggle="spec" checked>规格</label>
-                <label><input class="pk-checkbox" type="checkbox" data-column-toggle="model" checked>型号</label>
-                <label><input class="pk-checkbox" type="checkbox" data-column-toggle="sourceNo" checked>来源单号</label>
-                <label><input class="pk-checkbox" type="checkbox" data-column-toggle="rowRemark" checked>行备注</label>
-              </div>
+              <div class="po-column-panel" id="columnPanel" hidden></div>
             </div>
           </div>
           <div class="po-table-grid-wrap">
             <table class="pk-erp-table po-material-table" id="materialTable">
-              <colgroup>
-                <col style="width:104px"><col style="width:64px"><col style="width:56px"><col style="width:140px"><col style="width:180px"><col style="width:120px"><col style="width:120px"><col style="width:90px"><col style="width:160px"><col style="width:150px"><col style="width:76px"><col style="width:110px"><col style="width:120px"><col style="width:120px"><col style="width:90px"><col style="width:120px"><col style="width:130px"><col style="width:130px"><col style="width:130px"><col style="width:150px"><col style="width:160px">
-              </colgroup>
+              <colgroup id="materialColgroup"></colgroup>
               <thead id="materialHead"></thead>
               <tbody id="materialBody"></tbody>
               <tfoot id="materialFoot"></tfoot>
@@ -809,8 +804,12 @@
       "settleSupplier": {"valueKey":"name","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"code","label":"供应商编码","width":"180px"},{"key":"name","label":"结算供应商","width":"260px"}],"rows":[{"seq":"1","code":"000002","name":"测试供应商"},{"seq":"2","code":"000005","name":"创维智造工业电子厂测试"}]},
       "settleMethod": {"valueKey":"name","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"name","label":"结算方式","width":"220px"}],"rows":[{"seq":"1","name":"现金"},{"seq":"2","name":"银行转账"},{"seq":"3","name":"承兑汇票"}]},
       "paymentTerm": {"valueKey":"name","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"name","label":"付款条件","width":"220px"}],"rows":[{"seq":"1","name":"按金额"},{"seq":"2","name":"月结30天"},{"seq":"3","name":"货到付款"}]},
-      "materialCode": {"valueKey":"materialCode","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"materialCode","label":"物料编码","width":"180px"},{"key":"materialName","label":"物料名称","width":"240px"},{"key":"spec","label":"规格","width":"180px"},{"key":"model","label":"型号","width":"160px"}],"rows":[{"seq":"1","materialCode":"000000","materialName":"自动化测试专用物料","spec":"","model":"","unit":"个","factory":"成都工厂","unitPrice":21.39},{"seq":"2","materialCode":"00000001","materialName":"yyy-测试物料","spec":"规格","model":"型号","unit":"个","factory":"成都工厂","unitPrice":18.6},{"seq":"3","materialCode":"000001","materialName":"测试物料0516","spec":"12","model":"252","unit":"个","factory":"成都工厂","unitPrice":88.5},{"seq":"4","materialCode":"000002","materialName":"原材料1","spec":"原材料1规格","model":"原材料1型号","unit":"千克","factory":"成都工厂","unitPrice":36},{"seq":"5","materialCode":"000003","materialName":"原材料2","spec":"","model":"","unit":"件","factory":"成都工厂","unitPrice":52}]},
-      "factory": {"valueKey":"name","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"code","label":"工厂编码","width":"180px"},{"key":"name","label":"工厂名称","width":"240px"}],"rows":[{"seq":"1","code":"FAC-001","name":"成都工厂"},{"seq":"2","code":"FAC-002","name":"上海工厂"},{"seq":"3","code":"FAC-003","name":"苏州工厂"}]}
+      "materialCode": {"valueKey":"materialCode","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"materialCode","label":"物料编码","width":"180px"},{"key":"materialName","label":"物料名称","width":"240px"},{"key":"spec","label":"规格","width":"180px"},{"key":"model","label":"型号","width":"160px"}],"rows":[{"seq":"1","materialCode":"000000","materialName":"自动化测试专用物料","spec":"标准件","model":"AT-001","unit":"个","factory":"成都工厂","unitPrice":21.39,"currentStock":1280,"supplierMaterialNo":"SK-AT-001","supplierMaterialName":"自动化测试件","brand":"SmartOne","materialGrade":"Q235","color":"黑色","version":"V1.0","stageMark":"量产","drawingNo":"DWG-AT-001","qualityGrade":"A","tempRange":"-20~60C"},{"seq":"2","materialCode":"00000001","materialName":"yyy-测试物料","spec":"规格","model":"型号","unit":"个","factory":"成都工厂","unitPrice":18.6,"currentStock":640,"supplierMaterialNo":"SK-YYY-01","supplierMaterialName":"供应商测试物料","brand":"SmartOne","materialGrade":"铝合金","color":"银色","version":"V2.0","stageMark":"试产","drawingNo":"DWG-YYY-01","qualityGrade":"A","tempRange":"常温"},{"seq":"3","materialCode":"000001","materialName":"测试物料0516","spec":"12","model":"252","unit":"个","factory":"成都工厂","unitPrice":88.5,"currentStock":320,"supplierMaterialNo":"SK-000001","supplierMaterialName":"测试物料0516供方版","brand":"创维智造","materialGrade":"ABS","color":"白色","version":"V1.2","stageMark":"量产","drawingNo":"DWG-000001","qualityGrade":"B","tempRange":"0~45C"},{"seq":"4","materialCode":"000002","materialName":"原材料1","spec":"原材料1规格","model":"原材料1型号","unit":"千克","factory":"成都工厂","unitPrice":36,"currentStock":2680,"supplierMaterialNo":"RM-001","supplierMaterialName":"原材料一号","brand":"华鑫源","materialGrade":"304","color":"本色","version":"V1.0","stageMark":"量产","drawingNo":"","qualityGrade":"A","tempRange":"常温"},{"seq":"5","materialCode":"000003","materialName":"原材料2","spec":"","model":"","unit":"件","factory":"成都工厂","unitPrice":52,"currentStock":860,"supplierMaterialNo":"RM-002","supplierMaterialName":"原材料二号","brand":"华鑫源","materialGrade":"Q345","color":"灰色","version":"V1.0","stageMark":"量产","drawingNo":"","qualityGrade":"A","tempRange":"常温"}]},
+      "factory": {"valueKey":"name","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"code","label":"工厂编码","width":"180px"},{"key":"name","label":"工厂名称","width":"240px"}],"rows":[{"seq":"1","code":"FAC-001","name":"成都工厂"},{"seq":"2","code":"FAC-002","name":"上海工厂"},{"seq":"3","code":"FAC-003","name":"苏州工厂"}]},
+      "task": {"valueKey":"name","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"code","label":"任务编码","width":"170px"},{"key":"name","label":"所属任务","width":"220px"},{"key":"stage","label":"所属阶段","width":"180px"}],"rows":[{"seq":"1","code":"TASK-001","name":"设备维修任务","stage":"采购执行","projectCode":"PRJ-2026-018","project":"设备维修项目"},{"seq":"2","code":"TASK-002","name":"产线升级任务","stage":"物料准备","projectCode":"PRJ-2026-026","project":"二号产线升级"}]},
+      "stage": {"valueKey":"name","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"code","label":"阶段编码","width":"170px"},{"key":"name","label":"所属阶段","width":"220px"}],"rows":[{"seq":"1","code":"STAGE-01","name":"需求检讨"},{"seq":"2","code":"STAGE-02","name":"物料准备"},{"seq":"3","code":"STAGE-03","name":"采购执行"}]},
+      "project": {"valueKey":"name","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"code","label":"项目编码","width":"180px"},{"key":"name","label":"项目名称","width":"260px"}],"rows":[{"seq":"1","code":"PRJ-2026-018","name":"设备维修项目"},{"seq":"2","code":"PRJ-2026-026","name":"二号产线升级"},{"seq":"3","code":"PRJ-2026-031","name":"仓储自动化项目"}]},
+      "relatedCustomer": {"valueKey":"name","columns":[{"key":"seq","label":"序号","width":"70px"},{"key":"code","label":"客户编码","width":"180px"},{"key":"name","label":"客户名称","width":"260px"}],"rows":[{"seq":"1","code":"CUS-0008","name":"成都智造科技有限公司"},{"seq":"2","code":"CUS-0012","name":"上海精工设备有限公司"},{"seq":"3","code":"CUS-0021","name":"苏州工业系统有限公司"}]}
     }
   </script>
 
@@ -834,7 +833,7 @@
         settleSupplier: "测试供应商",
         settleMethod: "现金",
         paymentTerm: "按金额",
-        lines: [{ code: "000001", name: "测试物料0516", spec: "12", model: "252", unit: "个", factory: "成都工厂", deliveryDate: "2026-08-21", quantity: 1, unitPrice: 9.65, taxRate: 13 }],
+        lines: [{ code: "000001", name: "测试物料0516", spec: "12", model: "252", unit: "个", factory: "成都工厂", deliveryDate: "2026-08-21", quantity: 10, unitPrice: 9.65, discountRate: 5, taxRate: 13, task: "设备维修任务", stage: "采购执行", projectCode: "PRJ-2026-018", project: "设备维修项目", customerCode: "CUS-0008", relatedCustomer: "成都智造科技有限公司", rowRemark: "按计划分批到货", currentStock: 320, supplierMaterialNo: "SK-000001", supplierMaterialName: "测试物料0516供方版", sourceQty: 10, sourceNo: "PR-20260801-009", sourceBill: "采购申请单", sourceSeq: "1", previousRowStatus: "草稿", rowStatus: "执行中", brand: "创维智造", materialGrade: "ABS", color: "白色", version: "V1.2", stageMark: "量产", drawingNo: "DWG-000001", qualityGrade: "B", tempRange: "0~45C" }],
         paymentPlans: [{ code: "", name: "货到付款", ratio: 100, amount: 10.9, prepayment: false, dueMethod: "手工指定", dueDate: "2026-08-31", remark: "", actualAmount: 0, discountAmount: 0 }],
         terms: [{ code: "TK001", name: "交付条款", type: "标准", content: "按采购订单要求执行", remark: "" }]
       };
@@ -848,14 +847,53 @@
       var lastDateShell = null;
 
       var materialColumns = [
-        { key: "ops", label: "操作" }, { key: "index", label: "序号" }, { key: "select", label: "" },
-        { key: "materialCode", label: "物料编码", required: true }, { key: "materialName", label: "物料名称" },
-        { key: "spec", label: "规格" }, { key: "model", label: "型号" }, { key: "unit", label: "计量单位" },
-        { key: "factory", label: "工厂", required: true }, { key: "deliveryDate", label: "期望到货日期" },
-        { key: "gift", label: "赠品" }, { key: "quantity", label: "数量" }, { key: "unitPrice", label: "单价" },
-        { key: "amount", label: "金额" }, { key: "taxRate", label: "税率%" }, { key: "taxAmount", label: "税额" },
-        { key: "taxUnitPrice", label: "含税单价" }, { key: "taxIncludedAmount", label: "含税金额" },
-        { key: "priceTaxTotal", label: "价税合计" }, { key: "sourceNo", label: "来源单号" }, { key: "rowRemark", label: "行备注" }
+        { key: "ops", label: "操作", width: 104, fixed: true },
+        { key: "index", label: "序号", width: 64, fixed: true },
+        { key: "select", label: "", width: 56, fixed: true },
+        { key: "materialCode", label: "物料编码", width: 140, kind: "reference", required: true },
+        { key: "materialName", label: "物料名称", width: 180, kind: "readonly" },
+        { key: "spec", label: "规格", width: 120, kind: "readonly" },
+        { key: "model", label: "型号", width: 120, kind: "readonly" },
+        { key: "unit", label: "计量单位", width: 90, kind: "readonly" },
+        { key: "factory", label: "工厂", width: 160, kind: "reference", required: true },
+        { key: "deliveryDate", label: "期望到货日期", width: 150, kind: "date" },
+        { key: "gift", label: "赠品", width: 76, kind: "checkbox" },
+        { key: "quantity", label: "数量", width: 110, kind: "number", required: true, total: true },
+        { key: "unitPrice", label: "单价", width: 120, kind: "money" },
+        { key: "amount", label: "金额", width: 120, kind: "money", total: true },
+        { key: "discountRate", label: "折扣率%", width: 100, kind: "number" },
+        { key: "discountAmount", label: "折扣额", width: 120, kind: "money", total: true },
+        { key: "taxRate", label: "税率%", width: 90, kind: "number" },
+        { key: "taxAmount", label: "税额", width: 120, kind: "readonlyMoney", total: true },
+        { key: "taxUnitPrice", label: "含税单价", width: 130, kind: "money" },
+        { key: "taxIncludedAmount", label: "含税金额", width: 130, kind: "money", total: true },
+        { key: "priceTaxTotal", label: "价税合计", width: 130, kind: "readonlyMoney", total: true },
+        { key: "task", label: "所属任务", width: 140, kind: "reference" },
+        { key: "stage", label: "所属阶段", width: 140, kind: "reference" },
+        { key: "projectCode", label: "项目编码", width: 120, kind: "readonly" },
+        { key: "project", label: "所属项目", width: 150, kind: "reference" },
+        { key: "customerCode", label: "客户编码", width: 120, kind: "readonly" },
+        { key: "relatedCustomer", label: "关联客户", width: 180, kind: "reference" },
+        { key: "rowRemark", label: "行备注", width: 160, kind: "text" },
+        { key: "currentStock", label: "当前库存", width: 120, kind: "readonlyNumber" },
+        { key: "supplierMaterialNo", label: "供应商料号", width: 140, kind: "readonly" },
+        { key: "supplierMaterialName", label: "供应商料名", width: 160, kind: "readonly" },
+        { key: "sourceQty", label: "来源数量", width: 110, kind: "readonlyNumber" },
+        { key: "sourceNo", label: "来源单号", width: 150, kind: "readonly" },
+        { key: "sourceBill", label: "来源单据", width: 150, kind: "readonly" },
+        { key: "sourceSeq", label: "来源序号", width: 100, kind: "readonly" },
+        { key: "salesOrderNo", label: "销售订单号", width: 150, kind: "readonly" },
+        { key: "customerOrderNo", label: "客户订单编号", width: 150, kind: "readonly" },
+        { key: "previousRowStatus", label: "变更前行状态", width: 130, kind: "readonly" },
+        { key: "rowStatus", label: "行状态", width: 110, kind: "readonly" },
+        { key: "brand", label: "品牌", width: 110, kind: "readonly" },
+        { key: "materialGrade", label: "材质/牌号", width: 130, kind: "readonly" },
+        { key: "color", label: "颜色", width: 100, kind: "readonly" },
+        { key: "version", label: "版本", width: 100, kind: "readonly" },
+        { key: "stageMark", label: "阶段标记", width: 110, kind: "readonly" },
+        { key: "drawingNo", label: "图号", width: 120, kind: "readonly" },
+        { key: "qualityGrade", label: "质量等级", width: 120, kind: "readonly" },
+        { key: "tempRange", label: "温度范围", width: 130, kind: "readonly" }
       ];
 
       function readOrder() {
@@ -890,19 +928,67 @@
       }
 
       function emptyLine() {
-        return { materialCode: "", materialName: "", spec: "", model: "", unit: "", factory: "", deliveryDate: order.date || "2026-08-04", gift: false, quantity: 1, unitPrice: 0, amount: 0, taxRate: 13, taxAmount: 0, taxUnitPrice: 0, taxIncludedAmount: 0, priceTaxTotal: 0, sourceNo: "", rowRemark: "" };
+        return {
+          materialCode: "", materialName: "", spec: "", model: "", unit: "", factory: "",
+          deliveryDate: order.date || "2026-08-04", gift: false, quantity: 1,
+          unitPrice: 0, amount: 0, discountRate: 0, discountAmount: 0, taxRate: 13,
+          taxAmount: 0, taxUnitPrice: 0, taxIncludedAmount: 0, priceTaxTotal: 0,
+          task: "", stage: "", projectCode: "", project: "", customerCode: "", relatedCustomer: "",
+          rowRemark: "", currentStock: "", supplierMaterialNo: "", supplierMaterialName: "",
+          sourceQty: "", sourceNo: "", sourceBill: "", sourceSeq: "", salesOrderNo: "",
+          customerOrderNo: "", previousRowStatus: "", rowStatus: "草稿", brand: "", materialGrade: "",
+          color: "", version: "", stageMark: "", drawingNo: "", qualityGrade: "", tempRange: ""
+        };
       }
 
-      function calculateLine(line) {
+      function calculateLine(line, sourceKey) {
         line.quantity = Math.max(0, number(line.quantity));
         line.unitPrice = Math.max(0, number(line.unitPrice));
+        line.amount = Math.max(0, number(line.amount));
+        line.discountRate = Math.min(100, Math.max(0, number(line.discountRate)));
+        line.discountAmount = Math.max(0, number(line.discountAmount));
         line.taxRate = Math.max(0, number(line.taxRate));
-        var effectiveUnitPrice = line.gift ? 0 : line.unitPrice;
-        line.amount = line.quantity * effectiveUnitPrice;
-        line.taxAmount = line.amount * line.taxRate / 100;
-        line.taxUnitPrice = effectiveUnitPrice * (1 + line.taxRate / 100);
-        line.taxIncludedAmount = line.amount + line.taxAmount;
-        line.priceTaxTotal = line.taxIncludedAmount;
+        line.taxUnitPrice = Math.max(0, number(line.taxUnitPrice));
+        line.taxIncludedAmount = Math.max(0, number(line.taxIncludedAmount));
+
+        if (line.gift) {
+          ["unitPrice", "amount", "discountRate", "discountAmount", "taxAmount", "taxUnitPrice", "taxIncludedAmount", "priceTaxTotal"].forEach(function (key) { line[key] = 0; });
+          return line;
+        }
+
+        if (sourceKey === "amount") {
+          line.unitPrice = line.quantity ? line.amount / line.quantity : 0;
+        } else if (["quantity", "unitPrice", "materialCode", "gift"].indexOf(sourceKey) !== -1 || !sourceKey) {
+          line.amount = line.quantity * line.unitPrice;
+        }
+
+        if (sourceKey === "discountAmount") {
+          line.discountAmount = Math.min(line.amount, line.discountAmount);
+          line.discountRate = line.amount ? line.discountAmount / line.amount * 100 : 0;
+        } else {
+          line.discountAmount = line.amount * line.discountRate / 100;
+        }
+
+        if (sourceKey === "taxUnitPrice" || sourceKey === "taxIncludedAmount") {
+          if (sourceKey === "taxUnitPrice") line.taxIncludedAmount = line.quantity * line.taxUnitPrice;
+          else line.taxUnitPrice = line.quantity ? line.taxIncludedAmount / line.quantity : 0;
+          var divisor = 1 + line.taxRate / 100;
+          var netAmount = divisor ? line.taxIncludedAmount / divisor : line.taxIncludedAmount;
+          var discountFactor = 1 - line.discountRate / 100;
+          line.amount = discountFactor > 0 ? netAmount / discountFactor : 0;
+          line.unitPrice = line.quantity ? line.amount / line.quantity : 0;
+          line.discountAmount = Math.max(0, line.amount - netAmount);
+          line.discountRate = line.amount ? line.discountAmount / line.amount * 100 : 0;
+          line.taxAmount = Math.max(0, line.taxIncludedAmount - netAmount);
+          line.priceTaxTotal = line.taxIncludedAmount;
+          return line;
+        }
+
+        var taxableAmount = Math.max(0, line.amount - line.discountAmount);
+        line.taxAmount = taxableAmount * line.taxRate / 100;
+        line.priceTaxTotal = taxableAmount + line.taxAmount;
+        line.taxIncludedAmount = line.priceTaxTotal;
+        line.taxUnitPrice = line.quantity ? line.taxIncludedAmount / line.quantity : 0;
         return line;
       }
 
@@ -916,7 +1002,11 @@
             deliveryDate: item.deliveryDate || item.expectedDate || order.date || "2026-08-04",
             quantity: item.quantity == null ? 1 : item.quantity,
             unitPrice: item.unitPrice == null ? (taxPrice ? taxPrice / 1.13 : 0) : item.unitPrice,
-            taxRate: item.taxRate == null ? 13 : item.taxRate
+            taxRate: item.taxRate == null ? 13 : item.taxRate,
+            taxUnitPrice: item.taxUnitPrice == null ? (item.taxIncludedUnitPrice || taxPrice || 0) : item.taxUnitPrice,
+            supplierMaterialNo: item.supplierMaterialNo || item.supplierMaterialCode || "",
+            supplierMaterialName: item.supplierMaterialName || "",
+            materialGrade: item.materialGrade || item.grade || ""
           });
           return calculateLine(line);
         });
@@ -1003,11 +1093,17 @@
 
       function referenceCell(source, value, label, index) {
         var text = value || "";
-        return '<div class="pk-table-reference' + (text ? " has-clear-value" : "") + '" data-pk-reference-trigger="' + source + '" data-row-index="' + index + '" tabindex="0" aria-haspopup="true" aria-expanded="false"><input class="pk-table-reference-input" value="' + escapeHtml(text) + '" readonly placeholder="请选择' + escapeHtml(label) + '" aria-label="' + escapeHtml(label) + '"><button class="pk-table-clear-btn" type="button" aria-label="清除"></button><span class="pk-table-reference-suffix">...</span></div>';
+        return '<div class="pk-table-reference' + (text ? " has-clear-value" : "") + '" data-pk-reference-trigger="' + source + '" data-row-index="' + index + '" tabindex="0" aria-haspopup="true" aria-expanded="false"><input class="pk-table-reference-input" value="' + escapeHtml(text) + '" readonly placeholder="请选择' + escapeHtml(label) + '" aria-label="' + escapeHtml(label) + '"><button class="pk-table-clear-btn" type="button" aria-label="清除' + escapeHtml(label) + '"></button><span class="pk-table-reference-suffix">...</span></div>';
       }
 
-      function inputCell(key, value, index, inputMode) {
-        return '<div class="pk-table-field has-clear-value"><input class="pk-table-input" type="text" ' + (inputMode ? 'inputmode="' + inputMode + '" ' : "") + 'value="' + escapeHtml(value) + '" data-line-field="' + key + '" data-row-index="' + index + '" aria-label="' + key + '"' + (isEditable ? "" : " readonly") + '></div>';
+      function inputCell(key, value, index, inputMode, label) {
+        return '<div class="pk-table-field' + (String(value) ? " has-clear-value" : "") + '"><input class="pk-table-input" type="text" ' + (inputMode ? 'inputmode="' + inputMode + '" ' : "") + 'value="' + escapeHtml(value) + '" data-line-field="' + key + '" data-row-index="' + index + '" aria-label="' + escapeHtml(label || key) + '"' + (isEditable ? "" : " readonly") + '></div>';
+      }
+
+      function formatLineValue(column, value) {
+        if (["money", "readonlyMoney"].indexOf(column.kind) !== -1) return money(value);
+        if (column.kind === "readonlyNumber") return value === "" || value == null ? "" : money(value);
+        return value == null ? "" : value;
       }
 
       function materialCell(column, line, index) {
@@ -1016,26 +1112,29 @@
         if (column.key === "ops") content = actionButtons(index);
         else if (column.key === "index") content = String(index + 1);
         else if (column.key === "select") content = '<input class="pk-table-checkbox" type="checkbox" aria-label="选择第 ' + (index + 1) + ' 行">';
-        else if (column.key === "materialCode") content = referenceCell("materialCode", line.materialCode, "物料编码", index);
-        else if (column.key === "factory") content = referenceCell("factory", line.factory, "工厂", index);
-        else if (column.key === "deliveryDate") content = '<div class="pk-input-shell pk-date-input-shell has-clear-value" data-line-date="' + index + '" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false"><span class="prefix-icon" aria-hidden="true">▣</span><span class="value" data-pk-date-value>' + escapeHtml(line.deliveryDate) + "</span></div>";
-        else if (column.key === "gift") content = '<input class="pk-checkbox" type="checkbox" data-line-field="gift" data-row-index="' + index + '" aria-label="赠品"' + (line.gift ? " checked" : "") + (isEditable ? "" : " disabled") + ">";
-        else if (["quantity", "unitPrice", "taxRate"].indexOf(column.key) !== -1) content = inputCell(column.key, column.key === "unitPrice" ? money(line[column.key]) : line[column.key], index, "decimal");
-        else if (column.key === "rowRemark") content = inputCell(column.key, line[column.key], index, "");
-        else if (["amount", "taxAmount", "taxUnitPrice", "taxIncludedAmount", "priceTaxTotal"].indexOf(column.key) !== -1) content = '<span class="pk-table-readonly">' + money(line[column.key]) + "</span>";
-        else content = '<span class="pk-table-readonly">' + escapeHtml(line[column.key]) + "</span>";
+        else if (column.kind === "reference") content = referenceCell(column.key, line[column.key], column.label, index);
+        else if (column.kind === "date") content = '<div class="pk-input-shell pk-date-input-shell' + (line[column.key] ? " has-clear-value" : "") + '" data-line-date="' + index + '" tabindex="0" role="button" aria-haspopup="dialog" aria-expanded="false"><span class="prefix-icon" aria-hidden="true">▣</span><span class="value" data-pk-date-value>' + escapeHtml(line[column.key]) + "</span></div>";
+        else if (column.kind === "checkbox") content = '<input class="pk-checkbox" type="checkbox" data-line-field="' + column.key + '" data-row-index="' + index + '" aria-label="' + escapeHtml(column.label) + '"' + (line[column.key] ? " checked" : "") + (isEditable ? "" : " disabled") + ">";
+        else if (["number", "money", "text"].indexOf(column.kind) !== -1) content = inputCell(column.key, formatLineValue(column, line[column.key]), index, column.kind === "text" ? "" : "decimal", column.label);
+        else content = '<span class="pk-table-readonly" data-line-readonly="' + column.key + '">' + escapeHtml(formatLineValue(column, line[column.key])) + "</span>";
         var cellClass = (column.key === "ops" ? "ops " : "") + hidden.trim();
         return '<td class="' + cellClass.trim() + '" data-column-key="' + column.key + '"><div class="cell">' + content + "</div></td>";
       }
 
       function renderMaterialTable() {
+        var visibleWidth = materialColumns.reduce(function (sum, column) { return sum + (hiddenColumns.has(column.key) ? 0 : column.width); }, 0);
+        document.getElementById("materialTable").style.width = visibleWidth + "px";
+        document.getElementById("materialTable").style.minWidth = visibleWidth + "px";
+        document.getElementById("materialColgroup").innerHTML = materialColumns.map(function (column) {
+          return '<col style="width:' + column.width + 'px' + (hiddenColumns.has(column.key) ? ";display:none" : "") + '">';
+        }).join("");
         document.getElementById("materialHead").innerHTML = "<tr>" + materialColumns.map(headerCell).join("") + "</tr>";
         document.getElementById("materialBody").innerHTML = lines.map(function (line, index) {
           return '<tr data-material-row="' + index + '">' + materialColumns.map(function (column) { return materialCell(column, line, index); }).join("") + "</tr>";
         }).join("");
         var totals = getTotals();
         document.getElementById("materialFoot").innerHTML = '<tr>' + materialColumns.map(function (column) {
-          var value = column.key === "ops" ? "合计" : column.key === "quantity" ? money(totals.quantity) : ["amount", "taxAmount", "taxIncludedAmount", "priceTaxTotal"].indexOf(column.key) !== -1 ? money(totals[column.key]) : "";
+          var value = column.key === "ops" ? "合计" : column.total ? money(totals[column.key]) : "";
           return '<td class="' + (hiddenColumns.has(column.key) ? "po-hidden-column" : "") + '" data-column-key="' + column.key + '"><div class="cell">' + value + "</div></td>";
         }).join("") + "</tr>";
         document.getElementById("materialTable").classList.toggle("is-readonly", !isEditable);
@@ -1046,10 +1145,14 @@
             var index = reference ? Number(reference.dataset.rowIndex) : -1;
             if (!reference || !lines[index]) return;
             if (reference.dataset.pkReferenceTrigger === "materialCode") {
-              Object.assign(lines[index], { materialCode: "", materialName: "", spec: "", model: "", unit: "" });
+              Object.assign(lines[index], { materialCode: "", materialName: "", spec: "", model: "", unit: "", factory: "", unitPrice: 0, currentStock: "", supplierMaterialNo: "", supplierMaterialName: "", brand: "", materialGrade: "", color: "", version: "", stageMark: "", drawingNo: "", qualityGrade: "", tempRange: "" });
             }
             if (reference.dataset.pkReferenceTrigger === "factory") lines[index].factory = "";
-            calculateLine(lines[index]);
+            if (reference.dataset.pkReferenceTrigger === "task") Object.assign(lines[index], { task: "", stage: "", projectCode: "", project: "" });
+            if (reference.dataset.pkReferenceTrigger === "stage") lines[index].stage = "";
+            if (reference.dataset.pkReferenceTrigger === "project") Object.assign(lines[index], { projectCode: "", project: "" });
+            if (reference.dataset.pkReferenceTrigger === "relatedCustomer") Object.assign(lines[index], { customerCode: "", relatedCustomer: "" });
+            calculateLine(lines[index], reference.dataset.pkReferenceTrigger);
             renderMaterialTable();
           });
         });
@@ -1061,9 +1164,41 @@
 
       function getTotals() {
         return lines.reduce(function (totals, line) {
-          ["quantity", "amount", "taxAmount", "taxIncludedAmount", "priceTaxTotal"].forEach(function (key) { totals[key] += number(line[key]); });
+          ["quantity", "amount", "discountAmount", "taxAmount", "taxIncludedAmount", "priceTaxTotal"].forEach(function (key) { totals[key] += number(line[key]); });
           return totals;
-        }, { quantity: 0, amount: 0, taxAmount: 0, taxIncludedAmount: 0, priceTaxTotal: 0 });
+        }, { quantity: 0, amount: 0, discountAmount: 0, taxAmount: 0, taxIncludedAmount: 0, priceTaxTotal: 0 });
+      }
+
+      function renderColumnPanel() {
+        document.getElementById("columnPanel").innerHTML = materialColumns.filter(function (column) {
+          return !column.fixed;
+        }).map(function (column) {
+          return '<label><input class="pk-checkbox" type="checkbox" data-column-toggle="' + column.key + '"' + (hiddenColumns.has(column.key) ? "" : " checked") + '>' + escapeHtml(column.label) + "</label>";
+        }).join("");
+      }
+
+      function updateMaterialRow(index, sourceKey) {
+        var row = document.querySelector('[data-material-row="' + index + '"]');
+        if (!row || !lines[index]) return;
+        materialColumns.forEach(function (column) {
+          if (["ops", "index", "select"].indexOf(column.key) !== -1 || column.key === sourceKey) return;
+          var input = row.querySelector('[data-line-field="' + column.key + '"]');
+          if (input) {
+            if (input.type === "checkbox") input.checked = Boolean(lines[index][column.key]);
+            else input.value = formatLineValue(column, lines[index][column.key]);
+          }
+          var readonly = row.querySelector('[data-line-readonly="' + column.key + '"]');
+          if (readonly) readonly.textContent = formatLineValue(column, lines[index][column.key]);
+        });
+        var totals = getTotals();
+        materialColumns.forEach(function (column) {
+          if (!column.total) return;
+          var cell = document.querySelector('#materialFoot [data-column-key="' + column.key + '"] .cell');
+          if (cell) cell.textContent = money(totals[column.key]);
+        });
+        renderSummary();
+        renderExecution();
+        updateTotals();
       }
 
       function updateTotals() {
@@ -1238,10 +1373,25 @@
         var rowIndex = Number(trigger.dataset.rowIndex);
         if (!Number.isInteger(rowIndex) || !lines[rowIndex]) return;
         if (event.detail.source === "materialCode") {
-          Object.assign(lines[rowIndex], { materialCode: row.materialCode || "", materialName: row.materialName || "", spec: row.spec || "", model: row.model || "", unit: row.unit || "", factory: row.factory || "", unitPrice: row.unitPrice == null ? lines[rowIndex].unitPrice : row.unitPrice });
+          Object.assign(lines[rowIndex], {
+            materialCode: row.materialCode || "", materialName: row.materialName || "", spec: row.spec || "",
+            model: row.model || "", unit: row.unit || "", factory: row.factory || "",
+            unitPrice: row.unitPrice == null ? lines[rowIndex].unitPrice : row.unitPrice,
+            currentStock: row.currentStock == null ? "" : row.currentStock, supplierMaterialNo: row.supplierMaterialNo || "",
+            supplierMaterialName: row.supplierMaterialName || "", brand: row.brand || "",
+            materialGrade: row.materialGrade || "", color: row.color || "", version: row.version || "",
+            stageMark: row.stageMark || "", drawingNo: row.drawingNo || "",
+            qualityGrade: row.qualityGrade || "", tempRange: row.tempRange || ""
+          });
         }
         if (event.detail.source === "factory") lines[rowIndex].factory = row.name || event.detail.value;
-        calculateLine(lines[rowIndex]);
+        if (event.detail.source === "task") {
+          Object.assign(lines[rowIndex], { task: row.name || event.detail.value, stage: row.stage || "", projectCode: row.projectCode || "", project: row.project || "" });
+        }
+        if (event.detail.source === "stage") lines[rowIndex].stage = row.name || event.detail.value;
+        if (event.detail.source === "project") Object.assign(lines[rowIndex], { projectCode: row.code || "", project: row.name || event.detail.value });
+        if (event.detail.source === "relatedCustomer") Object.assign(lines[rowIndex], { customerCode: row.code || "", relatedCustomer: row.name || event.detail.value });
+        calculateLine(lines[rowIndex], event.detail.source);
         renderMaterialTable();
       });
 
@@ -1273,23 +1423,8 @@
         var key = input.dataset.lineField;
         if (!lines[index]) return;
         lines[index][key] = key === "gift" ? input.checked : input.value;
-        calculateLine(lines[index]);
-        if (["quantity", "unitPrice", "taxRate", "gift"].indexOf(key) !== -1) {
-          var row = input.closest("tr");
-          ["amount", "taxAmount", "taxUnitPrice", "taxIncludedAmount", "priceTaxTotal"].forEach(function (field) {
-            var cell = row.querySelector('[data-column-key="' + field + '"] .pk-table-readonly');
-            if (cell) cell.textContent = money(lines[index][field]);
-          });
-          renderSummary();
-          renderExecution();
-          updateTotals();
-          var foot = document.getElementById("materialFoot");
-          var totals = getTotals();
-          ["quantity", "amount", "taxAmount", "taxIncludedAmount", "priceTaxTotal"].forEach(function (field) {
-            var cell = foot.querySelector('[data-column-key="' + field + '"] .cell');
-            if (cell) cell.textContent = money(totals[field]);
-          });
-        }
+        calculateLine(lines[index], key);
+        updateMaterialRow(index, key);
       });
 
       document.addEventListener("change", function (event) {
@@ -1307,6 +1442,7 @@
           if (toggle.checked) hiddenColumns.delete(toggle.dataset.columnToggle);
           else hiddenColumns.add(toggle.dataset.columnToggle);
           renderMaterialTable();
+          renderColumnPanel();
         }
       });
 
@@ -1458,6 +1594,7 @@
       });
 
       syncHeader();
+      renderColumnPanel();
       renderMaterialTable();
       renderPaymentTable();
       renderTermsTable();
