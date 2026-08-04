@@ -41,15 +41,18 @@
     }
 
     .po-detail-toolbar {
-      height: 52px;
-      min-height: 52px;
-      padding: 0 12px;
+      width: calc(100% - 20px);
+      height: 44px;
+      min-height: 44px;
+      margin: 10px 10px 0;
+      padding: 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       background: #fff;
-      box-shadow: 0 2px 8px rgba(31, 45, 61, 0.08);
+      border-radius: 4px;
+      box-sizing: border-box;
     }
 
     .po-detail-toolbar .pk-toolbar-left,
@@ -73,7 +76,7 @@
     .po-detail-toolbar .pk-toolbar-btn,
     .po-detail-toolbar .pk-toolbar-dropdown,
     .po-detail-toolbar .pk-toolbar-dropdown-trigger {
-      height: 30px;
+      height: 28px;
       flex: 0 0 auto;
     }
 
@@ -84,7 +87,7 @@
     }
 
     .po-detail-toolbar .pk-toolbar-dropdown-menu {
-      top: 35px;
+      top: 33px;
       min-width: 170px;
       max-height: 286px;
       overflow-y: auto;
@@ -286,10 +289,10 @@
     }
 
     .detail-panel {
-      min-height: 300px;
+      min-height: 394px;
       padding-bottom: 6px;
       display: flex;
-      flex: 1;
+      flex: 1 0 394px;
       flex-direction: column;
     }
 
@@ -329,6 +332,40 @@
       height: 28px;
     }
 
+    .detail-toolbar .btn {
+      height: 28px;
+      min-width: 44px;
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      background: #fff;
+      color: #606266;
+      font-size: 12px;
+      line-height: 26px;
+      cursor: pointer;
+    }
+
+    .detail-toolbar .btn:hover {
+      border-color: #c6e2ff;
+      background: #ecf5ff;
+      color: #409eff;
+    }
+
+    .detail-toolbar .btn.primary {
+      border-color: #409eff;
+      background: #409eff;
+      color: #fff;
+    }
+
+    .detail-toolbar .btn.primary:hover {
+      border-color: #66b1ff;
+      background: #66b1ff;
+      color: #fff;
+    }
+
     .detail-toolbar button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
@@ -365,6 +402,10 @@
       scrollbar-gutter: stable;
     }
 
+    .po-table-grid-wrap table {
+      --table-footer-offset: 0px;
+    }
+
     .po-material-table {
       width: 2800px;
       min-width: 2800px;
@@ -373,6 +414,16 @@
     .po-summary-table {
       width: 1500px;
       min-width: 1500px;
+    }
+
+    .po-payment-table {
+      width: 1960px;
+      min-width: 1960px;
+    }
+
+    .po-terms-table {
+      width: 1180px;
+      min-width: 1180px;
     }
 
     .po-execution-table {
@@ -387,6 +438,8 @@
 
     .po-material-table td,
     .po-summary-table td,
+    .po-payment-table td,
+    .po-terms-table td,
     .po-execution-table td,
     .po-static-table td {
       height: 36px;
@@ -418,14 +471,56 @@
       padding: 0 8px;
     }
 
-    .po-material-table .pk-row-actions svg {
-      display: block;
-      pointer-events: none;
+    .detail-panel td.ops {
+      padding: 0 6px;
+      color: #009bee;
+      font-size: 0;
+      text-align: center;
+      vertical-align: middle;
     }
 
-    .po-material-table .pk-row-actions button {
-      width: 20px;
-      height: 20px;
+    .detail-panel .row-actions {
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .detail-panel .row-actions svg {
+      flex: 0 0 14px;
+      display: block;
+      margin: 0;
+      cursor: pointer;
+      transition: opacity 0.15s ease;
+    }
+
+    .detail-panel .row-actions svg:hover {
+      opacity: 0.7;
+    }
+
+    .detail-panel .row-actions .danger {
+      display: inline-flex;
+      align-items: center;
+      color: #ff6b61;
+    }
+
+    .detail-panel tfoot td {
+      transform: translateY(var(--table-footer-offset));
+    }
+
+    .po-payment-table .pk-table-field,
+    .po-terms-table .pk-table-field {
+      width: 100%;
+      height: 30px;
+    }
+
+    .po-payment-table .pk-table-input,
+    .po-payment-table .pk-table-select,
+    .po-terms-table .pk-table-input,
+    .po-terms-table .pk-table-select {
+      padding: 0 8px;
     }
 
     .po-material-table.is-readonly .pk-table-input {
@@ -629,7 +724,7 @@
 
         <div class="detail-body" data-detail-pane="material">
           <div class="detail-toolbar">
-            <div class="table-tools"><button class="pk-grid-btn pk-grid-btn--primary" id="addLineButton" type="button">新建</button></div>
+            <div class="table-tools"><button class="btn primary" id="addLineButton" type="button">新建</button></div>
             <div class="table-tools">
               <div class="pk-grid-search"><span aria-hidden="true">⌕</span><input id="materialSearch" type="search" placeholder="请输入关键字搜索" aria-label="请输入关键字搜索"></div>
               <button class="pk-grid-icon-btn" id="columnButton" type="button" title="列设置" aria-label="列设置">☰</button>
@@ -660,13 +755,32 @@
         </div>
 
         <div class="detail-body" data-detail-pane="payment" hidden>
-          <div class="detail-toolbar"><div class="table-tools"><button class="pk-grid-btn" type="button" data-detail-action="新建付款计划">新建</button><button class="pk-grid-btn" type="button" data-detail-action="导出付款计划">导出</button></div><div class="table-tools"><div class="pk-grid-search"><span aria-hidden="true">⌕</span><input type="search" placeholder="请输入关键字搜索"></div><button class="pk-grid-icon-btn" type="button" data-pane-fullscreen title="全屏" aria-label="全屏">⛶</button></div></div>
-          <div class="po-table-grid-wrap"><table class="pk-erp-table po-static-table"><thead><tr><th><div class="cell">操作</div></th><th><div class="cell">序号</div></th><th><div class="cell">付款计划编码</div></th><th><div class="cell"><span class="required">*</span>款项名称</div></th><th><div class="cell"><span class="required">*</span>计划付款比例（%）</div></th><th><div class="cell">计划付款金额</div></th><th><div class="cell">预付款</div></th><th><div class="cell">到期日</div></th><th><div class="cell">行备注</div></th></tr></thead><tbody><tr class="po-empty-row"><td colspan="9">暂无数据</td></tr></tbody><tfoot><tr><td><div class="cell">合计</div></td><td colspan="8"></td></tr></tfoot></table></div>
+          <div class="detail-toolbar">
+            <div class="table-tools"><button class="btn primary" id="addPaymentButton" type="button">新建</button><button class="btn" type="button" data-detail-action="导出付款计划">导出</button></div>
+            <div class="table-tools"><div class="pk-grid-search"><span aria-hidden="true">⌕</span><input id="paymentSearch" type="search" placeholder="请输入关键字搜索" aria-label="付款计划搜索"></div><button class="pk-grid-icon-btn" type="button" title="列设置" aria-label="列设置">☰</button><button class="pk-grid-icon-btn" type="button" data-pane-fullscreen title="全屏" aria-label="全屏">⛶</button></div>
+          </div>
+          <div class="po-table-grid-wrap">
+            <table class="pk-erp-table po-payment-table" id="paymentTable">
+              <colgroup><col style="width:104px"><col style="width:64px"><col style="width:56px"><col style="width:140px"><col style="width:150px"><col style="width:150px"><col style="width:140px"><col style="width:90px"><col style="width:170px"><col style="width:140px"><col style="width:170px"><col style="width:140px"><col style="width:140px"><col style="width:140px"><col style="width:130px"></colgroup>
+              <thead><tr><th><div class="cell">操作</div></th><th><div class="cell">序号</div></th><th><div class="cell"><input class="pk-table-checkbox" id="paymentSelectAll" type="checkbox" aria-label="全选付款计划"></div></th><th><div class="cell">付款计划编码</div></th><th><div class="cell"><span class="required">*</span>款项名称</div></th><th><div class="cell"><span class="required">*</span>计划付款比例（%）</div></th><th><div class="cell">计划付款金额</div></th><th><div class="cell">预付款</div></th><th><div class="cell">到期日期确认方式</div></th><th><div class="cell">到期日</div></th><th><div class="cell">行备注</div></th><th><div class="cell">实际付款金额</div></th><th><div class="cell">累计折让金额</div></th><th><div class="cell">未付款金额</div></th><th><div class="cell">付款状态</div></th></tr></thead>
+              <tbody id="paymentBody"></tbody>
+              <tfoot id="paymentFoot"></tfoot>
+            </table>
+          </div>
         </div>
 
         <div class="detail-body" data-detail-pane="terms" hidden>
-          <div class="detail-toolbar"><div class="table-tools"><button class="pk-grid-btn" type="button" data-detail-action="导出条款">导出</button></div><div class="table-tools"><div class="pk-grid-search"><span aria-hidden="true">⌕</span><input type="search" placeholder="请输入关键字搜索"></div><button class="pk-grid-icon-btn" type="button" data-pane-fullscreen title="全屏" aria-label="全屏">⛶</button></div></div>
-          <div class="po-table-grid-wrap"><table class="pk-erp-table po-static-table"><thead><tr><th><div class="cell">序号</div></th><th><div class="cell">条款编码</div></th><th><div class="cell">条款名称</div></th><th><div class="cell">条款类型</div></th><th><div class="cell">条款内容</div></th><th><div class="cell">行备注</div></th></tr></thead><tbody><tr class="po-empty-row"><td colspan="6">暂无数据</td></tr></tbody></table></div>
+          <div class="detail-toolbar">
+            <div class="table-tools"><button class="btn primary" id="addTermButton" type="button">新建</button><button class="btn" type="button" data-detail-action="导出条款">导出</button></div>
+            <div class="table-tools"><div class="pk-grid-search"><span aria-hidden="true">⌕</span><input id="termsSearch" type="search" placeholder="请输入关键字搜索" aria-label="条款信息搜索"></div><button class="pk-grid-icon-btn" type="button" title="列设置" aria-label="列设置">☰</button><button class="pk-grid-icon-btn" type="button" data-pane-fullscreen title="全屏" aria-label="全屏">⛶</button></div>
+          </div>
+          <div class="po-table-grid-wrap">
+            <table class="pk-erp-table po-terms-table" id="termsTable">
+              <colgroup><col style="width:104px"><col style="width:64px"><col style="width:56px"><col style="width:150px"><col style="width:180px"><col style="width:150px"><col style="width:300px"><col style="width:176px"></colgroup>
+              <thead><tr><th><div class="cell">操作</div></th><th><div class="cell">序号</div></th><th><div class="cell"><input class="pk-table-checkbox" id="termsSelectAll" type="checkbox" aria-label="全选条款信息"></div></th><th><div class="cell">条款编码</div></th><th><div class="cell">条款名称</div></th><th><div class="cell">条例类型</div></th><th><div class="cell">条款内容</div></th><th><div class="cell">行备注</div></th></tr></thead>
+              <tbody id="termsBody"></tbody>
+            </table>
+          </div>
         </div>
 
         <div class="detail-body" data-detail-pane="execution" hidden>
@@ -720,12 +834,16 @@
         settleSupplier: "测试供应商",
         settleMethod: "现金",
         paymentTerm: "按金额",
-        lines: [{ code: "000001", name: "测试物料0516", spec: "12", model: "252", unit: "个", factory: "成都工厂", deliveryDate: "2026-08-21", quantity: 1, unitPrice: 9.65, taxRate: 13 }]
+        lines: [{ code: "000001", name: "测试物料0516", spec: "12", model: "252", unit: "个", factory: "成都工厂", deliveryDate: "2026-08-21", quantity: 1, unitPrice: 9.65, taxRate: 13 }],
+        paymentPlans: [{ code: "", name: "货到付款", ratio: 100, amount: 10.9, prepayment: false, dueMethod: "手工指定", dueDate: "2026-08-31", remark: "", actualAmount: 0, discountAmount: 0 }],
+        terms: [{ code: "TK001", name: "交付条款", type: "标准", content: "按采购订单要求执行", remark: "" }]
       };
 
       var order = readOrder();
-      var isEditable = order.documentStatus === "草稿";
+      var isEditable = true;
       var lines = normalizeLines(order.lines);
+      var paymentPlans = normalizePaymentPlans(order.paymentPlans);
+      var terms = normalizeTerms(order.terms);
       var hiddenColumns = new Set();
       var lastDateShell = null;
 
@@ -804,6 +922,33 @@
         });
       }
 
+      function emptyPaymentPlan() {
+        return { code: "", name: "", ratio: 0, amount: 0, prepayment: false, dueMethod: "手工指定", dueDate: order.date || "2026-08-04", remark: "", actualAmount: 0, discountAmount: 0, unpaidAmount: 0, status: "未付款" };
+      }
+
+      function calculatePaymentPlan(plan) {
+        plan.ratio = Math.max(0, number(plan.ratio));
+        plan.amount = Math.max(0, number(plan.amount));
+        plan.actualAmount = Math.max(0, number(plan.actualAmount));
+        plan.discountAmount = Math.max(0, number(plan.discountAmount));
+        plan.unpaidAmount = Math.max(0, plan.amount - plan.actualAmount - plan.discountAmount);
+        plan.status = plan.amount > 0 && plan.unpaidAmount === 0 ? "已付款" : plan.actualAmount > 0 ? "部分付款" : "未付款";
+        return plan;
+      }
+
+      function normalizePaymentPlans(source) {
+        var items = Array.isArray(source) ? source : [];
+        return items.map(function (item) { return calculatePaymentPlan(Object.assign(emptyPaymentPlan(), item)); });
+      }
+
+      function emptyTerm() {
+        return { code: "", name: "", type: "", content: "", remark: "" };
+      }
+
+      function normalizeTerms(source) {
+        return (Array.isArray(source) ? source : []).map(function (item) { return Object.assign(emptyTerm(), item); });
+      }
+
       function notify(message, type) {
         if (window.PrototypeKit && typeof window.PrototypeKit.message === "function") window.PrototypeKit.message(message, type || "info", 2200);
       }
@@ -849,11 +994,10 @@
       }
 
       function actionButtons(index) {
-        if (!isEditable) return '<span class="pk-table-readonly"></span>';
-        return '<div class="pk-row-actions">'
-          + '<button type="button" data-row-action="add" data-row-index="' + index + '" title="新增行" aria-label="新增行"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>'
-          + '<button type="button" data-row-action="copy" data-row-index="' + index + '" title="复制行" aria-label="复制行"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>'
-          + '<button class="is-danger" type="button" data-row-action="delete" data-row-index="' + index + '" title="删除行" aria-label="删除行"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>'
+        return '<div class="row-actions">'
+          + '<svg data-row-action="add" data-row-index="' + index + '" role="button" tabindex="0" aria-label="新增行" title="新增行" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>'
+          + '<svg data-row-action="copy" data-row-index="' + index + '" role="button" tabindex="0" aria-label="复制行" title="复制行" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>'
+          + '<span class="danger"><svg data-row-action="delete" data-row-index="' + index + '" role="button" tabindex="0" aria-label="删除行" title="删除行" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg></span>'
           + "</div>";
       }
 
@@ -880,7 +1024,8 @@
         else if (column.key === "rowRemark") content = inputCell(column.key, line[column.key], index, "");
         else if (["amount", "taxAmount", "taxUnitPrice", "taxIncludedAmount", "priceTaxTotal"].indexOf(column.key) !== -1) content = '<span class="pk-table-readonly">' + money(line[column.key]) + "</span>";
         else content = '<span class="pk-table-readonly">' + escapeHtml(line[column.key]) + "</span>";
-        return '<td class="' + hidden.trim() + '" data-column-key="' + column.key + '"><div class="cell">' + content + "</div></td>";
+        var cellClass = (column.key === "ops" ? "ops " : "") + hidden.trim();
+        return '<td class="' + cellClass.trim() + '" data-column-key="' + column.key + '"><div class="cell">' + content + "</div></td>";
       }
 
       function renderMaterialTable() {
@@ -895,9 +1040,23 @@
         }).join("") + "</tr>";
         document.getElementById("materialTable").classList.toggle("is-readonly", !isEditable);
         if (window.PrototypeKit) window.PrototypeKit.init(document);
+        document.querySelectorAll("#materialBody .pk-table-clear-btn").forEach(function (button) {
+          button.addEventListener("click", function () {
+            var reference = button.closest(".pk-table-reference");
+            var index = reference ? Number(reference.dataset.rowIndex) : -1;
+            if (!reference || !lines[index]) return;
+            if (reference.dataset.pkReferenceTrigger === "materialCode") {
+              Object.assign(lines[index], { materialCode: "", materialName: "", spec: "", model: "", unit: "" });
+            }
+            if (reference.dataset.pkReferenceTrigger === "factory") lines[index].factory = "";
+            calculateLine(lines[index]);
+            renderMaterialTable();
+          });
+        });
         renderSummary();
         renderExecution();
         updateTotals();
+        window.requestAnimationFrame(function () { syncTableFooter(document.getElementById("materialTable")); });
       }
 
       function getTotals() {
@@ -911,12 +1070,103 @@
         document.getElementById("headerTaxTotal").value = money(getTotals().priceTaxTotal);
       }
 
+      function syncTableFooter(table) {
+        if (!table || !table.tFoot) return;
+        var grid = table.closest(".po-table-grid-wrap");
+        var body = table.querySelector("tbody");
+        if (!grid || !body) return;
+        table.style.setProperty("--table-footer-offset", "0px");
+        table.style.marginBottom = "0px";
+        var headHeight = table.tHead ? table.tHead.getBoundingClientRect().height : 0;
+        var footHeight = table.tFoot.getBoundingClientRect().height;
+        var rowsHeight = Array.prototype.reduce.call(body.querySelectorAll("tr"), function (sum, row) {
+          return row.hidden ? sum : sum + row.getBoundingClientRect().height;
+        }, 0);
+        var footerOffset = Math.max(0, Math.floor(grid.clientHeight - headHeight - rowsHeight - footHeight));
+        table.style.setProperty("--table-footer-offset", footerOffset + "px");
+        table.style.marginBottom = footerOffset + "px";
+      }
+
+      function syncVisibleTableFooters() {
+        document.querySelectorAll('[data-detail-pane]:not([hidden]) table').forEach(syncTableFooter);
+      }
+
+      function subtableActions(scope, index, allowCopy) {
+        return '<div class="row-actions">'
+          + '<svg data-subtable-action="add" data-subtable="' + scope + '" data-row-index="' + index + '" role="button" tabindex="0" aria-label="新增行" title="新增行" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>'
+          + (allowCopy ? '<svg data-subtable-action="copy" data-subtable="' + scope + '" data-row-index="' + index + '" role="button" tabindex="0" aria-label="复制行" title="复制行" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>' : "")
+          + '<span class="danger"><svg data-subtable-action="delete" data-subtable="' + scope + '" data-row-index="' + index + '" role="button" tabindex="0" aria-label="删除行" title="删除行" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg></span>'
+          + "</div>";
+      }
+
+      function subtableInput(scope, key, value, index, inputMode, type) {
+        return '<div class="pk-table-field has-clear-value"><input class="pk-table-input" type="' + (type || "text") + '" ' + (inputMode ? 'inputmode="' + inputMode + '" ' : "") + 'value="' + escapeHtml(value) + '" data-' + scope + '-field="' + key + '" data-row-index="' + index + '" aria-label="' + key + '"></div>';
+      }
+
+      function renderPaymentTable() {
+        document.getElementById("paymentBody").innerHTML = paymentPlans.length ? paymentPlans.map(function (plan, index) {
+          calculatePaymentPlan(plan);
+          var dueOptions = ["手工指定", "按单据日期", "按到货日期"].map(function (value) { return '<option' + (plan.dueMethod === value ? " selected" : "") + '>' + value + "</option>"; }).join("");
+          return '<tr data-payment-row="' + index + '">'
+            + '<td class="ops"><div class="cell">' + subtableActions("payment", index, false) + "</div></td>"
+            + '<td><div class="cell">' + (index + 1) + "</div></td>"
+            + '<td><div class="cell"><input class="pk-table-checkbox" type="checkbox" data-payment-select aria-label="选择第 ' + (index + 1) + ' 行付款计划"></div></td>'
+            + '<td><div class="cell"><span class="pk-table-readonly">' + escapeHtml(plan.code) + "</span></div></td>"
+            + '<td><div class="cell">' + subtableInput("payment", "name", plan.name, index, "", "text") + "</div></td>"
+            + '<td><div class="cell">' + subtableInput("payment", "ratio", plan.ratio, index, "decimal", "text") + "</div></td>"
+            + '<td><div class="cell">' + subtableInput("payment", "amount", money(plan.amount), index, "decimal", "text") + "</div></td>"
+            + '<td><div class="cell"><input class="pk-checkbox" type="checkbox" data-payment-field="prepayment" data-row-index="' + index + '" aria-label="预付款"' + (plan.prepayment ? " checked" : "") + "></div></td>"
+            + '<td><div class="cell"><div class="pk-table-field"><select class="pk-table-select" data-payment-field="dueMethod" data-row-index="' + index + '" aria-label="到期日期确认方式">' + dueOptions + "</select></div></div></td>"
+            + '<td><div class="cell">' + subtableInput("payment", "dueDate", plan.dueDate, index, "", "date") + "</div></td>"
+            + '<td><div class="cell">' + subtableInput("payment", "remark", plan.remark, index, "", "text") + "</div></td>"
+            + '<td><div class="cell"><span class="pk-table-readonly">' + money(plan.actualAmount) + "</span></div></td>"
+            + '<td><div class="cell"><span class="pk-table-readonly">' + money(plan.discountAmount) + "</span></div></td>"
+            + '<td><div class="cell"><span class="pk-table-readonly" data-payment-unpaid="' + index + '">' + money(plan.unpaidAmount) + "</span></div></td>"
+            + '<td><div class="cell"><span class="pk-table-readonly" data-payment-status="' + index + '">' + escapeHtml(plan.status) + "</span></div></td>"
+            + "</tr>";
+        }).join("") : '<tr class="po-empty-row"><td colspan="15">暂无数据</td></tr>';
+        updatePaymentFooter();
+        syncSelectionState("payment");
+        window.requestAnimationFrame(function () { syncTableFooter(document.getElementById("paymentTable")); });
+      }
+
+      function updatePaymentFooter() {
+        var totals = paymentPlans.reduce(function (result, plan) {
+          calculatePaymentPlan(plan);
+          ["ratio", "amount", "actualAmount", "discountAmount", "unpaidAmount"].forEach(function (key) { result[key] += number(plan[key]); });
+          return result;
+        }, { ratio: 0, amount: 0, actualAmount: 0, discountAmount: 0, unpaidAmount: 0 });
+        document.getElementById("paymentFoot").innerHTML = "<tr>" + ["合计", "", "", "", "", money(totals.ratio), money(totals.amount), "", "", "", "", money(totals.actualAmount), money(totals.discountAmount), money(totals.unpaidAmount), ""].map(function (value) { return '<td><div class="cell">' + value + "</div></td>"; }).join("") + "</tr>";
+      }
+
+      function renderTermsTable() {
+        document.getElementById("termsBody").innerHTML = terms.length ? terms.map(function (term, index) {
+          return '<tr data-term-row="' + index + '">'
+            + '<td class="ops"><div class="cell">' + subtableActions("term", index, true) + "</div></td>"
+            + '<td><div class="cell">' + (index + 1) + "</div></td>"
+            + '<td><div class="cell"><input class="pk-table-checkbox" type="checkbox" data-term-select aria-label="选择第 ' + (index + 1) + ' 行条款"></div></td>'
+            + ["code", "name", "type", "content", "remark"].map(function (key) { return '<td><div class="cell">' + subtableInput("term", key, term[key], index, "", "text") + "</div></td>"; }).join("")
+            + "</tr>";
+        }).join("") : '<tr class="po-empty-row"><td colspan="8">暂无数据</td></tr>';
+        syncSelectionState("term");
+      }
+
+      function syncSelectionState(scope) {
+        var selectAll = document.getElementById(scope === "payment" ? "paymentSelectAll" : "termsSelectAll");
+        var rows = Array.prototype.slice.call(document.querySelectorAll("[data-" + scope + "-select]"));
+        if (!selectAll) return;
+        var checkedCount = rows.filter(function (checkbox) { return checkbox.checked; }).length;
+        selectAll.checked = rows.length > 0 && checkedCount === rows.length;
+        selectAll.indeterminate = checkedCount > 0 && checkedCount < rows.length;
+      }
+
       function renderSummary() {
         var totals = getTotals();
         document.getElementById("summaryBody").innerHTML = lines.map(function (line, index) {
           return "<tr>" + [index + 1, line.materialCode, line.materialName, line.spec, line.model, line.unit, money(line.quantity), money(line.unitPrice), money(line.amount), money(line.taxAmount), money(line.taxIncludedAmount), money(line.priceTaxTotal)].map(function (value) { return '<td><div class="cell">' + escapeHtml(value) + "</div></td>"; }).join("") + "</tr>";
         }).join("");
-        document.getElementById("summaryFoot").innerHTML = '<tr><td><div class="cell">合计</div></td><td colspan="5"></td><td><div class="cell">' + money(totals.quantity) + '</div></td><td></td><td><div class="cell">' + money(totals.amount) + '</div></td><td><div class="cell">' + money(totals.taxAmount) + '</div></td><td><div class="cell">' + money(totals.taxIncludedAmount) + '</div></td><td><div class="cell">' + money(totals.priceTaxTotal) + "</div></td></tr>";
+        document.getElementById("summaryFoot").innerHTML = "<tr>" + ["合计", "", "", "", "", "", money(totals.quantity), "", money(totals.amount), money(totals.taxAmount), money(totals.taxIncludedAmount), money(totals.priceTaxTotal)].map(function (value) { return '<td><div class="cell">' + value + "</div></td>"; }).join("") + "</tr>";
+        window.requestAnimationFrame(syncVisibleTableFooters);
       }
 
       function renderExecution() {
@@ -925,7 +1175,8 @@
           var values = [index + 1, line.materialCode, line.materialName, line.unit, money(line.quantity), money(line.amount), money(line.taxAmount), money(line.priceTaxTotal), "0.00", "0.00", "0.00", money(line.quantity), money(line.priceTaxTotal), order.documentStatus || "草稿"];
           return "<tr>" + values.map(function (value) { return '<td><div class="cell">' + escapeHtml(value) + "</div></td>"; }).join("") + "</tr>";
         }).join("");
-        document.getElementById("executionFoot").innerHTML = '<tr><td><div class="cell">合计</div></td><td colspan="3"></td><td><div class="cell">' + money(totals.quantity) + '</div></td><td><div class="cell">' + money(totals.amount) + '</div></td><td><div class="cell">' + money(totals.taxAmount) + '</div></td><td><div class="cell">' + money(totals.priceTaxTotal) + '</div></td><td colspan="6"></td></tr>';
+        document.getElementById("executionFoot").innerHTML = "<tr>" + ["合计", "", "", "", money(totals.quantity), money(totals.amount), money(totals.taxAmount), money(totals.priceTaxTotal), "", "", "", "", "", ""].map(function (value) { return '<td><div class="cell">' + value + "</div></td>"; }).join("") + "</tr>";
+        window.requestAnimationFrame(syncVisibleTableFooters);
       }
 
       function activateTab(selector, paneSelector, key) {
@@ -937,6 +1188,7 @@
         document.querySelectorAll(paneSelector).forEach(function (pane) {
           pane.hidden = (pane.dataset.pane || pane.dataset.detailPane) !== key;
         });
+        window.requestAnimationFrame(syncVisibleTableFooters);
       }
 
       function saveOrder() {
@@ -946,6 +1198,10 @@
           var invalidLine = lines.findIndex(function (line) { return !line.materialCode || !line.factory; });
           if (invalidLine !== -1) missing = "第 " + (invalidLine + 1) + " 行的物料编码和工厂";
         }
+        if (!missing) {
+          var invalidPayment = paymentPlans.findIndex(function (plan) { return !String(plan.name || "").trim() || number(plan.ratio) <= 0; });
+          if (invalidPayment !== -1) missing = "第 " + (invalidPayment + 1) + " 行付款计划的款项名称和计划付款比例";
+        }
         if (missing) {
           notify("请完善" + missing, "warning");
           return;
@@ -953,6 +1209,8 @@
         if (!order.code || order.code === "保存后自动生成") order.code = "20260804-0619";
         order.taxTotal = getTotals().priceTaxTotal;
         order.lines = lines.map(function (line) { return Object.assign({}, line, { code: line.materialCode, name: line.materialName, deliveryDate: line.deliveryDate }); });
+        order.paymentPlans = paymentPlans.map(function (plan) { return Object.assign({}, calculatePaymentPlan(plan)); });
+        order.terms = terms.map(function (term) { return Object.assign({}, term); });
         sessionStorage.setItem("erp.purchase-order.detail", JSON.stringify(order));
         syncHeader();
         notify("采购订单已保存", "success");
@@ -988,6 +1246,27 @@
       });
 
       document.addEventListener("input", function (event) {
+        var paymentInput = event.target.closest("[data-payment-field]");
+        if (paymentInput) {
+          var paymentIndex = Number(paymentInput.dataset.rowIndex);
+          var paymentKey = paymentInput.dataset.paymentField;
+          if (!paymentPlans[paymentIndex]) return;
+          paymentPlans[paymentIndex][paymentKey] = paymentInput.type === "checkbox" ? paymentInput.checked : paymentInput.value;
+          calculatePaymentPlan(paymentPlans[paymentIndex]);
+          var unpaid = document.querySelector('[data-payment-unpaid="' + paymentIndex + '"]');
+          var status = document.querySelector('[data-payment-status="' + paymentIndex + '"]');
+          if (unpaid) unpaid.textContent = money(paymentPlans[paymentIndex].unpaidAmount);
+          if (status) status.textContent = paymentPlans[paymentIndex].status;
+          updatePaymentFooter();
+          window.requestAnimationFrame(function () { syncTableFooter(document.getElementById("paymentTable")); });
+          return;
+        }
+        var termInput = event.target.closest("[data-term-field]");
+        if (termInput) {
+          var termIndex = Number(termInput.dataset.rowIndex);
+          if (terms[termIndex]) terms[termIndex][termInput.dataset.termField] = termInput.value;
+          return;
+        }
         var input = event.target.closest("[data-line-field]");
         if (!input || !isEditable) return;
         var index = Number(input.dataset.rowIndex);
@@ -1015,6 +1294,14 @@
 
       document.addEventListener("change", function (event) {
         if (event.target.matches('[data-line-field="gift"]')) event.target.dispatchEvent(new Event("input", { bubbles: true }));
+        if (event.target.matches('select[data-payment-field]')) event.target.dispatchEvent(new Event("input", { bubbles: true }));
+        if (event.target.id === "paymentSelectAll" || event.target.id === "termsSelectAll") {
+          var scope = event.target.id === "paymentSelectAll" ? "payment" : "term";
+          document.querySelectorAll("[data-" + scope + "-select]").forEach(function (checkbox) { checkbox.checked = event.target.checked; });
+          event.target.indeterminate = false;
+        }
+        if (event.target.matches("[data-payment-select]")) syncSelectionState("payment");
+        if (event.target.matches("[data-term-select]")) syncSelectionState("term");
         var toggle = event.target.closest("[data-column-toggle]");
         if (toggle) {
           if (toggle.checked) hiddenColumns.delete(toggle.dataset.columnToggle);
@@ -1038,18 +1325,45 @@
         var rowAction = event.target.closest("[data-row-action]");
         if (rowAction && isEditable) {
           var index = Number(rowAction.dataset.rowIndex);
-          if (rowAction.dataset.rowAction === "add") lines.splice(index + 1, 0, emptyLine());
+          if (rowAction.dataset.rowAction === "add") lines.push(emptyLine());
           if (rowAction.dataset.rowAction === "copy") lines.splice(index + 1, 0, calculateLine(Object.assign({}, lines[index])));
           if (rowAction.dataset.rowAction === "delete") {
-            if (lines.length === 1) lines[0] = emptyLine();
-            else lines.splice(index, 1);
+            if (lines.length === 1) return;
+            lines.splice(index, 1);
           }
           renderMaterialTable();
+          return;
+        }
+        var subtableAction = event.target.closest("[data-subtable-action]");
+        if (subtableAction) {
+          var subtableIndex = Number(subtableAction.dataset.rowIndex);
+          var subtableCommand = subtableAction.dataset.subtableAction;
+          if (subtableAction.dataset.subtable === "payment") {
+            if (subtableCommand === "add") paymentPlans.push(emptyPaymentPlan());
+            if (subtableCommand === "delete") paymentPlans.splice(subtableIndex, 1);
+            renderPaymentTable();
+          }
+          if (subtableAction.dataset.subtable === "term") {
+            if (subtableCommand === "add") terms.push(emptyTerm());
+            if (subtableCommand === "copy" && terms[subtableIndex]) terms.splice(subtableIndex + 1, 0, Object.assign({}, terms[subtableIndex]));
+            if (subtableCommand === "delete") terms.splice(subtableIndex, 1);
+            renderTermsTable();
+          }
           return;
         }
         if (event.target.closest("#addLineButton") && isEditable) {
           lines.push(emptyLine());
           renderMaterialTable();
+          return;
+        }
+        if (event.target.closest("#addPaymentButton")) {
+          paymentPlans.push(emptyPaymentPlan());
+          renderPaymentTable();
+          return;
+        }
+        if (event.target.closest("#addTermButton")) {
+          terms.push(emptyTerm());
+          renderTermsTable();
           return;
         }
         if (event.target.closest("#columnButton")) {
@@ -1069,12 +1383,35 @@
         var expanded = document.getElementById("documentSection").classList.toggle("is-collapsed") === false;
         this.classList.toggle("is-expanded", expanded);
         this.setAttribute("aria-label", expanded ? "收起基本信息" : "展开基本信息");
+        window.requestAnimationFrame(syncVisibleTableFooters);
       });
+
+      function rowSearchText(row) {
+        return [row.textContent].concat(Array.prototype.map.call(row.querySelectorAll("input, select"), function (control) {
+          return control.value || "";
+        })).join(" ").toLowerCase();
+      }
 
       document.getElementById("materialSearch").addEventListener("input", function () {
         var keyword = this.value.trim().toLowerCase();
         document.querySelectorAll("[data-material-row]").forEach(function (row) {
-          row.hidden = keyword && row.textContent.toLowerCase().indexOf(keyword) === -1;
+          row.hidden = keyword && rowSearchText(row).indexOf(keyword) === -1;
+        });
+        window.requestAnimationFrame(function () { syncTableFooter(document.getElementById("materialTable")); });
+      });
+
+      document.getElementById("paymentSearch").addEventListener("input", function () {
+        var keyword = this.value.trim().toLowerCase();
+        document.querySelectorAll("[data-payment-row]").forEach(function (row) {
+          row.hidden = keyword && rowSearchText(row).indexOf(keyword) === -1;
+        });
+        window.requestAnimationFrame(function () { syncTableFooter(document.getElementById("paymentTable")); });
+      });
+
+      document.getElementById("termsSearch").addEventListener("input", function () {
+        var keyword = this.value.trim().toLowerCase();
+        document.querySelectorAll("[data-term-row]").forEach(function (row) {
+          row.hidden = keyword && rowSearchText(row).indexOf(keyword) === -1;
         });
       });
 
@@ -1084,6 +1421,7 @@
 
       document.getElementById("fullscreenButton").addEventListener("click", toggleFullscreen);
       document.querySelectorAll("[data-pane-fullscreen]").forEach(function (button) { button.addEventListener("click", toggleFullscreen); });
+      window.addEventListener("resize", function () { window.requestAnimationFrame(syncVisibleTableFooters); });
 
       document.addEventListener("click", function (event) {
         var shell = event.target.closest(".pk-date-input-shell");
@@ -1121,7 +1459,10 @@
 
       syncHeader();
       renderMaterialTable();
+      renderPaymentTable();
+      renderTermsTable();
       if (window.PrototypeKit) window.PrototypeKit.init(document);
+      window.requestAnimationFrame(syncVisibleTableFooters);
     })();
   </script>
 </body>
