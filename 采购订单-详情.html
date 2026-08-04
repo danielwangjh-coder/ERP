@@ -112,7 +112,6 @@
     .doc-section,
     .detail-panel {
       width: 100%;
-      padding: 0 10px;
       overflow: hidden;
       border: 0;
       border-radius: 4px;
@@ -122,9 +121,6 @@
 
     .doc-section {
       flex: 0 0 auto;
-    }
-
-    .doc-section.is-collapsed {
       padding: 0 10px;
     }
 
@@ -604,15 +600,6 @@
       border-radius: 0;
     }
 
-    @media (max-height: 720px) {
-      .doc-section.is-collapsed .section-pane[data-pane="basic"] {
-        max-height: 126px;
-      }
-
-      .section-pane {
-        padding-top: 8px;
-      }
-    }
   </style>
 </head>
 <body>
@@ -982,25 +969,25 @@
         { key: "spec", label: "规格", width: 120, kind: "readonly" },
         { key: "model", label: "型号", width: 120, kind: "readonly" },
         { key: "unit", label: "计量单位", width: 90, kind: "readonly" },
-        { key: "factory", label: "工厂", width: 160, kind: "reference", required: true },
-        { key: "deliveryDate", label: "期望到货日期", width: 150, kind: "date" },
-        { key: "gift", label: "赠品", width: 76, kind: "checkbox" },
+        { key: "factory", label: "工厂", width: 160, kind: "reference", required: true, bulkEditable: true },
+        { key: "deliveryDate", label: "期望到货日期", width: 150, kind: "date", bulkEditable: true },
+        { key: "gift", label: "赠品", width: 76, kind: "checkbox", bulkEditable: true },
         { key: "quantity", label: "数量", width: 110, kind: "number", required: true, total: true },
         { key: "unitPrice", label: "单价", width: 120, kind: "money" },
         { key: "amount", label: "金额", width: 120, kind: "money", total: true },
         { key: "discountRate", label: "折扣率%", width: 100, kind: "number" },
         { key: "discountAmount", label: "折扣额", width: 120, kind: "money", total: true },
-        { key: "taxRate", label: "税率%", width: 90, kind: "number" },
+        { key: "taxRate", label: "税率%", width: 90, kind: "number", bulkEditable: true },
         { key: "taxAmount", label: "税额", width: 120, kind: "readonlyMoney", total: true },
         { key: "taxUnitPrice", label: "含税单价", width: 130, kind: "money" },
         { key: "taxIncludedAmount", label: "含税金额", width: 130, kind: "money", total: true },
         { key: "priceTaxTotal", label: "价税合计", width: 130, kind: "readonlyMoney", total: true },
-        { key: "task", label: "所属任务", width: 140, kind: "reference" },
-        { key: "stage", label: "所属阶段", width: 140, kind: "reference" },
+        { key: "task", label: "所属任务", width: 140, kind: "reference", bulkEditable: true },
+        { key: "stage", label: "所属阶段", width: 140, kind: "reference", bulkEditable: true },
         { key: "projectCode", label: "项目编码", width: 120, kind: "readonly" },
-        { key: "project", label: "所属项目", width: 150, kind: "reference" },
+        { key: "project", label: "所属项目", width: 150, kind: "reference", bulkEditable: true },
         { key: "customerCode", label: "客户编码", width: 120, kind: "readonly" },
-        { key: "relatedCustomer", label: "关联客户", width: 180, kind: "reference" },
+        { key: "relatedCustomer", label: "关联客户", width: 180, kind: "reference", bulkEditable: true },
         { key: "rowRemark", label: "行备注", width: 160, kind: "text", bulkEditable: true },
         { key: "currentStock", label: "当前库存", width: 120, kind: "readonlyNumber" },
         { key: "supplierMaterialNo", label: "供应商料号", width: 140, kind: "readonly" },
