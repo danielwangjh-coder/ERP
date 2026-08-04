@@ -28,16 +28,7 @@
                   "general-unit-conversion",
                   "通用单位换算",
                   "#/basic-settings/business-master-data/unit-data/general-unit-conversion",
-                  "通用单位换算-列表.html",
-                  [
-                    {
-                      id: "general-unit-conversion-detail",
-                      label: "通用单位换算详情",
-                      route: "#/basic-settings/business-master-data/unit-data/general-unit-conversion/detail",
-                      page: "通用单位换算-详情.html"
-                    }
-                  ],
-                  "通用单位换算"
+                  "通用单位换算-列表.html"
                 ),
                 leaf(
                   "material-unit-conversion",

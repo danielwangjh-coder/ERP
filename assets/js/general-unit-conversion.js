@@ -803,7 +803,7 @@
   tableBody.addEventListener("click", function (event) {
     var detailLink = event.target.closest("[data-detail-id]");
     if (detailLink) {
-      sessionStorage.setItem("smartone.general-unit-conversion.current-record-id", detailLink.dataset.detailId);
+      openDialog(detailLink.dataset.detailId);
       return;
     }
     var rowMenuTrigger = event.target.closest("[data-row-menu-trigger]");
@@ -834,7 +834,8 @@
   tableBody.addEventListener("keydown", function (event) {
     var detailLink = event.target.closest("[data-detail-id]");
     if (!detailLink || (event.key !== "Enter" && event.key !== " ")) return;
-    sessionStorage.setItem("smartone.general-unit-conversion.current-record-id", detailLink.dataset.detailId);
+    event.preventDefault();
+    openDialog(detailLink.dataset.detailId);
   });
   tableBody.addEventListener("change", function (event) {
     if (!event.target.classList.contains("row-checkbox")) return;
