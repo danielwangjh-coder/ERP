@@ -994,7 +994,7 @@
     .purchase-list-table thead th:nth-child(1),
     .purchase-list-table thead th:nth-child(2),
     .purchase-list-table thead th:nth-child(3) {
-      text-align: center;
+      text-align: left;
     }
 
     .purchase-list-table tbody tr:nth-child(even) td {
@@ -1007,11 +1007,11 @@
     }
 
     .purchase-list-table .center {
-      text-align: center;
+      text-align: left;
     }
 
     .purchase-list-table .number {
-      text-align: right;
+      text-align: left;
     }
 
     .purchase-th-checkbox-wrap {
@@ -1021,7 +1021,7 @@
       justify-content: center;
       width: 14px;
       height: 14px;
-      margin: 0 auto;
+      margin: 0;
       cursor: pointer;
     }
 
@@ -1620,7 +1620,7 @@
 <body>
   <div class="srm-prototype" data-testid="general-unit-conversion-page">
     <div class="layout">
-      <main class="content">
+      <main class="content pk-list-page">
         <div class="ddp-search" aria-label="查询条件">
           <div class="layout-container">
             <div class="box-layout-search">
@@ -1756,15 +1756,15 @@
           </div>
         </div>
 
-        <section class="list-table-shell" aria-label="通用单位换算列表">
-          <div class="list-toolbar">
-            <div class="list-toolbar-left">
+        <section class="list-table-shell pk-list-surface" aria-label="通用单位换算列表">
+          <div class="list-toolbar pk-list-toolbar">
+            <div class="list-toolbar-left pk-list-toolbar-left">
               <button class="btn primary" id="createButton" data-testid="create-general-conversion" data-erp-demo-local-create type="button">新增</button>
               <button class="btn" id="batchDeleteButton" type="button">删除</button>
               <button class="btn" id="exportButton" type="button">导出</button>
               <button class="btn" id="refreshButton" type="button">刷新</button>
             </div>
-            <div class="list-toolbar-right">
+            <div class="list-toolbar-right pk-list-toolbar-right">
               <div class="column-display-control" id="columnDisplayControl">
                 <button class="btn list-icon-btn" id="columnDisplayButton" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="columnDisplayPopover">列展示</button>
                 <div class="column-display-popover el-popper" id="columnDisplayPopover" role="group" aria-label="选择展示列" aria-hidden="true" hidden>
@@ -1781,9 +1781,9 @@
             </div>
           </div>
 
-          <div class="purchase-table-wrap">
-            <div class="purchase-table-inner">
-              <table class="purchase-list-table conversion-table">
+          <div class="purchase-table-wrap pk-list-table-wrap">
+            <div class="purchase-table-inner pk-list-table-inner">
+              <table class="purchase-list-table conversion-table pk-list-table">
                 <colgroup>
                   <col style="width: 58px">
                   <col style="width: 58px">
@@ -1818,7 +1818,7 @@
             </div>
           </div>
 
-          <footer class="list-footer-bar">
+          <footer class="list-footer-bar pk-list-footer">
             <span class="selected-count">已勾选 <strong id="selectedCount">0</strong> 条</span>
             <div class="pagination-lite" aria-label="分页">
               <span id="totalCount">共 0 条</span>

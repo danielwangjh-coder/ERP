@@ -497,7 +497,7 @@
       kitStyle.id = "erp-demo-prototype-kit-style";
       kitStyle.rel = "stylesheet";
       kitStyle.href = "assets/vendor/prototype-kit.css";
-      frameDocument.head.append(kitStyle);
+      frameDocument.head.prepend(kitStyle);
     }
 
     listToolbar.querySelectorAll("button:not(.primary)").forEach((button) => {

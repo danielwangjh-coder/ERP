@@ -3210,6 +3210,12 @@
   white-space: nowrap;
 }
 
+/* List workbenches use one scanning edge for every header and body value. */
+.pk-list-table thead th,
+.pk-list-table tbody td {
+  text-align: left !important;
+}
+
 .pk-list-table th {
   position: sticky;
   top: 0;
@@ -3221,16 +3227,6 @@
 
 .pk-list-table tbody tr:hover td {
   background: #eaf5fd;
-}
-
-.pk-list-table th.is-number,
-.pk-list-table td.is-number {
-  text-align: right;
-}
-
-.pk-list-table th.is-center,
-.pk-list-table td.is-center {
-  text-align: center;
 }
 
 .pk-list-link {
