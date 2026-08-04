@@ -35,7 +35,7 @@
   }
 
   function initTextarea(root) {
-    root.querySelectorAll("[data-pk-count]").forEach(function (textarea) {
+    root.querySelectorAll("textarea[data-pk-count]").forEach(function (textarea) {
       var shell = textarea.closest(".pk-textarea-wrap, .pk-textarea-shell");
       var count = shell ? shell.querySelector(".pk-textarea-count") : null;
       var update = function () {
@@ -2280,6 +2280,118 @@
     doc.body.classList.toggle("pk-dialog-open", hasVisibleLayer);
   }
 
+  function initErpModules(root) {
+    var doc = root && root.nodeType === 9 ? root : (root.ownerDocument || document);
+
+    root.querySelectorAll("[data-pk-erp-column-manager]").forEach(function (manager) {
+      if (!markReady(manager, "pkErpColumnReady")) return;
+      var trigger = manager.querySelector("[data-pk-erp-column-trigger]");
+      var panel = manager.querySelector("[data-pk-erp-column-panel]");
+      var module = manager.closest("[data-pk-erp-module]");
+      var table = module ? module.querySelector("[data-pk-erp-table]") : null;
+      if (!trigger || !panel || !table) return;
+
+      trigger.addEventListener("click", function () {
+        var opening = panel.hidden;
+        doc.querySelectorAll("[data-pk-erp-column-panel]").forEach(function (item) {
+          item.hidden = true;
+        });
+        panel.hidden = !opening;
+        trigger.setAttribute("aria-expanded", opening ? "true" : "false");
+      });
+
+      manager.addEventListener("change", function (event) {
+        var checkbox = event.target.closest("[data-pk-erp-column-index]");
+        if (!checkbox) return;
+        var index = Number(checkbox.dataset.pkErpColumnIndex);
+        table.querySelectorAll("tr").forEach(function (row) {
+          if (row.children[index]) row.children[index].hidden = !checkbox.checked;
+        });
+      });
+    });
+
+    root.querySelectorAll("[data-pk-erp-fullscreen]").forEach(function (button) {
+      if (!markReady(button, "pkErpFullscreenReady")) return;
+      button.addEventListener("click", function () {
+        var module = button.closest("[data-pk-erp-module]");
+        if (!module) return;
+        var fullscreen = !module.classList.contains("is-fullscreen");
+        module.classList.toggle("is-fullscreen", fullscreen);
+        button.setAttribute("aria-pressed", fullscreen ? "true" : "false");
+        button.setAttribute("aria-label", fullscreen ? "退出全屏" : "全屏");
+        button.title = fullscreen ? "退出全屏" : "全屏";
+        doc.body.classList.toggle("pk-erp-fullscreen-active", !!doc.querySelector("[data-pk-erp-module].is-fullscreen"));
+      });
+    });
+
+    root.querySelectorAll("[data-pk-audit-log]").forEach(function (panel) {
+      if (!markReady(panel, "pkAuditLogReady")) return;
+      var userInput = panel.querySelector("[data-pk-audit-user]");
+      var startInput = panel.querySelector("[data-pk-audit-start-date]");
+      var endInput = panel.querySelector("[data-pk-audit-end-date]");
+      var keywordInput = panel.querySelector("[data-pk-audit-keyword]");
+      var searchButton = panel.querySelector("[data-pk-audit-search]");
+      var rows = Array.from(panel.querySelectorAll("[data-pk-audit-row]"));
+      var emptyRow = panel.querySelector("[data-pk-audit-empty]");
+      var count = panel.querySelector("[data-pk-audit-count]");
+
+      function applyFilters() {
+        var user = userInput ? userInput.value.trim().toLowerCase() : "";
+        var startDate = startInput ? startInput.value.trim() : "";
+        var endDate = endInput ? endInput.value.trim() : "";
+        var keyword = keywordInput ? keywordInput.value.trim().toLowerCase() : "";
+        var visibleCount = 0;
+
+        rows.forEach(function (row) {
+          var rowUser = String(row.dataset.pkAuditUser || "").toLowerCase();
+          var rowDate = String(row.dataset.pkAuditDate || "");
+          var rowText = row.textContent.toLowerCase();
+          var visible = (!user || rowUser.indexOf(user) >= 0) &&
+            (!startDate || rowDate >= startDate) &&
+            (!endDate || rowDate <= endDate) &&
+            (!keyword || rowText.indexOf(keyword) >= 0);
+          row.hidden = !visible;
+          if (visible) visibleCount += 1;
+        });
+
+        if (emptyRow) emptyRow.hidden = visibleCount !== 0;
+        if (count) count.textContent = String(visibleCount);
+      }
+
+      if (searchButton) searchButton.addEventListener("click", applyFilters);
+      [userInput, startInput, endInput, keywordInput].forEach(function (input) {
+        if (!input) return;
+        input.addEventListener("keydown", function (event) {
+          if (event.key === "Enter") applyFilters();
+        });
+      });
+    });
+
+    if (markReady(doc.documentElement, "pkErpModuleDocumentReady")) {
+      doc.addEventListener("click", function (event) {
+        if (event.target.closest("[data-pk-erp-column-manager]")) return;
+        doc.querySelectorAll("[data-pk-erp-column-panel]").forEach(function (panel) {
+          panel.hidden = true;
+          var trigger = panel.parentElement && panel.parentElement.querySelector("[data-pk-erp-column-trigger]");
+          if (trigger) trigger.setAttribute("aria-expanded", "false");
+        });
+      });
+      doc.addEventListener("keydown", function (event) {
+        if (event.key !== "Escape") return;
+        var fullscreenModule = doc.querySelector("[data-pk-erp-module].is-fullscreen");
+        if (!fullscreenModule) return;
+        fullscreenModule.classList.remove("is-fullscreen");
+        var button = fullscreenModule.querySelector("[data-pk-erp-fullscreen]");
+        if (button) {
+          button.setAttribute("aria-pressed", "false");
+          button.setAttribute("aria-label", "全屏");
+          button.title = "全屏";
+        }
+        doc.body.classList.remove("pk-erp-fullscreen-active");
+      });
+    }
+  }
+
   function initTabs(root) {
     root.querySelectorAll("[data-pk-tabs]").forEach(function (tabs) {
       if (!markReady(tabs, "pkTabsReady")) return;
@@ -2389,6 +2501,7 @@
     var doc = mask.ownerDocument;
     syncOverlayLock(doc);
     if (visible) {
+      refreshTableSpacers(mask);
       var firstControl = mask.querySelector("button, input, select, textarea, [tabindex='0']");
       if (firstControl) firstControl.focus();
     }
@@ -2456,15 +2569,16 @@
       tabs.addEventListener("click", function (event) {
         var tab = event.target.closest("[data-pk-document-tab]");
         if (!tab) return;
-        var dialog = tab.closest(".pk-dialog--document-detail");
-        if (!dialog) return;
-        dialog.querySelectorAll("[data-pk-document-tab]").forEach(function (item) {
+        var group = tab.closest("[data-pk-document-tab-group]") || tab.closest(".pk-dialog--document-detail");
+        if (!group) return;
+        group.querySelectorAll("[data-pk-document-tab]").forEach(function (item) {
           item.classList.toggle("is-active", item === tab);
           item.setAttribute("aria-selected", item === tab ? "true" : "false");
         });
-        dialog.querySelectorAll("[data-pk-document-panel]").forEach(function (panel) {
+        group.querySelectorAll("[data-pk-document-panel]").forEach(function (panel) {
           panel.hidden = panel.dataset.pkDocumentPanel !== tab.dataset.pkDocumentTab;
         });
+        refreshTableSpacers(group);
       });
     });
 
@@ -2492,6 +2606,7 @@
     initTableExamples(scope);
     initSnippetCopy(scope);
     initListWorkbenches(scope);
+    initErpModules(scope);
     initTabs(scope);
     initAlerts(scope);
     initLoading(scope);

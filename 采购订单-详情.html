@@ -42,7 +42,6 @@
 
     .po-detail-toolbar {
       width: calc(100% - 20px);
-      height: 44px;
       min-height: 44px;
       margin: 10px 10px 0;
       padding: 10px;
@@ -125,6 +124,10 @@
       flex: 0 0 auto;
     }
 
+    .doc-section.is-collapsed {
+      padding: 0 10px;
+    }
+
     .section-tabs,
     .detail-tabs {
       height: 40px;
@@ -180,9 +183,37 @@
       display: none;
     }
 
+    .doc-workspace.is-common-view .doc-section {
+      min-height: 0;
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+    }
+
+    .doc-workspace.is-common-view .section-pane[data-pane="feedback"],
+    .doc-workspace.is-common-view .section-pane[data-pane="attachment"],
+    .doc-workspace.is-common-view .section-pane[data-pane="approval"],
+    .doc-workspace.is-common-view .section-pane[data-pane="log"] {
+      min-height: 0;
+      max-height: none;
+      padding: 0;
+      flex: 1 1 auto;
+      overflow: hidden;
+    }
+
+    .doc-workspace.is-common-view .section-pane > .pk-erp-module {
+      min-height: 0;
+      height: 100%;
+    }
+
+    .doc-workspace.is-common-view .detail-panel {
+      display: none;
+    }
+
     .doc-section.is-collapsed .section-pane[data-pane="basic"] {
       max-height: 142px;
       overflow-y: hidden;
+      padding-bottom: 24px;
     }
 
     .po-document-form {
@@ -290,7 +321,7 @@
 
     .detail-panel {
       min-height: 394px;
-      padding-bottom: 6px;
+      padding: 0 10px 6px;
       display: flex;
       flex: 1 0 394px;
       flex-direction: column;
@@ -707,11 +738,107 @@
           </div>
         </div>
 
-        <div class="section-pane" data-pane="feedback" hidden><div class="pk-textarea-shell"><textarea class="pk-textarea-input" maxlength="255" rows="3" placeholder="输入评论"></textarea><span class="pk-textarea-count">0/255</span></div></div>
-        <div class="section-pane" data-pane="attachment" hidden><div class="po-empty-row">暂无附件</div></div>
-        <div class="section-pane" data-pane="approval" hidden><div class="po-empty-row">暂无审批信息</div></div>
+        <div class="section-pane" data-pane="feedback" hidden>
+          <div class="pk-erp-module pk-communication-panel" data-pk-erp-module>
+            <div class="pk-communication-composer">
+              <textarea class="pk-communication-input" rows="3" placeholder="输入评论" aria-label="输入评论"></textarea>
+              <div class="pk-communication-actions">
+                <div class="ddp-layout-upload pk-inline-upload">
+                  <button class="pk-list-toolbar-btn ddp-layout-upload-click" type="button">附件</button>
+                  <input class="el-upload__input pk-upload-input" type="file" multiple aria-label="添加评论附件">
+                  <ul class="el-upload-list pk-upload-list" hidden></ul>
+                </div>
+                <button class="pk-list-toolbar-btn is-primary" type="button" disabled>发送</button>
+              </div>
+            </div>
+            <div class="pk-erp-module-heading">
+              <strong>评论列表</strong>
+              <label class="pk-grid-search pk-communication-search"><span aria-hidden="true">⌕</span><input type="search" placeholder="请输入关键字搜索评论" aria-label="请输入关键字搜索评论"></label>
+            </div>
+            <div class="pk-erp-empty" role="status"><span class="pk-erp-empty-icon" aria-hidden="true">▱</span><span>暂无数据</span></div>
+          </div>
+        </div>
+
+        <div class="section-pane" data-pane="attachment" hidden>
+          <div class="pk-erp-module pk-attachment-panel" data-pk-erp-module>
+            <div class="pk-erp-module-toolbar">
+              <div class="pk-list-toolbar-left">
+                <div class="ddp-layout-upload pk-toolbar-upload">
+                  <button class="pk-list-toolbar-btn is-primary ddp-layout-upload-click" type="button">上传附件</button>
+                  <input class="el-upload__input pk-upload-input" type="file" multiple aria-label="上传附件">
+                  <ul class="el-upload-list pk-upload-list" hidden></ul>
+                </div>
+                <button class="pk-list-toolbar-btn" type="button" data-pk-message-type="warning" data-pk-message-text="请先选择需要下载的附件">下载</button>
+                <button class="pk-list-toolbar-btn" type="button" data-pk-message-type="success" data-pk-message-text="附件列表已刷新">刷新</button>
+              </div>
+              <div class="pk-list-toolbar-right">
+                <div class="pk-column-manager" data-pk-erp-column-manager>
+                  <button class="pk-grid-icon-btn" type="button" data-pk-erp-column-trigger aria-label="列设置" title="列设置" aria-haspopup="true" aria-expanded="false">☷</button>
+                  <div class="pk-column-panel" data-pk-erp-column-panel hidden>
+                    <div class="pk-column-panel-title">列设置</div>
+                    <label class="pk-column-option"><input type="checkbox" data-pk-erp-column-index="3" checked>文件类型</label>
+                    <label class="pk-column-option"><input type="checkbox" data-pk-erp-column-index="4" checked>文件大小</label>
+                    <label class="pk-column-option"><input type="checkbox" data-pk-erp-column-index="5" checked>备注</label>
+                    <label class="pk-column-option"><input type="checkbox" data-pk-erp-column-index="6" checked>上传人</label>
+                    <label class="pk-column-option"><input type="checkbox" data-pk-erp-column-index="7" checked>上传时间</label>
+                  </div>
+                </div>
+                <button class="pk-grid-icon-btn" type="button" data-pk-erp-fullscreen aria-label="全屏" title="全屏" aria-pressed="false">⛶</button>
+              </div>
+            </div>
+            <div class="pk-erp-module-table-wrap">
+              <div class="pk-list-table-inner">
+                <table class="pk-list-table pk-attachment-table" data-pk-erp-table>
+                  <colgroup><col style="width: 46px"><col style="width: 70px"><col style="width: 220px"><col style="width: 110px"><col style="width: 110px"><col style="width: 180px"><col style="width: 110px"><col style="width: 170px"><col style="width: 90px"></colgroup>
+                  <thead><tr><th><input class="pk-checkbox" type="checkbox" aria-label="全选附件"></th><th>序号</th><th>文件名称</th><th>文件类型</th><th>文件大小</th><th>备注</th><th>上传人</th><th>上传时间</th><th>操作</th></tr></thead>
+                  <tbody><tr class="pk-empty-row"><td colspan="9"><div class="pk-erp-empty is-table"><span class="pk-erp-empty-icon" aria-hidden="true">▱</span><span>暂无数据</span></div></td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-pane" data-pane="approval" hidden>
+          <div class="pk-erp-module pk-approval-panel" data-pk-erp-module>
+            <div class="pk-erp-empty is-large" role="status"><span class="pk-erp-empty-icon" aria-hidden="true">▱</span><span>暂无数据</span></div>
+          </div>
+        </div>
+
         <div class="section-pane" data-pane="log" hidden>
-          <div class="po-table-grid-wrap" style="height: 142px;"><table class="pk-erp-table po-static-table"><thead><tr><th><div class="cell">序号</div></th><th><div class="cell">操作人</div></th><th><div class="cell">业务实体</div></th><th><div class="cell">操作</div></th><th><div class="cell">操作时间</div></th><th><div class="cell">备注</div></th></tr></thead><tbody><tr><td><div class="cell">1</div></td><td><div class="cell">王建华</div></td><td><div class="cell">采购订单</div></td><td><div class="cell">[+]保存</div></td><td><div class="cell">2026-08-04 12:20:18</div></td><td><div class="cell">采购订单表头</div></td></tr><tr><td><div class="cell">2</div></td><td><div class="cell">王建华</div></td><td><div class="cell">采购订单明细</div></td><td><div class="cell">[+]保存</div></td><td><div class="cell">2026-08-04 12:20:18</div></td><td><div class="cell">物料明细</div></td></tr></tbody></table></div>
+          <div class="pk-erp-module pk-audit-log-panel" data-pk-erp-module data-pk-audit-log>
+            <div class="pk-erp-log-filters">
+              <button class="pk-list-toolbar-btn" type="button" data-pk-message-type="success" data-pk-message-text="日志导出任务已创建">导出</button>
+              <input class="pk-erp-filter-input" type="text" placeholder="请选择用户" aria-label="请选择用户" data-pk-audit-user>
+              <div class="pk-erp-date-range">
+                <input class="pk-erp-filter-input" type="text" placeholder="开始日期" aria-label="开始日期" data-pk-audit-start-date>
+                <span>至</span>
+                <input class="pk-erp-filter-input" type="text" placeholder="结束日期" aria-label="结束日期" data-pk-audit-end-date>
+              </div>
+              <label class="pk-grid-search pk-audit-log-search"><span aria-hidden="true">⌕</span><input type="search" placeholder="请输入关键字查询" aria-label="请输入关键字查询" data-pk-audit-keyword></label>
+              <button class="pk-list-toolbar-btn is-primary" type="button" data-pk-audit-search>搜索</button>
+            </div>
+            <div class="pk-erp-module-table-wrap pk-audit-log-table-wrap">
+              <div class="pk-list-table-inner">
+                <table class="pk-list-table pk-audit-log-table">
+                  <colgroup><col style="width: 70px"><col style="width: 100px"><col style="width: 160px"><col style="width: 80px"><col style="width: 150px"><col style="width: 170px"><col style="width: 220px"><col style="width: 130px"><col style="width: 130px"><col style="width: 130px"></colgroup>
+                  <thead><tr><th>序号</th><th>操作人</th><th>业务实体</th><th>行号</th><th>操作</th><th>操作时间</th><th>备注</th><th>更新字段</th><th>原值</th><th>新值</th></tr></thead>
+                  <tbody>
+                    <tr data-pk-audit-row data-pk-audit-user="王建华" data-pk-audit-date="2026-08-04"><td>1</td><td>王建华</td><td>采购订单</td><td></td><td>[+]保存</td><td>2026-08-04 12:20:18</td><td>采购订单表头</td><td>单据状态</td><td>草稿</td><td>执行中</td></tr>
+                    <tr data-pk-audit-row data-pk-audit-user="王建华" data-pk-audit-date="2026-08-04"><td>2</td><td>王建华</td><td>采购订单明细表</td><td>1</td><td>[+]保存（关联改动）</td><td>2026-08-04 12:20:18</td><td>物料明细</td><td>数量</td><td>0</td><td>1</td></tr>
+                    <tr class="pk-empty-row" data-pk-audit-empty hidden><td colspan="10">暂无符合条件的日志</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <footer class="pk-list-footer">
+              <span class="pk-list-result-summary">共 <strong data-pk-audit-count>2</strong> 条</span>
+              <div class="pk-pagination" aria-label="日志分页">
+                <select class="pk-pagination-size" aria-label="每页条数"><option>50条/页</option></select>
+                <div class="pk-pagination-pages"><button class="pk-pagination-btn" type="button" disabled aria-label="上一页">‹</button><button class="pk-pagination-page is-active" type="button" aria-current="page">1</button><button class="pk-pagination-btn" type="button" disabled aria-label="下一页">›</button></div>
+                <span>前往</span><input class="pk-pagination-input" type="number" value="1" min="1" aria-label="跳转页码"><span>页</span>
+              </div>
+            </footer>
+          </div>
         </div>
       </section>
 
@@ -735,7 +862,7 @@
             </div>
           </div>
           <div class="po-table-grid-wrap">
-            <table class="pk-erp-table po-material-table" id="materialTable">
+            <table class="pk-erp-table pk-editable-table po-material-table" id="materialTable">
               <colgroup id="materialColgroup"></colgroup>
               <thead id="materialHead"></thead>
               <tbody id="materialBody"></tbody>
@@ -874,7 +1001,7 @@
         { key: "project", label: "所属项目", width: 150, kind: "reference" },
         { key: "customerCode", label: "客户编码", width: 120, kind: "readonly" },
         { key: "relatedCustomer", label: "关联客户", width: 180, kind: "reference" },
-        { key: "rowRemark", label: "行备注", width: 160, kind: "text" },
+        { key: "rowRemark", label: "行备注", width: 160, kind: "text", bulkEditable: true },
         { key: "currentStock", label: "当前库存", width: 120, kind: "readonlyNumber" },
         { key: "supplierMaterialNo", label: "供应商料号", width: 140, kind: "readonly" },
         { key: "supplierMaterialName", label: "供应商料名", width: 160, kind: "readonly" },
@@ -1080,7 +1207,9 @@
       function headerCell(column) {
         var hidden = hiddenColumns.has(column.key) ? " po-hidden-column" : "";
         var required = column.required ? '<span class="required">*</span>' : "";
-        return '<th class="' + hidden.trim() + '" data-column-key="' + column.key + '"><div class="cell">' + required + escapeHtml(column.label) + "</div></th>";
+        var thClass = (hidden + (column.bulkEditable ? " is-bulk-editable" : "")).trim();
+        var title = column.bulkEditable ? ' title="支持批量编辑"' : "";
+        return '<th class="' + thClass + '" data-column-key="' + column.key + '"' + title + '><div class="cell">' + required + escapeHtml(column.label) + "</div></th>";
       }
 
       function actionButtons(index) {
@@ -1323,6 +1452,9 @@
         document.querySelectorAll(paneSelector).forEach(function (pane) {
           pane.hidden = (pane.dataset.pane || pane.dataset.detailPane) !== key;
         });
+        if (selector === "[data-section-tab]") {
+          document.querySelector(".doc-workspace").classList.toggle("is-common-view", ["feedback", "attachment", "approval", "log"].indexOf(key) !== -1);
+        }
         window.requestAnimationFrame(syncVisibleTableFooters);
       }
 

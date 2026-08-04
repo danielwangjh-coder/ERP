@@ -881,6 +881,18 @@
   color: #409eff;
 }
 
+.pk-toolbar-btn.is-primary {
+  border-color: #409eff;
+  background: #409eff;
+  color: #fff;
+}
+
+.pk-toolbar-btn.is-primary:hover {
+  border-color: #66b1ff;
+  background: #66b1ff;
+  color: #fff;
+}
+
 .pk-toolbar-btn:active {
   border-color: #3a8ee6;
   color: #3a8ee6;
@@ -3828,9 +3840,7 @@ body.pk-dialog-open {
 
 .pk-dialog--document-detail .pk-dialog-body {
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .pk-master-detail-grid {
@@ -3868,6 +3878,64 @@ body.pk-dialog-open {
   white-space: nowrap;
 }
 
+.pk-document-title-block {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pk-document-title-line {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pk-document-status {
+  height: 22px;
+  padding: 0 8px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  border: 1px solid #b3d8ff;
+  border-radius: 3px;
+  background: #ecf5ff;
+  color: #409eff;
+  font-size: 12px;
+}
+
+.pk-document-code {
+  overflow: hidden;
+  color: #909399;
+  font-size: 12px;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pk-document-toolbar {
+  min-height: 45px;
+  padding: 8px 16px;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid #ebeef5;
+  background: #fff;
+}
+
+.pk-document-section {
+  min-width: 0;
+  border-bottom: 8px solid #f5f7fa;
+  background: #fff;
+}
+
+.pk-document-section:last-child {
+  border-bottom: 0;
+}
+
 .pk-document-tabs {
   min-height: 40px;
   padding: 0 16px;
@@ -3894,6 +3962,16 @@ body.pk-dialog-open {
   color: #409eff;
 }
 
+.pk-document-tab:hover,
+.pk-document-tab:focus-visible {
+  color: #409eff;
+}
+
+.pk-document-tab:focus-visible {
+  outline: 2px solid rgba(64, 158, 255, 0.24);
+  outline-offset: -2px;
+}
+
 .pk-document-tab.is-active::after {
   content: "";
   position: absolute;
@@ -3907,12 +3985,130 @@ body.pk-dialog-open {
 .pk-document-content {
   min-height: 0;
   padding: 12px 16px;
-  flex: 1 1 auto;
   overflow: auto;
 }
 
 .pk-document-content[hidden] {
   display: none;
+}
+
+.pk-document-form-panel {
+  min-height: 144px;
+}
+
+.pk-document-common-panel,
+.pk-document-table-panel {
+  padding: 0;
+}
+
+.pk-document-detail-layout .pk-erp-module {
+  min-height: 240px;
+}
+
+.pk-document-detail-layout .pk-erp-empty {
+  min-height: 140px;
+}
+
+.pk-document-detail-layout .pk-erp-module-table-wrap {
+  min-height: 180px;
+}
+
+.pk-document-detail-layout .pk-erp-module .pk-empty-row td {
+  height: 180px;
+}
+
+.pk-document-table-toolbar {
+  min-height: 45px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #ebeef5;
+  background: #fff;
+}
+
+.pk-document-table-toolbar strong {
+  color: #606266;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.pk-document-table-wrap {
+  height: 222px;
+  border: 0;
+}
+
+.pk-document-line-table {
+  width: 1440px;
+  min-width: 1440px;
+}
+
+.pk-document-summary-table {
+  width: 100%;
+  min-width: 1010px;
+}
+
+.pk-document-payment-table {
+  width: 930px;
+  min-width: 930px;
+}
+
+.pk-document-terms-table {
+  width: 960px;
+  min-width: 960px;
+}
+
+.pk-document-layout-map {
+  margin-bottom: 14px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border: 1px solid #dcdfe6;
+  border-radius: 3px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.pk-document-layout-map span {
+  min-height: 54px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #ebeef5;
+  color: #606266;
+  font-size: 13px;
+  text-align: center;
+}
+
+.pk-document-layout-map span:last-child {
+  border-right: 0;
+}
+
+@media (max-width: 900px) {
+  .pk-document-toolbar,
+  .pk-document-table-toolbar {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .pk-document-toolbar .pk-toolbar-right,
+  .pk-document-table-toolbar .pk-list-toolbar-right {
+    margin-left: 0;
+  }
+
+  .pk-document-layout-map {
+    grid-template-columns: 1fr;
+  }
+
+  .pk-document-layout-map span {
+    border-right: 0;
+    border-bottom: 1px solid #ebeef5;
+  }
+
+  .pk-document-layout-map span:last-child {
+    border-bottom: 0;
+  }
 }
 
 .pk-list-demo {
@@ -4141,6 +4337,241 @@ body.pk-dialog-open {
   font-weight: 400;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.pk-erp-common-tabs > .pk-tab-panel {
+  min-height: 420px;
+  padding: 0;
+}
+
+.pk-erp-module {
+  position: relative;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+  color: #606266;
+}
+
+.pk-erp-module.is-fullscreen {
+  position: fixed;
+  inset: 12px;
+  z-index: 2400;
+  min-height: 0;
+  border: 1px solid #dcdfe6;
+  border-radius: 3px;
+  box-shadow: 0 8px 30px rgba(31, 45, 61, 0.18);
+}
+
+body.pk-erp-fullscreen-active {
+  overflow: hidden;
+}
+
+.pk-erp-module-toolbar,
+.pk-erp-module-heading,
+.pk-erp-log-filters {
+  min-height: 48px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #ebeef5;
+  background: #fff;
+}
+
+.pk-erp-module-toolbar {
+  justify-content: space-between;
+}
+
+.pk-erp-module-heading {
+  justify-content: space-between;
+}
+
+.pk-erp-module-heading strong {
+  color: #303133;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pk-inline-upload,
+.pk-toolbar-upload {
+  min-height: 28px;
+}
+
+.pk-communication-composer {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid #ebeef5;
+  background: #fff;
+}
+
+.pk-communication-input {
+  width: 100%;
+  height: 76px;
+  padding: 8px 10px;
+  display: block;
+  border: 1px solid #dcdfe6;
+  border-radius: 3px;
+  outline: none;
+  resize: none;
+  background: #fff;
+  color: #303133;
+  font-family: var(--pk-font);
+  font-size: 14px;
+  line-height: 20px;
+  box-sizing: border-box;
+}
+
+.pk-communication-input:focus {
+  border-color: #409eff;
+}
+
+.pk-communication-input::placeholder {
+  color: #c0c4cc;
+}
+
+.pk-communication-actions {
+  min-height: 38px;
+  padding-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.pk-communication-search {
+  width: min(260px, 48%);
+}
+
+.pk-erp-empty {
+  min-height: 180px;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #909399;
+  font-size: 14px;
+}
+
+.pk-erp-empty.is-large {
+  min-height: 360px;
+}
+
+.pk-erp-empty.is-table {
+  min-height: 190px;
+}
+
+.pk-erp-empty-icon {
+  color: #c0c4cc;
+  font-size: 46px;
+  line-height: 1;
+}
+
+.pk-erp-module-table-wrap {
+  min-height: 220px;
+  flex: 1 1 auto;
+  overflow: auto;
+  border-bottom: 1px solid #ebeef5;
+  background: #fff;
+  scrollbar-gutter: stable;
+}
+
+.pk-erp-module .pk-list-table th,
+.pk-erp-module .pk-list-table td {
+  height: 40px;
+  padding: 8px;
+}
+
+.pk-erp-module .pk-empty-row td {
+  height: 220px;
+  padding: 0;
+}
+
+.pk-attachment-table {
+  min-width: 1096px;
+}
+
+.pk-erp-log-filters {
+  flex-wrap: wrap;
+}
+
+.pk-erp-filter-input {
+  width: 156px;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid #dcdfe6;
+  border-radius: 3px;
+  outline: none;
+  background: #fff;
+  color: #606266;
+  font-family: var(--pk-font);
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.pk-erp-filter-input:focus {
+  border-color: #409eff;
+}
+
+.pk-erp-filter-input::placeholder {
+  color: #c0c4cc;
+}
+
+.pk-erp-date-range {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #909399;
+}
+
+.pk-audit-log-search {
+  width: 220px;
+}
+
+.pk-audit-log-table-wrap {
+  min-height: 240px;
+}
+
+.pk-audit-log-table {
+  min-width: 1340px;
+}
+
+.pk-audit-log-panel .pk-list-footer {
+  border-top: 0;
+}
+
+@media (max-width: 900px) {
+  .pk-erp-common-tabs > .pk-tab-panel,
+  .pk-erp-module {
+    min-height: 460px;
+  }
+
+  .pk-erp-module-toolbar,
+  .pk-erp-module-heading,
+  .pk-erp-log-filters {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .pk-erp-module-toolbar .pk-list-toolbar-right {
+    margin-left: 0;
+  }
+
+  .pk-erp-date-range {
+    width: 100%;
+  }
+
+  .pk-erp-date-range .pk-erp-filter-input {
+    min-width: 0;
+    flex: 1 1 0;
+  }
+
+  .pk-audit-log-search,
+  .pk-communication-search {
+    width: 100%;
+  }
 }
 
 .pk-alert-list {
