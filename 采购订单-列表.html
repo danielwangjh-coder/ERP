@@ -156,49 +156,6 @@
       text-align: center;
     }
 
-    .po-inline-detail td {
-      height: auto;
-      padding: 0 !important;
-      background: #fbfdff !important;
-    }
-
-    .po-inline-detail-wrap {
-      padding: 10px 16px 12px 120px;
-      border-bottom: 1px solid #d9edf9;
-    }
-
-    .po-inline-detail-title {
-      margin-bottom: 8px;
-      color: #606266;
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    .po-inline-detail-table {
-      width: 100%;
-      min-width: 680px;
-      border-spacing: 0;
-      border-collapse: collapse;
-      table-layout: fixed;
-    }
-
-    .po-inline-detail-table th,
-    .po-inline-detail-table td {
-      height: 34px;
-      padding: 5px 8px !important;
-      border: 1px solid #e8eaec;
-      background: #fff !important;
-      font-size: 12px;
-      font-weight: 400;
-      text-align: left;
-    }
-
-    .po-inline-detail-table th {
-      background: #f5f7fa !important;
-      color: #606266;
-      font-weight: 600;
-    }
-
     .po-summary-empty {
       color: #c0c4cc;
       font-weight: 400 !important;
@@ -706,7 +663,6 @@
       var visibleOrders = [];
       var tableBody = document.getElementById("orderTableBody");
       var selectAll = document.getElementById("selectAll");
-      var showDetails = document.getElementById("showDetails");
       var referencePopover = document.getElementById("poReferencePopover");
       var referenceBody = document.getElementById("poReferenceBody");
       var referencePagination = document.getElementById("poReferencePagination");
@@ -919,13 +875,6 @@
         });
       }
 
-      function inlineDetailMarkup(order) {
-        var rows = order.lines.map(function (line, index) {
-          return "<tr><td>" + (index + 1) + "</td><td>" + escapeHtml(line.code) + "</td><td>" + escapeHtml(line.name) + "</td><td>" + formatNumber(line.quantity) + "</td><td>" + escapeHtml(line.unit) + "</td><td>" + escapeHtml(line.deliveryDate) + "</td></tr>";
-        }).join("");
-        return '<tr class="po-inline-detail"' + (showDetails.checked ? "" : " hidden") + '><td colspan="19"><div class="po-inline-detail-wrap"><div class="po-inline-detail-title">物料明细</div><table class="po-inline-detail-table"><thead><tr><th>序号</th><th>物料编码</th><th>物料名称</th><th>数量</th><th>单位</th><th>交货日期</th></tr></thead><tbody>' + rows + "</tbody></table></div></td></tr>";
-      }
-
       function orderRowMarkup(order, index) {
         var checked = selectedIds.has(order.id) ? " checked" : "";
         return '<tr data-order-row="' + escapeHtml(order.id) + '">'
@@ -948,7 +897,7 @@
           + "<td>" + escapeHtml(order.documentStatus) + "</td>"
           + "<td>" + escapeHtml(order.approvalStatus) + "</td>"
           + "<td>" + escapeHtml(order.documentName) + "</td>"
-          + "</tr>" + inlineDetailMarkup(order);
+          + "</tr>";
       }
 
       function updateSelectionState() {
@@ -1084,12 +1033,6 @@
           else selectedIds.delete(order.id);
         });
         renderTable();
-      });
-
-      showDetails.addEventListener("change", function () {
-        document.querySelectorAll(".po-inline-detail").forEach(function (row) {
-          row.hidden = !showDetails.checked;
-        });
       });
 
       document.getElementById("searchButton").addEventListener("click", function () {
